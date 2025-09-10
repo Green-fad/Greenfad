@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenfad - Agence Web & Digital | Développement Sur Mesure</title>
+    <meta name="description" content="Greenfad, votre partenaire digital pour le développement web, applications mobiles, SEO et solutions d'impression. Expertise technique et approche personnalisée.">
+    <meta name="keywords" content="développement web, application mobile, SEO, impression, Flutter, WordPress, agence digitale">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Greenfad - Agence Web & Digital">
+    <meta property="og:description" content="Développement web, applications mobiles, SEO et solutions d'impression sur mesure">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://greenfad.tech">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="#home">
+                        <img src="assets/images/greenfad-logo.svg" alt="Greenfad Logo" class="logo">
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link">Accueil</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                    <li><a href="#about" class="nav-link">À propos</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                <div class="nav-cta">
+                    <a href="#contact" class="btn btn-primary">Devis Gratuit</a>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        Transformez votre <span class="highlight">vision digitale</span> en réalité
+                    </h1>
+                    <p class="hero-description">
+                        Greenfad accompagne votre entreprise dans sa transformation numérique avec des solutions sur mesure : 
+                        développement web, applications mobiles, SEO et communication imprimée.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number">150+</span>
+                            <span class="stat-label">Projets réalisés</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">98%</span>
+                            <span class="stat-label">Satisfaction client</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">5 ans</span>
+                            <span class="stat-label">D'expertise</span>
+                        </div>
+                    </div>
+                    <div class="hero-cta">
+                        <a href="#contact" class="btn btn-primary btn-large">
+                            <i class="fas fa-rocket"></i>
+                            Démarrer mon projet
+                        </a>
+                        <a href="#portfolio" class="btn btn-outline btn-large">
+                            <i class="fas fa-play"></i>
+                            Voir nos réalisations
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-visual">
+                        <i class="fas fa-code hero-icon"></i>
+                        <i class="fas fa-mobile-alt hero-icon"></i>
+                        <i class="fas fa-search hero-icon"></i>
+                        <i class="fas fa-print hero-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1200 120L0 16.48V0h1200v120z" fill="currentColor"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Trust Indicators -->
+    <section class="trust">
+        <div class="container">
+            <p class="trust-text">Approuvé par les meilleures entreprises</p>
+            <div class="trust-logos">
+                <div class="trust-logo">
+                    <img src="assets/images/clients/client1.png" alt="Client 1" loading="lazy">
+                </div>
+                <div class="trust-logo">
+                    <img src="assets/images/clients/client2.png" alt="Client 2" loading="lazy">
+                </div>
+                <div class="trust-logo">
+                    <img src="assets/images/clients/client3.png" alt="Client 3" loading="lazy">
+                </div>
+                <div class="trust-logo">
+                    <img src="assets/images/clients/client4.png" alt="Client 4" loading="lazy">
+                </div>
+                <div class="trust-logo">
+                    <img src="assets/images/clients/client5.png" alt="Client 5" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nos expertises au service de votre croissance</h2>
+                <p class="section-subtitle">
+                    Une approche complète pour tous vos besoins digitaux et de communication
+                </p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Web Development -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="service-title">Développement Web</h3>
+                    <p class="service-description">
+                        Sites web sur mesure, e-commerce performants et applications web modernes 
+                        avec les dernières technologies.
+                    </p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Sites responsive et optimisés</li>
+                        <li><i class="fas fa-check"></i> E-commerce Shopify/WooCommerce</li>
+                        <li><i class="fas fa-check"></i> Applications web React/Vue.js</li>
+                        <li><i class="fas fa-check"></i> CMS WordPress personnalisé</li>
+                    </ul>
+                    <a href="#contact" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- Mobile Development -->
+                <div class="service-card featured">
+                    <div class="service-badge">Populaire</div>
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="service-title">Applications Mobiles</h3>
+                    <p class="service-description">
+                        Applications natives iOS/Android et cross-platform avec Flutter 
+                        pour une expérience utilisateur optimale.
+                    </p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Flutter & FlutterFlow</li>
+                        <li><i class="fas fa-check"></i> Applications natives iOS/Android</li>
+                        <li><i class="fas fa-check"></i> Progressive Web Apps (PWA)</li>
+                        <li><i class="fas fa-check"></i> Intégration API et services</li>
+                    </ul>
+                    <a href="#contact" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- SEO & Digital Marketing -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="service-title">SEO & Marketing Digital</h3>
+                    <p class="service-description">
+                        Optimisation pour les moteurs de recherche et stratégies digitales 
+                        pour augmenter votre visibilité en ligne.
+                    </p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Audit SEO complet</li>
+                        <li><i class="fas fa-check"></i> Optimisation technique</li>
+                        <li><i class="fas fa-check"></i> Stratégie de contenu</li>
+                        <li><i class="fas fa-check"></i> Analyse de performance</li>
+                    </ul>
+                    <a href="#contact" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <!-- Print & Communication -->
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3 class="service-title">Impression & Communication</h3>
+                    <p class="service-description">
+                        Solutions d'impression professionnelle, signalétique et objets publicitaires 
+                        pour votre communication physique.
+                    </p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Cartes de visite & flyers</li>
+                        <li><i class="fas fa-check"></i> Signalétique grand format</li>
+                        <li><i class="fas fa-check"></i> Objets publicitaires</li>
+                        <li><i class="fas fa-check"></i> Brochures & catalogues</li>
+                    </ul>
+                    <a href="#contact" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Notre méthode de travail</h2>
+                <p class="section-subtitle">
+                    Un processus éprouvé pour garantir le succès de votre projet
+                </p>
+            </div>
+            
+            <div class="process-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Analyse & Stratégie</h3>
+                    <p class="step-description">
+                        Nous analysons vos besoins, votre marché et définissons ensemble 
+                        la stratégie optimale pour votre projet.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Conception & Design</h3>
+                    <p class="step-description">
+                        Création des maquettes et prototypes en collaboration avec vous 
+                        pour valider l'expérience utilisateur.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Développement</h3>
+                    <p class="step-description">
+                        Développement technique avec les meilleures pratiques, 
+                        tests réguliers et suivi de l'avancement.
+                    </p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Lancement & Suivi</h3>
+                    <p class="step-description">
+                        Mise en ligne, formation et accompagnement continu 
+                        pour assurer le succès de votre projet.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nos réalisations</h2>
+                <p class="section-subtitle">
+                    Découvrez quelques projets qui illustrent notre expertise
+                </p>
+            </div>
+            
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="assets/images/portfolio/project1.jpg" alt="E-commerce Fashion" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <h3>E-commerce Fashion</h3>
+                            <p>Site e-commerce avec 300% d'augmentation des ventes</p>
+                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <div class="portfolio-tags">
+                            <span class="tag">E-commerce</span>
+                            <span class="tag">Shopify</span>
+                        </div>
+                        <h3>Boutique de Mode</h3>
+                        <p>Développement d'une boutique en ligne avec système de gestion des stocks intégré.</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="assets/images/portfolio/project2.jpg" alt="Application Mobile" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <h3>App Mobile Fitness</h3>
+                            <p>Application avec 50k+ téléchargements</p>
+                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <div class="portfolio-tags">
+                            <span class="tag">Flutter</span>
+                            <span class="tag">iOS/Android</span>
+                        </div>
+                        <h3>Application Fitness</h3>
+                        <p>App mobile de coaching sportif avec suivi personnalisé et communauté intégrée.</p>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <img src="assets/images/portfolio/project3.jpg" alt="Site Vitrine" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <h3>Site Corporate</h3>
+                            <p>+200% d'augmentation du trafic organique</p>
+                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                        </div>
+                    </div>
+                    <div class="portfolio-content">
+                        <div class="portfolio-tags">
+                            <span class="tag">WordPress</span>
+                            <span class="tag">SEO</span>
+                        </div>
+                        <h3>Site Corporate</h3>
+                        <p>Refonte complète avec optimisation SEO pour une entreprise BTP.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="portfolio-cta">
+                <a href="#contact" class="btn btn-primary btn-large">Voir tous nos projets</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Ce que disent nos clients</h2>
+                <p class="section-subtitle">
+                    La satisfaction client au cœur de notre mission
+                </p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">
+                            "Greenfad a transformé notre présence en ligne. Notre nouveau site a généré 
+                            40% de leads supplémentaires dès le premier mois."
+                        </p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="assets/images/testimonials/avatar1.jpg" alt="Marie Dupont" class="author-avatar">
+                        <div class="author-info">
+                            <h4 class="author-name">Marie Dupont</h4>
+                            <p class="author-title">Directrice Marketing, TechStart</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">
+                            "L'équipe Greenfad a su comprendre nos besoins et livrer une application 
+                            mobile qui dépasse nos attentes. Un vrai partenaire de confiance."
+                        </p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="assets/images/testimonials/avatar2.jpg" alt="Pierre Martin" class="author-avatar">
+                        <div class="author-info">
+                            <h4 class="author-name">Pierre Martin</h4>
+                            <p class="author-title">CEO, InnovateCorp</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="testimonial-text">
+                            "Excellent travail sur notre stratégie SEO. Nous sommes maintenant 
+                            en première page sur nos mots-clés prioritaires."
+                        </p>
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="assets/images/testimonials/avatar3.jpg" alt="Sophie Bernard" class="author-avatar">
+                        <div class="author-info">
+                            <h4 class="author-name">Sophie Bernard</h4>
+                            <p class="author-title">Responsable Digital, ModernBiz</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2 class="section-title">À propos de Greenfad</h2>
+                    <p class="about-description">
+                        Depuis 5 ans, Greenfad accompagne les entreprises dans leur transformation digitale 
+                        avec passion et expertise. Notre équipe pluridisciplinaire combine créativité, 
+                        technique et stratégie pour donner vie à vos projets les plus ambitieux.
+                    </p>
+                    <div class="about-values">
+                        <div class="value">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <h4>Innovation</h4>
+                                <p>Technologies de pointe et solutions créatives</p>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <i class="fas fa-handshake"></i>
+                            <div>
+                                <h4>Partnership</h4>
+                                <p>Relation de confiance et accompagnement personnalisé</p>
+                            </div>
+                        </div>
+                        <div class="value">
+                            <i class="fas fa-award"></i>
+                            <div>
+                                <h4>Excellence</h4>
+                                <p>Qualité irréprochable et respect des délais</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-card">
+                        <span class="stat-number">150+</span>
+                        <span class="stat-label">Projets livrés</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">50+</span>
+                        <span class="stat-label">Clients satisfaits</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">98%</span>
+                        <span class="stat-label">Taux de satisfaction</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Années d'expérience</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Prêt à démarrer votre projet ?</h2>
+                <p class="section-subtitle">
+                    Contactez-nous pour un devis personnalisé et gratuit
+                </p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Parlons de votre projet</h3>
+                    <p>
+                        Notre équipe est à votre disposition pour étudier vos besoins 
+                        et vous proposer la solution la plus adaptée.
+                    </p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Téléphone</h4>
+                                <p>+33 1 23 45 67 89</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>contact@greenfad.tech</p>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Adresse</h4>
+                                <p>123 Rue de l'Innovation<br>75001 Paris, France</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Nom complet *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Téléphone</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Entreprise</label>
+                        <input type="text" id="company" name="company">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Service souhaité</label>
+                        <select id="service" name="service">
+                            <option value="">Choisir un service</option>
+                            <option value="web">Développement Web</option>
+                            <option value="mobile">Application Mobile</option>
+                            <option value="seo">SEO & Marketing</option>
+                            <option value="print">Impression</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" rows="5" placeholder="Décrivez votre projet..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="consent" required>
+                            <span class="checkmark"></span>
+                            J'accepte que mes données soient utilisées pour me recontacter concernant ma demande.
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-large btn-full">
+                        <i class="fas fa-paper-plane"></i>
+                        Envoyer ma demande
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="assets/images/greenfad-logo-white.svg" alt="Greenfad Logo" class="footer-logo">
+                    <p class="footer-description">
+                        Votre partenaire pour la transformation digitale. 
+                        Développement web, mobile, SEO et impression.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Services</h4>
+                        <ul>
+                            <li><a href="#services">Développement Web</a></li>
+                            <li><a href="#services">Applications Mobiles</a></li>
+                            <li><a href="#services">SEO & Marketing</a></li>
+                            <li><a href="#services">Impression</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Entreprise</h4>
+                        <ul>
+                            <li><a href="#about">À propos</a></li>
+                            <li><a href="#portfolio">Portfolio</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                            <li><a href="#">Carrières</a></li>
+                        </ul>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Documentation</a></li>
+                            <li><a href="#">Support technique</a></li>
+                            <li><a href="#">Politique de confidentialité</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Greenfad. Tous droits réservés.</p>
+                <div class="footer-legal">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">CGV</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
