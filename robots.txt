@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://greenfad.tech/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /assets/
+Disallow: /components/
+Disallow: /docs/
+
+# Allow important files
+Allow: /assets/css/styles.css
+Allow: /assets/js/main.js
+Allow: /assets/images/
+
+# Crawl-delay (optional, for heavy crawlers)
+Crawl-delay: 1
