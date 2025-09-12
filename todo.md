@@ -21,8 +21,10 @@
 - [x] Effets hover et transitions
 
 ### Prochaines étapes
-- [ ] Tester le site localement
-- [ ] Vérifier la responsivité mobile
-- [ ] Optimiser les performances
+- [x] Tester le site localement
+- [x] Vérifier la responsivité mobile
+- [x] Optimiser les performances
+- [x] Corriger la navigation et le menu mobile
+- [x] Améliorer la page d'accueil (visuels, animations, etc.)
 - [ ] Commit et push des modifications
 

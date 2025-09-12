@@ -131,6 +131,10 @@ class Navigation {
                             top: targetPosition,
                             behavior: 'smooth'
                         });
+                        // Close mobile menu after click
+                        if (this.isMenuOpen) {
+                            this.toggleMobileMenu();
+                        }
                     }
                 }
             });
