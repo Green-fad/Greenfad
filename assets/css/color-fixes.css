@@ -1,0 +1,380 @@
+/* ===== CORRECTIONS COULEURS ET LOGOS GREENFAD ===== */
+
+/* Retour aux couleurs originales Greenfad */
+:root {
+    --primary-color: #00D4AA;
+    --primary-dark: #00B894;
+    --primary-light: #55EFC4;
+    --secondary-color: #6C5CE7;
+    --accent-color: #FDCB6E;
+    --text-dark: #2D3748;
+    --text-light: #64748B;
+    --white: #FFFFFF;
+    --gray-light: #F8F9FA;
+    --gray-medium: #E2E8F0;
+}
+
+/* Correction de la navigation - couleurs conformes */
+.header {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 2px 10px rgba(0, 212, 170, 0.1) !important;
+    border-bottom: 1px solid rgba(0, 212, 170, 0.1);
+}
+
+.nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+    background: rgba(0, 212, 170, 0.08) !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--primary-color);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 70%;
+}
+
+/* Bouton CTA header - couleurs Greenfad */
+.btn-primary {
+    background: var(--primary-color) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 25px !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.25) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(0, 212, 170, 0.3) !important;
+}
+
+/* Correction des boutons "Découvrir" - couleurs conformes */
+.service-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background: var(--primary-color) !important;
+    color: white !important;
+    text-decoration: none !important;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 3px 10px rgba(0, 212, 170, 0.2) !important;
+    margin-top: 1rem;
+}
+
+.service-cta:hover {
+    background: var(--primary-dark) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 5px 15px rgba(0, 212, 170, 0.3) !important;
+    color: white !important;
+}
+
+/* Correction du titre principal - couleurs Greenfad */
+.hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem !important;
+    color: var(--text-dark) !important;
+}
+
+.highlight {
+    color: var(--primary-color) !important;
+    position: relative;
+}
+
+.highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+/* Correction des cartes de service */
+.service-card {
+    background: white !important;
+    border-radius: 15px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid var(--gray-medium) !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover::before {
+    transform: scaleX(1);
+}
+
+.service-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 30px rgba(0, 212, 170, 0.1) !important;
+}
+
+/* Badge "Populaire" - couleurs conformes */
+.service-badge {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    background: var(--accent-color) !important;
+    color: var(--text-dark) !important;
+    padding: 0.4rem 0.8rem !important;
+    border-radius: 15px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(253, 203, 110, 0.3) !important;
+}
+
+/* CORRECTION MAJEURE - Section logos clients */
+.clients-section {
+    padding: 3rem 0 !important;
+    background: var(--gray-light) !important;
+}
+
+.clients-grid {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 2rem !important;
+    align-items: center !important;
+    justify-items: center !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+}
+
+.client-logo {
+    width: 120px !important;
+    height: 80px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: white !important;
+    border-radius: 10px !important;
+    padding: 1rem !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid var(--gray-medium) !important;
+}
+
+.client-logo:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(0, 212, 170, 0.1) !important;
+}
+
+.client-logo img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    filter: grayscale(100%) opacity(0.7) !important;
+    transition: all 0.3s ease !important;
+}
+
+.client-logo:hover img {
+    filter: grayscale(0%) opacity(1) !important;
+}
+
+/* Responsive pour les logos clients */
+@media (max-width: 768px) {
+    .clients-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 1rem !important;
+    }
+    
+    .client-logo {
+        width: 100px !important;
+        height: 70px !important;
+        padding: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .clients-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .client-logo {
+        width: 90px !important;
+        height: 60px !important;
+        padding: 0.5rem !important;
+    }
+}
+
+/* Correction des statistiques hero */
+.hero-stats {
+    display: flex !important;
+    gap: 2rem !important;
+    margin: 2rem 0 !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+}
+
+.stat {
+    text-align: left !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.stat-number {
+    display: block !important;
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: var(--primary-color) !important;
+    margin-bottom: 0.25rem !important;
+    line-height: 1 !important;
+}
+
+.stat-label {
+    font-size: 0.9rem !important;
+    color: var(--text-light) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Correction des boutons CTA hero */
+.hero-cta {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-top: 2rem !important;
+    flex-wrap: wrap !important;
+}
+
+.btn-large {
+    padding: 1rem 2rem !important;
+    font-size: 1rem !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+}
+
+.btn-outline {
+    background: transparent !important;
+    border: 2px solid var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.btn-outline:hover {
+    background: var(--primary-color) !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 5px 15px rgba(0, 212, 170, 0.25) !important;
+}
+
+/* Correction des couleurs des sections */
+.section-title {
+    color: var(--text-dark) !important;
+    font-weight: 700 !important;
+}
+
+.section-subtitle {
+    color: var(--text-light) !important;
+}
+
+.service-title {
+    color: var(--text-dark) !important;
+    font-weight: 600 !important;
+}
+
+.service-description {
+    color: var(--text-light) !important;
+}
+
+.service-features li {
+    color: var(--text-light) !important;
+}
+
+.service-features i {
+    color: var(--primary-color) !important;
+}
+
+/* Correction des témoignages */
+.testimonial-card {
+    background: white !important;
+    border: 1px solid var(--gray-medium) !important;
+    border-radius: 15px !important;
+}
+
+.testimonial-text {
+    color: var(--text-light) !important;
+}
+
+.testimonial-author {
+    color: var(--text-dark) !important;
+}
+
+.testimonial-role {
+    color: var(--text-light) !important;
+}
+
+/* Suppression des gradients non conformes */
+.btn-primary::before,
+.service-cta::before {
+    display: none !important;
+}
+
+/* Correction du footer */
+.footer {
+    background: var(--text-dark) !important;
+    color: white !important;
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.footer a {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.footer a:hover {
+    color: var(--primary-color) !important;
+}
+
