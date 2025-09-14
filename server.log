@@ -1,18 +1,26 @@
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/usr/local/lib/python3.12/http/server.py", line 1314, in <module>
-    test(
-  File "/usr/local/lib/python3.12/http/server.py", line 1261, in test
-    with ServerClass(addr, HandlerClass) as httpd:
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.12/socketserver.py", line 457, in __init__
-    self.server_bind()
-  File "/usr/local/lib/python3.12/http/server.py", line 1308, in server_bind
-    return super().server_bind()
-           ^^^^^^^^^^^^^^^^^^^^^
-  File "/usr/local/lib/python3.12/http/server.py", line 136, in server_bind
-    socketserver.TCPServer.server_bind(self)
-  File "/usr/local/lib/python3.12/socketserver.py", line 478, in server_bind
-    self.socket.bind(self.server_address)
-OSError: [Errno 98] Address already in use
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/services/web-development.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/greenfad-logo.svg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/services/mobile-development.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/services/print-communication.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/services/seo-marketing.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/testimonials/avatar1.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/js/script.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/js/main.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/testimonials/avatar2.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:31] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:31] "GET /assets/images/testimonials/avatar3.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/clients/client2.png HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/clients/client3.png HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/clients/client4.png HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/clients/client5.png HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] code 404, message File not found
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/clients/client1.png HTTP/1.1" 404 -
+127.0.0.1 - - [13/Sep/2025 23:57:32] "GET /assets/images/favicon.ico HTTP/1.1" 200 -
