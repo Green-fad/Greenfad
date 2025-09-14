@@ -1,0 +1,405 @@
+/* ===== CORRECTIONS SPÉCIFIQUES GREENFAD ===== */
+
+/* Amélioration de la visibilité de la barre de navigation */
+.header {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08) !important;
+    border-bottom: 1px solid rgba(0, 212, 170, 0.1);
+}
+
+.navbar {
+    padding: 1rem 0;
+}
+
+.nav-link {
+    color: #2D3748 !important;
+    font-weight: 500 !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: #00D4AA !important;
+    background: rgba(0, 212, 170, 0.1);
+    transform: translateY(-1px);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00D4AA, #6C5CE7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 80%;
+}
+
+/* Amélioration du bouton CTA dans le header */
+.btn-primary {
+    background: linear-gradient(135deg, #00D4AA, #6C5CE7) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 2rem !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.4) !important;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+/* Correction des boutons "Découvrir" dans les services */
+.service-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    background: linear-gradient(135deg, #00D4AA, #6C5CE7) !important;
+    color: white !important;
+    text-decoration: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.2) !important;
+    position: relative;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.service-cta:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3) !important;
+    color: white !important;
+}
+
+.service-cta i {
+    transition: transform 0.3s ease;
+}
+
+.service-cta:hover i {
+    transform: translateX(3px);
+}
+
+/* Amélioration des cartes de service */
+.service-card {
+    background: white !important;
+    border-radius: 20px !important;
+    padding: 2rem !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(0, 212, 170, 0.1) !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #00D4AA, #6C5CE7);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+}
+
+.service-card:hover::before {
+    transform: scaleX(1);
+}
+
+.service-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 20px 40px rgba(0, 212, 170, 0.15) !important;
+}
+
+.service-title {
+    color: #2D3748 !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    margin: 1rem 0 !important;
+}
+
+.service-description {
+    color: #64748B !important;
+    line-height: 1.6 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.service-features {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1.5rem 0 !important;
+}
+
+.service-features li {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 0.5rem 0 !important;
+    color: #475569 !important;
+}
+
+.service-features i {
+    color: #00D4AA !important;
+    font-size: 0.9rem !important;
+}
+
+/* Badge "Populaire" amélioré */
+.service-badge {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
+    color: white !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 50px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3) !important;
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Correction du titre principal */
+.hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem) !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 1.5rem !important;
+    background: linear-gradient(135deg, #2D3748, #00D4AA, #6C5CE7) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    background-size: 200% 200% !important;
+    animation: gradient-text 4s ease infinite;
+}
+
+@keyframes gradient-text {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.highlight {
+    position: relative;
+    z-index: 1;
+}
+
+.highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(90deg, rgba(0, 212, 170, 0.3), rgba(108, 92, 231, 0.3));
+    z-index: -1;
+    border-radius: 8px;
+}
+
+/* Amélioration des statistiques */
+.hero-stats {
+    display: flex !important;
+    gap: 2rem !important;
+    margin: 2rem 0 !important;
+    flex-wrap: wrap !important;
+}
+
+.stat {
+    text-align: center !important;
+    padding: 1rem !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 15px !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 212, 170, 0.1) !important;
+    transition: all 0.3s ease !important;
+}
+
+.stat:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 25px rgba(0, 212, 170, 0.1) !important;
+}
+
+.stat-number {
+    display: block !important;
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: #00D4AA !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.stat-label {
+    font-size: 0.9rem !important;
+    color: #64748B !important;
+    font-weight: 500 !important;
+}
+
+/* Amélioration des boutons CTA hero */
+.hero-cta {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-top: 2rem !important;
+    flex-wrap: wrap !important;
+}
+
+.btn-large {
+    padding: 1rem 2rem !important;
+    font-size: 1.1rem !important;
+    border-radius: 50px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    text-decoration: none !important;
+}
+
+.btn-outline {
+    background: transparent !important;
+    border: 2px solid #00D4AA !important;
+    color: #00D4AA !important;
+}
+
+.btn-outline:hover {
+    background: #00D4AA !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3) !important;
+}
+
+/* Responsive amélioré */
+@media (max-width: 768px) {
+    .nav-link {
+        padding: 1rem !important;
+        font-size: 1.1rem !important;
+        text-align: center !important;
+    }
+    
+    .hero-stats {
+        justify-content: center !important;
+        gap: 1rem !important;
+    }
+    
+    .stat {
+        flex: 1 1 calc(50% - 0.5rem) !important;
+        min-width: 120px !important;
+    }
+    
+    .hero-cta {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    
+    .btn-large {
+        width: 100% !important;
+        justify-content: center !important;
+        max-width: 300px !important;
+    }
+    
+    .service-card {
+        margin-bottom: 2rem !important;
+    }
+}
+
+/* Correction des erreurs de layout */
+.container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 1rem !important;
+}
+
+.section {
+    padding: 4rem 0 !important;
+}
+
+.section-header {
+    text-align: center !important;
+    margin-bottom: 3rem !important;
+}
+
+.section-title {
+    font-size: clamp(2rem, 4vw, 3rem) !important;
+    font-weight: 700 !important;
+    color: #2D3748 !important;
+    margin-bottom: 1rem !important;
+}
+
+.section-subtitle {
+    font-size: 1.2rem !important;
+    color: #64748B !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+    line-height: 1.6 !important;
+}
+
+/* Amélioration de la grille des services */
+.services-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    gap: 2rem !important;
+    margin-top: 3rem !important;
+}
+
+/* Correction des images de service */
+.service-image {
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    margin-bottom: 1.5rem !important;
+    height: 200px !important;
+}
+
+.service-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.4s ease !important;
+}
+
+.service-card:hover .service-image img {
+    transform: scale(1.05) !important;
+}
+
