@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="assets/css/layout-fixes.css">
     <link rel="stylesheet" href="assets/css/professional-design.min.css">
     <link rel="stylesheet" href="assets/css/floating-cards.min.css">
+    <link rel="stylesheet" href="assets/css/agency-identity.min.css">
     
     <!-- Fonts avec display=swap pour optimiser le chargement -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,40 +81,46 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
+    <!-- Hero Section Agence -->
+    <section id="home" class="hero-agency">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 class="hero-title">
-                    Votre <span class="highlight">partenaire digital</span> de confiance en Afrique
+                <div class="agency-badge">
+                    Agence digitale leader en Afrique
+                </div>
+                <h1 class="hero-title-agency">
+                    Nous créons des <span class="agency-highlight">expériences digitales</span> exceptionnelles
                 </h1>
-                <p class="hero-description">
-                    Greenfad transforme vos idées en solutions numériques performantes. 
-                    Développement web, applications mobiles, SEO et communication visuelle - 
-                    nous donnons vie à vos projets avec expertise et créativité.
+                <p class="hero-description-agency">
+                    <span class="highlight-text">Greenfad</span> est l'agence de référence pour la transformation numérique en Afrique. 
+                    Nous concevons et développons des solutions sur mesure qui propulsent votre business vers le succès.
                 </p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">150+</span>
-                        <span class="stat-label">Projets réalisés</span>
+                <div class="agency-stats">
+                    <div class="agency-stat">
+                        <span class="agency-stat-number">150+</span>
+                        <span class="agency-stat-label">Projets livrés</span>
                     </div>
-                    <div class="stat">
-                        <span class="stat-number">50+</span>
-                        <span class="stat-label">Clients satisfaits</span>
+                    <div class="agency-stat">
+                        <span class="agency-stat-number">50+</span>
+                        <span class="agency-stat-label">Clients conquis</span>
                     </div>
-                    <div class="stat">
-                        <span class="stat-number">5+</span>
-                        <span class="stat-label">Années d'expertise</span>
+                    <div class="agency-stat">
+                        <span class="agency-stat-number">5+</span>
+                        <span class="agency-stat-label">Années d'expertise</span>
+                    </div>
+                    <div class="agency-stat">
+                        <span class="agency-stat-number">98%</span>
+                        <span class="agency-stat-label">Satisfaction client</span>
                     </div>
                 </div>
-                <div class="hero-cta">
-                    <a href="#contact" class="btn btn-primary btn-large">
+                <div class="agency-cta-group">
+                    <a href="#contact" class="btn-agency-primary">
                         <i class="fas fa-rocket"></i>
-                        Démarrer mon projet
+                        Démarrer votre projet
                     </a>
-                    <a href="#portfolio" class="btn btn-outline btn-large">
+                    <a href="#portfolio" class="btn-agency-secondary">
                         <i class="fas fa-play"></i>
-                        Voir nos réalisations
+                        Découvrir nos réalisations
                     </a>
                 </div>
             </div>
@@ -169,92 +176,100 @@
         </div>
     </section>
 
-    <!-- Services Section -->
-    <section id="services" class="services">
+    <!-- Expertise Agence Section -->
+    <section id="services" class="agency-expertise">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nos expertises au service de votre croissance</h2>
-                <p class="section-subtitle">
-                    Une approche complète pour tous vos besoins digitaux et de communication
+            <div class="expertise-header">
+                <div class="expertise-badge">Notre expertise</div>
+                <h2 class="expertise-title">Des solutions digitales qui transforment votre business</h2>
+                <p class="expertise-subtitle">
+                    En tant qu'agence leader, nous maîtrisons l'ensemble de l'écosystème digital pour créer des expériences exceptionnelles qui génèrent des résultats mesurables.
                 </p>
             </div>
             
-            <div class="services-grid">
-                <!-- Web Development -->
-                <div class="service-card">
-                    <div class="service-image">
-                        <img src="assets/images/services/web-development.jpg" alt="Développement Web">
+            <div class="expertise-grid">
+                <!-- Développement Web -->
+                <div class="expertise-card">
+                    <div class="expertise-icon">
+                        <i class="fas fa-code"></i>
                     </div>
-                    <h3 class="service-title">Développement Web</h3>
-                    <p class="service-description">
-                        Sites web sur mesure, e-commerce performants et applications web modernes 
-                        avec les dernières technologies.
+                    <h3 class="expertise-card-title">Développement Web Premium</h3>
+                    <p class="expertise-card-description">
+                        Nous créons des sites web et applications qui allient performance technique et design exceptionnel pour maximiser votre impact digital.
                     </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Sites responsive et optimisés</li>
-                        <li><i class="fas fa-check"></i> E-commerce Shopify/WooCommerce</li>
-                        <li><i class="fas fa-check"></i> Applications web React/Vue.js</li>
-                        <li><i class="fas fa-check"></i> CMS WordPress personnalisé</li>
+                    <ul class="expertise-features">
+                        <li>Sites web sur mesure haute performance</li>
+                        <li>E-commerce avec conversion optimisée</li>
+                        <li>Applications web React/Vue.js</li>
+                        <li>Architecture cloud scalable</li>
+                        <li>Optimisation SEO technique avancée</li>
                     </ul>
-                    <a href="services/web-development.html" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                    <a href="services/web-development.html" class="expertise-cta">
+                        Explorer nos réalisations <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <!-- Mobile Development -->
-                <div class="service-card featured">
-                    <div class="service-badge">Populaire</div>
-                    <div class="service-image">
-                        <img src="assets/images/services/mobile-development.jpg" alt="Applications Mobiles">
+                <!-- Applications Mobiles -->
+                <div class="expertise-card">
+                    <div class="expertise-icon">
+                        <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h3 class="service-title">Applications Mobiles</h3>
-                    <p class="service-description">
-                        Applications natives iOS/Android et cross-platform avec Flutter 
-                        pour une expérience utilisateur optimale.
+                    <h3 class="expertise-card-title">Applications Mobiles Natives</h3>
+                    <p class="expertise-card-description">
+                        Développement d'applications mobiles innovantes qui offrent une expérience utilisateur exceptionnelle et génèrent de l'engagement.
                     </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Flutter & FlutterFlow</li>
-                        <li><i class="fas fa-check"></i> Applications natives iOS/Android</li>
-                        <li><i class="fas fa-check"></i> Progressive Web Apps (PWA)</li>
-                        <li><i class="fas fa-check"></i> Intégration API et services</li>
+                    <ul class="expertise-features">
+                        <li>Apps natives iOS & Android</li>
+                        <li>Flutter cross-platform</li>
+                        <li>Progressive Web Apps (PWA)</li>
+                        <li>Intégration API & services cloud</li>
+                        <li>Analytics et optimisation UX</li>
                     </ul>
-                    <a href="services/mobile-apps.html" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                    <a href="services/mobile-apps.html" class="expertise-cta">
+                        Voir nos apps <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <!-- SEO & Digital Marketing -->
-                <div class="service-card">
-                    <div class="service-image">
-                        <img src="assets/images/services/seo-marketing.jpg" alt="SEO & Marketing Digital">
+                <!-- Stratégie Digitale -->
+                <div class="expertise-card">
+                    <div class="expertise-icon">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="service-title">SEO & Marketing Digital</h3>
-                    <p class="service-description">
-                        Optimisation pour les moteurs de recherche et stratégies digitales 
-                        pour augmenter votre visibilité en ligne.
+                    <h3 class="expertise-card-title">Stratégie Digitale & SEO</h3>
+                    <p class="expertise-card-description">
+                        Nous élaborons des stratégies digitales sur mesure qui positionnent votre marque en leader et génèrent une croissance durable.
                     </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Audit SEO complet</li>
-                        <li><i class="fas fa-check"></i> Optimisation technique</li>
-                        <li><i class="fas fa-check"></i> Stratégie de contenu</li>
-                        <li><i class="fas fa-check"></i> Analyse de performance</li>
+                    <ul class="expertise-features">
+                        <li>Audit digital complet</li>
+                        <li>Stratégie SEO avancée</li>
+                        <li>Marketing de contenu</li>
+                        <li>Analytics & reporting</li>
+                        <li>Optimisation des conversions</li>
                     </ul>
-                    <a href="services/seo-marketing.html" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                    <a href="services/seo-marketing.html" class="expertise-cta">
+                        Découvrir notre approche <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
 
-                <!-- Print & Communication -->
-                <div class="service-card">
-                    <div class="service-image">
-                        <img src="assets/images/services/print-communication.jpg" alt="Impression & Communication">
+                <!-- Identité Visuelle -->
+                <div class="expertise-card">
+                    <div class="expertise-icon">
+                        <i class="fas fa-palette"></i>
                     </div>
-                    <h3 class="service-title">Impression & Communication</h3>
-                    <p class="service-description">
-                        Solutions d'impression professionnelle, signalétique et objets publicitaires 
-                        pour votre communication physique.
+                    <h3 class="expertise-card-title">Identité Visuelle & Branding</h3>
+                    <p class="expertise-card-description">
+                        Création d'identités visuelles fortes et cohérentes qui marquent les esprits et renforcent votre positionnement sur le marché.
                     </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Cartes de visite & flyers</li>
-                        <li><i class="fas fa-check"></i> Signalétique grand format</li>
-                        <li><i class="fas fa-check"></i> Objets publicitaires</li>
-                        <li><i class="fas fa-check"></i> Brochures & catalogues</li>
+                    <ul class="expertise-features">
+                        <li>Création de logo & charte graphique</li>
+                        <li>Design système complet</li>
+                        <li>Supports print & digital</li>
+                        <li>Signalétique & packaging</li>
+                        <li>Guidelines de marque</li>
                     </ul>
-                    <a href="services/print-communication.html" class="service-cta">Découvrir <i class="fas fa-arrow-right"></i></a>
+                    <a href="services/print-communication.html" class="expertise-cta">
+                        Voir notre portfolio <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>

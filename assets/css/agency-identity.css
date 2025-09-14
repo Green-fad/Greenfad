@@ -1,0 +1,507 @@
+/* ===== IDENTITÉ AGENCE GREENFAD ===== */
+
+/* Variables spécifiques à l'agence */
+:root {
+    --agency-primary: #00D4AA;
+    --agency-secondary: #6C5CE7;
+    --agency-accent: #FDCB6E;
+    --agency-dark: #2D3748;
+    --agency-light: #F7FAFC;
+    --agency-gradient: linear-gradient(135deg, #00D4AA 0%, #6C5CE7 100%);
+    --agency-gradient-soft: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(108, 92, 231, 0.1) 100%);
+}
+
+/* Hero section spécialisé agence */
+.hero-agency {
+    position: relative;
+    background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 30%, #F0F9FF 70%, #EEF2FF 100%);
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-agency::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 212, 170, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(253, 203, 110, 0.05) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.hero-agency::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="agency-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="%2300D4AA" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23agency-grid)"/></svg>');
+    z-index: 1;
+}
+
+/* Badge agence premium */
+.agency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--agency-primary);
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.1);
+    animation: float-badge 3s ease-in-out infinite;
+}
+
+.agency-badge::before {
+    content: '🚀';
+    font-size: 16px;
+}
+
+@keyframes float-badge {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Titre agence avec effet spécial */
+.hero-title-agency {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.hero-title-agency .agency-highlight {
+    background: var(--agency-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+}
+
+.hero-title-agency .agency-highlight::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--agency-gradient);
+    border-radius: 2px;
+    animation: underline-grow 2s ease-out;
+}
+
+@keyframes underline-grow {
+    0% { width: 0; }
+    100% { width: 100%; }
+}
+
+/* Description agence enrichie */
+.hero-description-agency {
+    font-size: 1.375rem;
+    line-height: 1.7;
+    color: var(--agency-dark);
+    margin-bottom: 32px;
+    max-width: 600px;
+}
+
+.hero-description-agency .highlight-text {
+    color: var(--agency-primary);
+    font-weight: 600;
+    position: relative;
+}
+
+/* Statistiques agence premium */
+.agency-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 32px;
+    margin: 40px 0;
+    max-width: 600px;
+}
+
+.agency-stat {
+    text-align: center;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 212, 170, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.agency-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--agency-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease;
+}
+
+.agency-stat:hover::before {
+    transform: scaleX(1);
+}
+
+.agency-stat:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(0, 212, 170, 0.15);
+    border-color: var(--agency-primary);
+}
+
+.agency-stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--agency-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.agency-stat-label {
+    font-size: 0.875rem;
+    color: var(--agency-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Boutons CTA agence premium */
+.agency-cta-group {
+    display: flex;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.btn-agency-primary {
+    background: var(--agency-gradient);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0, 212, 170, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-agency-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-agency-primary:hover::before {
+    left: 100%;
+}
+
+.btn-agency-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(0, 212, 170, 0.4);
+}
+
+.btn-agency-secondary {
+    background: transparent;
+    color: var(--agency-primary);
+    border: 2px solid var(--agency-primary);
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-agency-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--agency-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    z-index: -1;
+}
+
+.btn-agency-secondary:hover::before {
+    transform: scaleX(1);
+}
+
+.btn-agency-secondary:hover {
+    color: white;
+    border-color: transparent;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0, 212, 170, 0.25);
+}
+
+/* Section expertise agence */
+.agency-expertise {
+    padding: 80px 0;
+    background: white;
+    position: relative;
+}
+
+.agency-expertise::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--agency-gradient);
+}
+
+.expertise-header {
+    text-align: center;
+    margin-bottom: 64px;
+}
+
+.expertise-badge {
+    display: inline-block;
+    background: var(--agency-gradient-soft);
+    color: var(--agency-primary);
+    padding: 8px 24px;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(0, 212, 170, 0.2);
+}
+
+.expertise-title {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-weight: 800;
+    color: var(--agency-dark);
+    margin-bottom: 24px;
+    line-height: 1.2;
+}
+
+.expertise-subtitle {
+    font-size: 1.25rem;
+    color: #64748B;
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Cartes expertise agence */
+.expertise-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.expertise-card {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 212, 170, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.expertise-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--agency-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease;
+}
+
+.expertise-card:hover::before {
+    transform: scaleX(1);
+}
+
+.expertise-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 60px rgba(0, 212, 170, 0.15);
+    border-color: var(--agency-primary);
+}
+
+.expertise-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--agency-gradient-soft);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(0, 212, 170, 0.2);
+}
+
+.expertise-icon i {
+    font-size: 32px;
+    background: var(--agency-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.expertise-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--agency-dark);
+    margin-bottom: 16px;
+}
+
+.expertise-card-description {
+    color: #64748B;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.expertise-features {
+    list-style: none;
+    margin-bottom: 32px;
+}
+
+.expertise-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: #4A5568;
+}
+
+.expertise-features li::before {
+    content: '✓';
+    width: 20px;
+    height: 20px;
+    background: var(--agency-gradient);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.expertise-cta {
+    background: var(--agency-primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.expertise-cta:hover {
+    background: #00B894;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 212, 170, 0.25);
+}
+
+/* Responsive pour agence */
+@media (max-width: 768px) {
+    .hero-title-agency {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+    }
+    
+    .hero-description-agency {
+        font-size: 1.125rem;
+    }
+    
+    .agency-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .agency-cta-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-agency-primary,
+    .btn-agency-secondary {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+    
+    .expertise-grid {
+        grid-template-columns: 1fr;
+        padding: 0 16px;
+    }
+    
+    .expertise-card {
+        padding: 32px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .agency-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .agency-stat {
+        padding: 20px;
+    }
+    
+    .agency-stat-number {
+        font-size: 2rem;
+    }
+}
+
