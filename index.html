@@ -8,23 +8,43 @@
     <meta name="keywords" content="e-gouvernement, solutions numériques état, transformation digitale Afrique, collectivités Mali Burkina Faso, applications gouvernementales">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Greenfad - Agence Web & Digital">
-    <meta property="og:description" content="Développement web, applications mobiles, SEO et solutions d'impression sur mesure">
+    <meta property="og:title" content="Greenfad - Solutions Numériques pour l'État et les Collectivités | Afrique">
+    <meta property="og:description" content="Leader des solutions numériques gouvernementales en Afrique de l'Ouest et Centrale. E-gouvernement, transformation digitale des collectivités, applications d'état.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://greenfad.tech">
+    <meta property="og:url" content="https://green-fad.github.io/Greenfad/">
+    <meta property="og:image" content="https://green-fad.github.io/Greenfad/assets/images/greenfad-logo.png">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="Greenfad">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Greenfad - Solutions E-gouvernement en Afrique">
+    <meta name="twitter:description" content="Transformation digitale des collectivités et institutions publiques en Afrique">
+    <meta name="twitter:image" content="https://green-fad.github.io/Greenfad/assets/images/greenfad-logo.png">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     
-    <!-- CSS Optimisé -->
-    <link rel="stylesheet" href="assets/css/styles.min.css">
-    <link rel="stylesheet" href="assets/css/improvements.min.css">
-    <link rel="stylesheet" href="assets/css/fixes.css">
-    <link rel="stylesheet" href="assets/css/color-fixes.css">
-    <link rel="stylesheet" href="assets/css/layout-fixes.css">
-    <link rel="stylesheet" href="assets/css/professional-design.min.css">
-    <link rel="stylesheet" href="assets/css/floating-cards.min.css">
-    <link rel="stylesheet" href="assets/css/agency-identity.min.css">
+    <!-- CSS Optimisé - Critical CSS Inline -->
+    <style>
+        /* Critical CSS pour un chargement rapide */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        .header { position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
+        .hero-agency { min-height: 100vh; display: flex; align-items: center; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); }
+        .btn-primary { background: linear-gradient(135deg, #00D4AA, #00B894); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; }
+    </style>
+    
+    <!-- CSS Non-critique chargé de manière asynchrone -->
+    <link rel="preload" href="assets/css/styles.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="assets/css/improvements.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="assets/css/professional-design.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="assets/css/countries-section.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="assets/css/styles.min.css">
+        <link rel="stylesheet" href="assets/css/improvements.min.css">
+        <link rel="stylesheet" href="assets/css/professional-design.min.css">
+        <link rel="stylesheet" href="assets/css/countries-section.css">
+    </noscript>
     
     <!-- Fonts avec display=swap pour optimiser le chargement -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -86,61 +106,61 @@
         <div class="hero-content">
             <div class="hero-text">
                 <div class="agency-badge">
-                    Agence digitale leader en Afrique
+                    🏛️ Solutions E-gouvernement • Afrique de l'Ouest & Centrale
                 </div>
                 <h1 class="hero-title-agency">
-                    Nous créons des <span class="agency-highlight">expériences digitales</span> exceptionnelles
+                    Transformez vos <span class="agency-highlight">services publics</span> avec le numérique
                 </h1>
                 <p class="hero-description-agency">
-                    <span class="highlight-text">Greenfad</span> est l'agence de référence pour la transformation numérique en Afrique. 
-                    Nous concevons et développons des solutions sur mesure qui propulsent votre business vers le succès.
+                    <span class="highlight-text">Greenfad</span> accompagne les États et collectivités du <strong>Mali, Burkina Faso, Côte d'Ivoire et RDC</strong> 
+                    dans leur transformation digitale. Nous développons des solutions e-gouvernement sécurisées, accessibles et adaptées aux réalités africaines.
                 </p>
                 <div class="agency-stats">
                     <div class="agency-stat">
-                        <span class="agency-stat-number">150+</span>
-                        <span class="agency-stat-label">Projets livrés</span>
+                        <span class="agency-stat-number">25+</span>
+                        <span class="agency-stat-label">Projets e-gouvernement</span>
                     </div>
                     <div class="agency-stat">
-                        <span class="agency-stat-number">50+</span>
-                        <span class="agency-stat-label">Clients conquis</span>
+                        <span class="agency-stat-number">4</span>
+                        <span class="agency-stat-label">Pays d'intervention</span>
                     </div>
                     <div class="agency-stat">
-                        <span class="agency-stat-number">5+</span>
-                        <span class="agency-stat-label">Années d'expertise</span>
+                        <span class="agency-stat-number">500k+</span>
+                        <span class="agency-stat-label">Citoyens bénéficiaires</span>
                     </div>
                     <div class="agency-stat">
-                        <span class="agency-stat-number">98%</span>
-                        <span class="agency-stat-label">Satisfaction client</span>
+                        <span class="agency-stat-number">99.8%</span>
+                        <span class="agency-stat-label">Disponibilité des services</span>
                     </div>
                 </div>
                 <div class="agency-cta-group">
                     <a href="#contact" class="btn-agency-primary">
-                        <i class="fas fa-rocket"></i>
-                        Démarrer votre projet
+                        <i class="fas fa-handshake"></i>
+                        Demander un audit gratuit
                     </a>
                     <a href="#portfolio" class="btn-agency-secondary">
-                        <i class="fas fa-play"></i>
-                        Découvrir nos réalisations
+                        <i class="fas fa-landmark"></i>
+                        Voir nos références publiques
                     </a>
                 </div>
             </div>
             <div class="hero-visual">
                 <div class="floating-cards">
                     <div class="floating-card card-1">
-                        <i class="fas fa-code"></i>
-                        <span>Web</span>
+                        <i class="fas fa-university"></i>
+                        <span>E-admin</span>
                     </div>
                     <div class="floating-card card-2">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Mobile</span>
+                        <i class="fas fa-id-card"></i>
+                        <span>Identité digitale</span>
                     </div>
                     <div class="floating-card card-3">
-                        <i class="fas fa-search"></i>
-                        <span>SEO</span>
+                        <i class="fas fa-vote-yea"></i>
+                        <span>E-voting</span>
                     </div>
                     <div class="floating-card card-4">
-                        <i class="fas fa-print"></i>
-                        <span>Print</span>
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Cybersécurité</span>
                     </div>
                 </div>
             </div>
@@ -152,10 +172,56 @@
         </div>
     </section>
 
+    <!-- Pays d'intervention -->
+    <section class="countries-intervention">
+        <div class="container">
+            <div class="countries-header">
+                <h2 class="countries-title">Nos zones d'intervention en Afrique</h2>
+                <p class="countries-subtitle">
+                    Nous accompagnons les institutions publiques de 4 pays stratégiques
+                </p>
+            </div>
+            <div class="countries-grid">
+                <div class="country-card">
+                    <div class="country-flag">🇲🇱</div>
+                    <h3>Mali</h3>
+                    <p>Solutions e-gouvernement pour l'administration malienne</p>
+                    <div class="country-stats">
+                        <span>8 projets</span> • <span>Bamako, Sikasso</span>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <div class="country-flag">🇧🇫</div>
+                    <h3>Burkina Faso</h3>
+                    <p>Transformation digitale des services publics burkinabés</p>
+                    <div class="country-stats">
+                        <span>6 projets</span> • <span>Ouagadougou, Bobo-Dioulasso</span>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <div class="country-flag">🇨🇮</div>
+                    <h3>Côte d'Ivoire</h3>
+                    <p>Modernisation des collectivités ivoiriennes</p>
+                    <div class="country-stats">
+                        <span>10 projets</span> • <span>Abidjan, Bouaké, San-Pédro</span>
+                    </div>
+                </div>
+                <div class="country-card">
+                    <div class="country-flag">🇨🇩</div>
+                    <h3>RD Congo</h3>
+                    <p>E-administration pour les institutions congolaises</p>
+                    <div class="country-stats">
+                        <span>5 projets</span> • <span>Kinshasa, Lubumbashi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Trust Indicators -->
     <section class="clients-section">
         <div class="clients-container">
-            <p class="clients-title">Approuvé par les meilleures entreprises</p>
+            <p class="clients-title">🏛️ Partenaire de confiance des institutions publiques africaines</p>
             <div class="clients-grid">
                 <div class="client-logo">
                     <img src="assets/images/clients/client1.png" alt="Client 1" loading="lazy">
@@ -275,124 +341,7 @@
         </div>
     </section>
 
-    <!-- Countries Section -->
-    <section class="countries">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nos pays d'intervention</h2>
-                <p class="section-subtitle">
-                    Présents dans 5 pays d'Afrique de l'Ouest et Centrale pour accompagner la transformation numérique des institutions publiques
-                </p>
-            </div>
-            
-            <div class="countries-grid">
-                <!-- Mali -->
-                <div class="country-card">
-                    <div class="country-image">
-                        <img src="assets/images/countries/mali.jpg" alt="Mali - Bamako" loading="lazy">
-                        <div class="country-overlay">
-                            <div class="country-flag">🇲🇱</div>
-                            <h3>Mali</h3>
-                            <p>Siège social - Bamako</p>
-                        </div>
-                    </div>
-                    <div class="country-content">
-                        <h3>Mali</h3>
-                        <p>Notre siège social à Bamako, au cœur de la transformation digitale malienne. Solutions e-gouvernement et modernisation des services publics.</p>
-                        <ul class="country-services">
-                            <li>✓ Plateforme e-gouvernement</li>
-                            <li>✓ Applications citoyennes</li>
-                            <li>✓ Digitalisation des collectivités</li>
-                        </ul>
-                    </div>
-                </div>
 
-                <!-- Burkina Faso -->
-                <div class="country-card">
-                    <div class="country-image">
-                        <img src="assets/images/countries/burkina-faso.jpg" alt="Burkina Faso - Ouagadougou" loading="lazy">
-                        <div class="country-overlay">
-                            <div class="country-flag">🇧🇫</div>
-                            <h3>Burkina Faso</h3>
-                            <p>Succursale - Ouagadougou</p>
-                        </div>
-                    </div>
-                    <div class="country-content">
-                        <h3>Burkina Faso</h3>
-                        <p>Partenaire du Faso Digital 2025, nous accompagnons la transformation numérique des institutions burkinabè.</p>
-                        <ul class="country-services">
-                            <li>✓ Solutions gouvernementales</li>
-                            <li>✓ Systèmes d'information publics</li>
-                            <li>✓ Formation digitale</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Niger -->
-                <div class="country-card">
-                    <div class="country-image">
-                        <img src="assets/images/countries/niger.jpg" alt="Niger - Niamey" loading="lazy">
-                        <div class="country-overlay">
-                            <div class="country-flag">🇳🇪</div>
-                            <h3>Niger</h3>
-                            <p>Succursale - Niamey</p>
-                        </div>
-                    </div>
-                    <div class="country-content">
-                        <h3>Niger</h3>
-                        <p>Accompagnement des institutions nigériennes dans leur transition numérique et le développement de services publics innovants.</p>
-                        <ul class="country-services">
-                            <li>✓ Solutions e-gouvernement</li>
-                            <li>✓ Plateformes citoyennes</li>
-                            <li>✓ Infrastructure numérique</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Côte d'Ivoire -->
-                <div class="country-card">
-                    <div class="country-image">
-                        <img src="assets/images/countries/cote-ivoire.jpg" alt="Côte d'Ivoire - Abidjan" loading="lazy">
-                        <div class="country-overlay">
-                            <div class="country-flag">🇨🇮</div>
-                            <h3>Côte d'Ivoire</h3>
-                            <p>Succursale - Abidjan</p>
-                        </div>
-                    </div>
-                    <div class="country-content">
-                        <h3>Côte d'Ivoire</h3>
-                        <p>Au service de la Côte d'Ivoire Numérique, nous développons des solutions innovantes pour l'administration ivoirienne.</p>
-                        <ul class="country-services">
-                            <li>✓ Portails gouvernementaux</li>
-                            <li>✓ Services numériques citoyens</li>
-                            <li>✓ Interopérabilité des systèmes</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- RDC Congo -->
-                <div class="country-card">
-                    <div class="country-image">
-                        <img src="assets/images/countries/rdc-congo.jpeg" alt="RDC Congo - Kinshasa" loading="lazy">
-                        <div class="country-overlay">
-                            <div class="country-flag">🇨🇩</div>
-                            <h3>RDC Congo</h3>
-                            <p>Succursale - Kinshasa</p>
-                        </div>
-                    </div>
-                    <div class="country-content">
-                        <h3>RDC Congo</h3>
-                        <p>Contributeur à la stratégie Digital 2025 de la RDC, nous modernisons les services publics congolais.</p>
-                        <ul class="country-services">
-                            <li>✓ Identité numérique</li>
-                            <li>✓ Plateformes administratives</li>
-                            <li>✓ Solutions de paiement public</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Process Section -->
     <section class="process">
