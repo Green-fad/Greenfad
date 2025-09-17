@@ -335,6 +335,8 @@ button {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-4xl);
     align-items: center;
+    padding-top: 0px;
+
 }
 
 .hero-title {

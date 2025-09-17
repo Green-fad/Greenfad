@@ -116,6 +116,7 @@
     color: var(--agency-dark);
     margin-bottom: 32px;
     max-width: 600px;
+    text-align: justify;
 }
 
 .hero-description-agency .highlight-text {
@@ -177,7 +178,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 8px;
+    /* margin-bottom: 24px; */
     line-height: 1;
 }
 
