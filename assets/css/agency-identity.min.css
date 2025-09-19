@@ -16,6 +16,7 @@
     display: flex;
     align-items: center;
     padding-top: 85px;
+    padding-bottom: 8px;
 }
 
 .hero-agency::before {
@@ -293,6 +294,107 @@
     border-color: transparent;
     transform: translateY(-3px);
     box-shadow: 0 8px 32px rgba(0, 212, 170, 0.25);
+}
+
+.section-gradient-separator {
+    height: 1.5px; 
+    background: linear-gradient(90deg, #00D4AA, #6C5CE7);
+    width: 100%;
+    margin-top: -1px; 
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2; 
+}
+
+
+/* ===== CLIENTS LOGOS ===== */
+
+.client-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    /*gap: 10px;  Space between logo and label */
+    transition: transform 0.3s ease; /* Smooth transition for card hover effect */
+}
+
+.client-item:hover {
+    transform: translateY(-2px); 
+}
+
+.client-item:hover .client-label {
+    background: var(--agency-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700; 
+}
+
+.client-logo {
+    width: 100px; 
+    height: 70px; 
+    background: var(--white);
+    border-radius: var(--border-radius-lg); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem; 
+    box-shadow: var(--shadow-sm); 
+    border: 1px solid var(--gray-200); 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: var(--spacing-sm); 
+}
+
+.client-logo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.15); 
+    border-color: var(--primary-color);
+}
+
+.client-logo img {
+    max-width: 80%;
+    max-height: 80%; 
+    object-fit: contain;
+    filter: grayscale(100%) opacity(0.6); 
+    transition: all 0.3s ease;
+}
+
+.client-logo:hover img {
+    filter: grayscale(0%) opacity(1);
+}
+
+.client-label {
+    font-size: 0.75rem;
+    color: #64748B; 
+    font-weight: 500; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    margin-top: 0;
+    display: block;
+    line-height: 1.2;
+}
+
+/* Responsive pour client logos et titres */
+@media (max-width: 768px) {
+    .client-logo {
+        width: 80px; 
+        height: 60px; 
+        padding: 0.5rem; 
+    }
+    .client-label {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .client-logo {
+        width: 70px; 
+        height: 50px; 
+        padding: 0.4rem; 
+    }
+    .client-label {
+        font-size: 0.8rem;
+    }
 }
 
 
