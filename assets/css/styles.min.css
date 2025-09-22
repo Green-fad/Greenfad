@@ -678,13 +678,17 @@ button {
 
 .process-steps {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-2xl);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3xl);
+    max-width: 900px; 
+    margin: 0 auto;
+    place-items: center;
 }
 
 .step {
     text-align: center;
     position: relative;
+    padding: var(--spacing-md);
 }
 
 .step:not(:last-child)::after {
@@ -722,6 +726,9 @@ button {
 .step-description {
     color: var(--text-secondary);
     line-height: 1.6;
+    text-align: justify;
+    word-spacing: -0.01em; 
+    hyphens: auto;
 }
 
 .portfolio {
