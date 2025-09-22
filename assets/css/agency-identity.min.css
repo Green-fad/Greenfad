@@ -447,13 +447,15 @@
     line-height: 1.6;
     max-width: 700px;
     margin: 0 auto;
+    text-align: justify;
+    text-align-last: center;
 }
 
 .expertise-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 32px;
-    max-width: 1200px;
+    max-width: 1150px;
     margin: 0 auto;
     padding: 0 24px;
 }
@@ -523,6 +525,10 @@
     color: #64748B;
     line-height: 1.6;
     margin-bottom: 24px;
+    text-align:justify;
+    hyphens: auto; 
+    -webkit-hyphens: auto; 
+    -ms-hyphens: auto;
 }
 
 .expertise-features {

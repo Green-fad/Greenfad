@@ -168,6 +168,10 @@ button {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+    text-align:justify;
+    hyphens: auto; 
+    -webkit-hyphens: auto; 
+    -ms-hyphens: auto;
 }
 
 .section-header {

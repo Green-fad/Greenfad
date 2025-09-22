@@ -376,6 +376,14 @@ body {
     line-height: 1.6 !important;
 }
 
+.section-subtitle:hover .gradient-text {
+    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 .services-grid {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
