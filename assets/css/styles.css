@@ -932,7 +932,7 @@ button {
     flex-direction: column;
     gap: var(--spacing-md);
     padding: var(--spacing-md);
-    background: var(--white);
+    background: var(--agency-light);
     border-radius: var(--border-radius-xl); 
     box-shadow: var(--shadow-md); /* Ombre de la barre latérale */
     align-items: center;
