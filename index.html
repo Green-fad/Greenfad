@@ -17,7 +17,7 @@
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     
     <!-- CSS Optimisé -->
-    <link rel="stylesheet" href="assets/css/styles.min.css?v=1.0.6">
+    <link rel="stylesheet" href="assets/css/styles.min.css?v=1.0.7">
     <link rel="stylesheet" href="assets/css/improvements.min.css">
     <link rel="stylesheet" href="assets/css/fixes.css">
     <link rel="stylesheet" href="assets/css/color-fixes.css">
@@ -468,79 +468,133 @@
     <div class="section-gradient-separator"></div>
 
     <!-- Portfolio Section -->
-    <section id="portfolio" class="portfolio">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-title-bagde">Nos réalisations</div>
-                <p class="section-subtitle">
-                    Découvrez quelques projets qui illustrent notre expertise.
-                </p>
-            </div>
-            
-            <div class="portfolio-grid">
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        <img src="assets/images/portfolio/project1.jpg" alt="E-commerce Fashion" loading="lazy">
-                        <div class="portfolio-overlay">
-                            <h3>E-commerce Fashion</h3>
-                            <p>Site e-commerce avec 300% d'augmentation des ventes</p>
-                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <div class="portfolio-tags">
-                            <span class="tag">E-commerce</span>
-                            <span class="tag">Shopify</span>
-                        </div>
-                        <h3>Boutique de Mode</h3>
-                        <p>Développement d'une boutique en ligne avec système de gestion des stocks intégré.</p>
-                    </div>
-                </div>
 
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        <img src="assets/images/portfolio/project2.png" alt="Application Mobile" loading="lazy">
-                        <div class="portfolio-overlay">
-                            <h3>App Mobile Fitness</h3>
-                            <p>Application avec 50k+ téléchargements</p>
-                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <div class="portfolio-tags">
-                            <span class="tag">Flutter</span>
-                            <span class="tag">iOS/Android</span>
-                        </div>
-                        <h3>Application Fitness</h3>
-                        <p>App mobile de coaching sportif avec suivi personnalisé et communauté intégrée.</p>
-                    </div>
-                </div>
 
-                <div class="portfolio-item">
-                    <div class="portfolio-image">
-                        <img src="assets/images/portfolio/project3.jpeg" alt="Site Vitrine" loading="lazy">
-                        <div class="portfolio-overlay">
-                            <h3>Site Corporate</h3>
-                            <p>+200% d'augmentation du trafic organique</p>
-                            <a href="#" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
-                        </div>
-                    </div>
-                    <div class="portfolio-content">
-                        <div class="portfolio-tags">
-                            <span class="tag">WordPress</span>
-                            <span class="tag">SEO</span>
-                        </div>
-                        <h3>Site Corporate</h3>
-                        <p>Refonte complète avec optimisation SEO pour une entreprise BTP.</p>
+<!-- ... existing code ... -->
+
+    <!-- NEW Portfolio Section -->
+    <section id="portfolio" class="portfolio-redesign">
+        <div class="container portfolio-redesign-container">
+            <div class="portfolio-left-column">
+                <div class="portfolio-sidebar">
+                    <div class="portfolio-nav">
+                        <button class="portfolio-nav-item active" data-project="ferefad">
+                            <img src="assets/images/portfolio/ferefad-logo.png" alt="FereFad Logo">
+                        </button>
+                        <button class="portfolio-nav-item" data-project="qrfad">
+                            <img src="assets/images/portfolio/qrfad-logo.png" alt="QRFAD Logo">
+                        </button>
+                        <button class="portfolio-nav-item" data-project="fadcard">
+                            <img src="assets/images/portfolio/fadcard-logo3.png" alt="Fad Card Logo">
+                        </button>
+                        <button class="portfolio-nav-item" data-project="corporate">
+                            <img src="assets/images/portfolio/amitiefad-logo.png" alt="Amitié Fad Logo">
+                        </button>
                     </div>
                 </div>
+                <div class="portfolio-sidebar-cta">
+                    <a href="#contact" class="btn btn-primary btn-large">Voir tous nos projets</a>
+                </div>
             </div>
-            
-            <div class="portfolio-cta">
-                <a href="#contact" class="btn btn-primary btn-large">Voir tous nos projets</a>
-            </div>
+
+            <div class="portfolio-display">
+                <div class="portfolio-progress">
+                    <div class="portfolio-progress-bar"></div>
+                </div>
+                
+                    <!-- Project 1: FereFad -->
+                    <div class="portfolio-project-content active" id="project-ferefad">
+                        <div class="portfolio-display-image">
+                            <img src="assets/images/portfolio/ferefad1.jpg" alt="La Marketplace de Greenfad">
+                            <!-- Overlay Added -->
+                            <div class="portfolio-overlay">
+                                <h3>La Marketplace de Greenfad</h3>
+                                <p>Plateforme de Petites Annonces pour l'Afrique</p>
+                                <a href="https://www.ferefad.com/" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                            </div>
+                        </div>
+                        <div class="portfolio-display-tags">
+                            <span class="tag">Marketplace</span>
+                            <span class="tag">iOS - Android - Web</span>
+                        </div>
+                        <h3 class="portfolio-display-title">FereFad</h3>
+                        <p class="portfolio-display-description">
+                            <span style="color: #2C374B; font-weight: bold;">Fer</span><span style="color: #E9B833; font-weight: bold;">e</span><span style="color: #C34240; font-weight: bold;">Fad</span> est une plateforme inspirée par Oumar Ballo
+                            pour autonomiser la jeunesse africaine via le commerce numérique,
+                            soutenue par Greenfad pour encourager la croissance économique à
+                            travers une marketplace inclusive et transparente.
+                        </p>
+                    </div>
+
+                    <!-- Project 2: QRFAD -->
+                    <div class="portfolio-project-content" id="project-qrfad">
+                        <div class="portfolio-display-image">
+                            <img src="assets/images/portfolio/qrfad.jpg" alt="Scan & Commandez !">
+                            <!-- Overlay Added -->
+                            <div class="portfolio-overlay">
+                                <h3>Scan & Commandez !</h3>
+                                <p>Qrfad – Le menu digital pensé pour l’Afrique.</p>
+                                <a href="https://qrfad.com/" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                            </div>
+                        </div>
+                        <div class="portfolio-display-tags">
+                            <span class="tag">QR CODE</span>
+                            <span class="tag">Menu Digital</span>
+                        </div>
+                        <h3 class="portfolio-display-title">QRFAD</h3>
+                        <p class="portfolio-display-description">
+                            <span style="color: #158936; font-weight: bold;">QRFAD</span> est une solution numérique locale qui permet aux restaurants et hôtels africains de créer des menus digitaux via QR code, simples à gérer, accessibles en plusieurs langues et adaptés aux réalités du terrain.
+                        </p>
+                    </div>
+
+                    <!-- Project 3: FADCARD -->
+                    <div class="portfolio-project-content" id="project-fadcard">
+                        <div class="portfolio-display-image">
+                            <img src="assets/images/portfolio/fadcard.jpg" alt="Carte de visite numérique NFC">
+                            <!-- Overlay Added -->
+                            <div class="portfolio-overlay">
+                                <h3>Carte de visite numérique NFC</h3>
+                                <p>Votre identité professionnelle, digitale</p>
+                                <a href="https://fadcard.greenfad.tech/" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                            </div>
+                        </div>
+                        <div class="portfolio-display-tags">
+                            <span class="tag">Carte Digitale</span>
+                            <span class="tag">NFC/RFID</span>
+                        </div>
+                        <h3 class="portfolio-display-title">Fad Card</h3>
+                        <p class="portfolio-display-description">
+                            La <span style="color: #d0c52d; font-weight: bold;">Fad Card</span> de GreenFad est une carte de visite digitale équipée de la technologie NFC/RFID. En un simple geste, elle permet de partager vos coordonnées et informations professionnelles de façon moderne, sécurisée et mémorable. Compacte, élégante et adaptée à tous — entrepreneurs, entreprises ou indépendants — elle révolutionne la manière de réseauter et de gérer ses contacts.
+                        </p>
+                    </div>
+
+                    <!-- Project 4: Amitié Fad -->
+                    <div class="portfolio-project-content" id="project-amitiefad">
+                        <div class="portfolio-display-image">
+                            <img src="assets/images/portfolio/amitiefad.jpg" alt="Le confort connecté">
+                            <!-- Overlay Added -->
+                            <div class="portfolio-overlay">
+                                <h3>Le confort connecté</h3>
+                                <p>L’Amitié Fad - Votre Assistant Hôlelier Digital</p>
+                                <a href="https://greenfad.tech/vous-souvenez-vous-de-ces-petits-moments-frustrants-dans-un-hotel/" class="portfolio-link">Voir le projet <i class="fas fa-external-link-alt"></i></a>
+                            </div>
+                        </div>
+                        <div class="portfolio-display-tags">
+                            <span class="tag">Hospitalité Digitale</span>
+                            <span class="tag">Service Connecté</span>
+                        </div>
+                        <h3 class="portfolio-display-title">L’Amitié Fad</h3>
+                        <p class="portfolio-display-description">
+                            <span style="color: #ca9c49; font-weight: bold;">L’Amitié </span><span style="color: #453123; font-weight: bold;">Fad</span> est une solution digitale innovante qui simplifie la communication entre clients et personnel d’hôtel. Grâce à un simple QR code en chambre, les clients peuvent demander des services (ménage, taxi, restauration, ne pas déranger…) directement depuis leur smartphone. Rapide, intuitif et adapté aux réalités africaines, L’Amitié Fad offre plus de confort aux clients et plus d’efficacité aux équipes hôtelières.
+                        </p>
+                    </div>
+                </div>
         </div>
     </section>
+    <!-- END Portfolio Section -->
+
+
+
 
     <div class="section-gradient-separator"></div>
 
@@ -837,5 +891,6 @@
 
     <!-- Scripts -->
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/portfolio-interactivity.js?v=1.0.1"></script>
 </body>
 </html>

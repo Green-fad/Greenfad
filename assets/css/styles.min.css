@@ -746,6 +746,8 @@ button {
     hyphens: auto;
 }
 
+/* OLD Portfolio design Styles */
+
 .portfolio {
     padding: var(--spacing-4xl) 0;
     background: var(--gray-50);
@@ -773,14 +775,14 @@ button {
 
 .portfolio-image {
     position: relative;
-    height: 250px;
+    /* height: 250px; */
     overflow: hidden;
 }
 
 .portfolio-image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     transition: transform var(--transition-slow);
 }
 
@@ -844,7 +846,7 @@ button {
 }
 
 .portfolio-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
 }
 
 .portfolio-tags {
@@ -878,6 +880,279 @@ button {
     text-align: center;
 }
 
+
+
+/* New Portfolio Redesign Styles */
+
+.portfolio-redesign {
+    padding: var(--spacing-4xl) 0;
+    background: var(--gray-50); /* Couleur de fond pour toute la section */
+}
+
+.portfolio-redesign-container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    display: flex;
+    gap: var(--spacing-3xl);
+    align-items: flex-start; /* Aligne les éléments en haut */
+    padding: var(--spacing-xl); /* Marge intérieure autour de toute la section */
+}
+
+/* Colonne de gauche contenant la barre latérale et le bouton CTA */
+.portfolio-left-column {
+    flex: 0 0 150px; /* Largeur fixe de 150px */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-2xl); /* Marge en haut pour décaler la colonne vers le bas */
+}
+
+/* La boîte blanche contenant les boutons logo */
+.portfolio-sidebar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--white);
+    border-radius: var(--border-radius-xl); 
+    box-shadow: var(--shadow-md); /* Ombre de la barre latérale */
+    align-items: center;
+}
+
+/* Conteneur pour la navigation des logos */
+.portfolio-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg); /* Espace vertical entre les boutons logo */
+    width: 100%;
+    align-items: center; 
+    flex-grow: 1;
+}
+
+/* Style de chaque bouton logo */
+.portfolio-nav-item {
+    width: 90px; 
+    height: 90px; 
+    background: var(--agency-gradient-soft);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    border-radius: 10px; 
+    padding: var(--spacing-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    box-shadow: var(--shadow-sm); /* Ombre subtile pour les éléments inactifs */
+}
+
+.portfolio-nav-item:hover {
+    background: var(--primary-color);
+    border-color: transparent; 
+    box-shadow: var(--shadow-md);
+}
+
+.portfolio-nav-item.active {
+    background: var(--primary-light);
+    border-color: transparent;
+    box-shadow: var(--shadow-sm);
+}
+
+.portfolio-nav-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: filter var(--transition-fast);
+    filter: none; 
+}
+
+/* Style du bouton "Voir tous nos projets" */
+.portfolio-sidebar-cta {
+    margin-top: 0;
+    text-align: center;
+}
+
+/* Zone d'affichage du projet à droite */
+.portfolio-display {
+    grid-area: display;
+    flex: 1; /* Prend l'espace restant */
+    padding: var(--spacing-md); /* Marge intérieure dans la zone d'affichage */
+}
+
+/* Contenu de chaque projet (initialement caché) */
+.portfolio-project-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out; /* Transition douce pour le changement de contenu */
+}
+
+.portfolio-project-content.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Conteneur de l'image du projet */
+.portfolio-display-image {
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    max-height: 500px;
+    position: relative; /* Nécessaire pour l'effet de superposition */
+}
+
+/* Affiche la superposition et zoome sur l'image au survol */
+.portfolio-display-image:hover .portfolio-overlay {
+    opacity: 1;
+}
+
+.portfolio-display-image:hover img {
+    transform: scale(1.1);
+}
+
+.portfolio-display-image img {
+    width: 100%;
+    height: 100%; /* S'assure que l'image conserve son ratio */
+    object-fit: contain; /* S'assure que l'image est entièrement visible */
+    display: block;
+    border-radius: var(--border-radius-md);
+    transition: transform var(--transition-slow);
+}
+
+/* Conteneur pour les tags (ex: Flutter, iOS/Android) */
+.portfolio-display-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Style de chaque tag individuel */
+.tag {
+    background: var(--agency-gradient-soft);
+    color: var(--text-secondary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Titre du projet affiché */
+.portfolio-display-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Description du projet affiché */
+.portfolio-display-description {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Barre de progression grise (le conteneur) */
+.portfolio-progress {
+    position: relative;
+    height: 4px;
+    background: var(--gray-200); /* Fond gris clair pour la piste de progression */
+    margin-bottom: var(--spacing-xl);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+/* La barre de progression active (avec le dégradé) */
+.portfolio-progress-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); 
+    border-radius: 2px;
+    width: 0%;
+    /* L'animation de la largeur est gérée par le JavaScript pour plus de précision */
+}
+
+/* --- Ajustements pour les écrans responsives (tablettes et mobiles) --- */
+@media (max-width: 768px) {
+    .portfolio-redesign-container {
+        flex-direction: column; /* Passe en mode colonne */
+        align-items: center; /* Centre les éléments */
+        padding: var(--spacing-md);
+    }
+
+    .portfolio-left-column {
+        width: 100%; /* La colonne de gauche prend toute la largeur */
+        align-items: center; /* Centre son contenu (la barre latérale et le bouton) */
+        margin-top: 0; /* Annule la marge du haut en mode mobile */
+        flex: none; /* Annule la largeur fixe */
+    }
+
+    .portfolio-sidebar {
+        width: 100%;
+        max-width: 500px; /* Limite la largeur sur les tablettes */
+        padding: var(--spacing-sm);
+    }
+
+    .portfolio-nav {
+        flex-direction: row; /* Les logos s'affichent horizontalement */
+        flex-wrap: wrap; /* Permet le retour à la ligne si pas assez de place */
+        justify-content: center; /* Centre les logos */
+        gap: var(--spacing-md); /* Espace entre les logos */
+    }
+
+    .portfolio-nav-item {
+        width: 70px; /* Taille des boutons légèrement réduite pour mobile */
+        height: 70px;
+        padding: var(--spacing-xs);
+    }
+
+    .portfolio-sidebar-cta {
+        width: 100%;
+        margin-top: var(--spacing-sm);
+    }
+
+    .portfolio-display {
+        width: 100%;
+        padding: var(--spacing-sm);
+    }
+
+    .portfolio-display-image {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .portfolio-display-title {
+        font-size: var(--font-size-xl);
+    }
+
+    .portfolio-display-description {
+        font-size: var(--font-size-base); /* Police de base pour une meilleure lisibilité */
+    }
+
+    .portfolio-display-tags {
+        gap: var(--spacing-xs);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .tag {
+        font-size: var(--font-size-xs);
+    }
+
+    .portfolio-progress {
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+
+
+
+
+/* TESTIMONY */
 .testimonials {
     padding: var(--spacing-4xl) 0;
     background: var(--white);
