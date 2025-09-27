@@ -183,7 +183,7 @@ button {
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-    text-align:justify;
+    text-align:center;
     hyphens: auto; 
     -webkit-hyphens: auto; 
     -ms-hyphens: auto;
@@ -2226,6 +2226,8 @@ a:focus {
     box-shadow: var(--shadow-md);
     transition: all var(--transition-normal);
     border: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
 }
 
 .country-card:hover {
@@ -2287,7 +2289,11 @@ a:focus {
 }
 
 .country-content {
-    padding: var(--spacing-2xl);
+    padding: var(--spacing-lg) var(--spacing-2xl) var(--spacing-2xl); /* Padding réduit en HAUT, mais conservé sur les côtés et en bas */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* IMPORTANT : Empêche les éléments (comme le bouton) de s'étirer en largeur */
 }
 
 .country-content h3 {
@@ -2319,6 +2325,13 @@ a:focus {
     font-weight: bold;
     margin-right: var(--spacing-sm);
 }
+
+.country-cta {
+    font-size: var(--font-size-sm);
+    margin-top: auto; /* Pousse le bouton tout en bas de l'espace disponible */
+    padding-top: var(--spacing-lg); /* Ajoute un espace de sécurité au-dessus du bouton pour qu'il ne colle jamais au texte */
+}
+
 
 @media (max-width:768px) {
     .nav-menu {
