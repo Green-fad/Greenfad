@@ -1411,7 +1411,7 @@ button {
 
 /* ===== FOOTER ===== */
 .footer {
-    background: var(--gray-800);
+    background: #2D3748;
     color: var(--white);
     padding: var(--spacing-4xl) 0 var(--spacing-xl);
 }

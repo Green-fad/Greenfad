@@ -13,11 +13,18 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://greenfad.tech">
     
-    <!-- Favicon -->
+        
+    <!-- FAVICON AMÉLIORÉ -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+    <link rel="manifest" href="/assets/images/site.webmanifest">
+    <!-- La ligne .ico est une solution de repli pour les anciens navigateurs -->
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-    
+
+
     <!-- CSS Optimisé -->
-    <link rel="stylesheet" href="assets/css/styles.min.css?v=1.0.9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?v=1.0.10">
     <link rel="stylesheet" href="assets/css/improvements.min.css">
     <link rel="stylesheet" href="assets/css/fixes.css">
     <link rel="stylesheet" href="assets/css/color-fixes.css">
@@ -37,8 +44,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Preload des ressources critiques -->
-    <link rel="preload" href="assets/images/greenfad-logo.svg" as="image">
-    <link rel="preload" href="assets/css/styles.min.css?v=1.0.9" as="style">
+    <link rel="preload" href="assets/images/greenfad-logo-new.svg" as="image">
+    <link rel="preload" href="assets/css/styles.min.css?v=1.0.10" as="style">
     
     <!-- DNS Prefetch pour les domaines externes -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -51,7 +58,7 @@
             <div class="nav-container">
                 <div class="nav-logo">
                     <a href="#home">
-                        <img src="assets/images/greenfad-logo.svg" alt="Greenfad Logo" class="logo">
+                        <img src="assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
                     </a>
                 </div>
                 <ul class="nav-menu">
@@ -847,16 +854,17 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <img src="assets/images/greenfad-logo.svg" alt="Greenfad Logo" class="footer-logo">
+                    <img src="assets/images/greenfad-logo-footer1.svg" alt="Greenfad Logo" class="footer-logo">
                     <p class="footer-description">
                         Votre partenaire pour la transformation digitale. 
                         Développement web, mobile, SEO et impression.
                     </p>
                     <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="https://ml.linkedin.com/company/green-fad" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://www.facebook.com/p/Green-fad-100083594433530/" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/greenfad.tech/" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@greenfad1?is_from_webapp=1&sender_device=pc" class="social-link"><i class="fab fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/@greenfad" class="social-link"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
                 
@@ -864,10 +872,10 @@
                     <div class="link-group">
                         <h4>Services</h4>
                         <ul>
-                            <li><a href="#services">Développement Web</a></li>
-                            <li><a href="#services">Applications Mobiles</a></li>
-                            <li><a href="#services">SEO & Marketing</a></li>
-                            <li><a href="#services">Impression</a></li>
+                            <li><a href="services/web-development.html">Développement Web</a></li>
+                            <li><a href="services/mobile-apps.html">Applications Mobiles</a></li>
+                            <li><a href="services/seo-marketing.html">SEO & Marketing</a></li>
+                            <li><a href="services/print-communication.html">Impression</a></li>
                         </ul>
                     </div>
                     <div class="link-group">
@@ -876,27 +884,27 @@
                             <li><a href="#about">À propos</a></li>
                             <li><a href="#portfolio">Portfolio</a></li>
                             <li><a href="#contact">Contact</a></li>
-                            <li><a href="#">Carrières</a></li>
+                            <li><a href="careers.html">Carrières</a></li>
                         </ul>
                     </div>
                     <div class="link-group">
                         <h4>Support</h4>
                         <ul>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Documentation</a></li>
-                            <li><a href="#">Support technique</a></li>
-                            <li><a href="#">Politique de confidentialité</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="documentation.html">Documentation</a></li>
+                            <li><a href="support-technique.html">Support technique</a></li>
+                            <li><a href="politique-de-confidentialite.html">Politique de confidentialité</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 Greenfad. Tous droits réservés.</p>
+                <p>&copy; <span id="copyright-year">2024</span> Greenfad. Tous droits réservés.</p>
                 <div class="footer-legal">
-                    <a href="#">Mentions légales</a>
-                    <a href="#">Politique de confidentialité</a>
-                    <a href="#">CGV</a>
+                    <a href="mentions-legales.html">Mentions légales</a>
+                    <a href="politique-de-confidentialite.html">Politique de confidentialité</a>
+                    <a href="cgv.html">CGV</a>
                 </div>
             </div>
         </div>
@@ -904,6 +912,7 @@
 
     <!-- Scripts -->
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/portfolio-interactivity.js?v=1.0.1"></script>
+    <script src="assets/js/portfolio-interactivity.js?v=1.0.2"></script>
+    <script src="assets/js/footer-script.js?v=1.0.1"></script>
 </body>
 </html>

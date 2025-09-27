@@ -1393,7 +1393,7 @@ button {
 }
 
 .footer {
-    background: var(--gray-800);
+    background: #2D3748;
     color: var(--white);
     padding: var(--spacing-4xl) 0 var(--spacing-xl);
 }
@@ -1435,6 +1435,10 @@ button {
 .social-link:hover {
     background: var(--primary-color);
     transform: translateY(-2px);
+}
+
+.social-link:hover i {
+    color: var(--white);
 }
 
 .footer-links {
@@ -2652,4 +2656,82 @@ a:focus {
 
 .nav-link:hover::after {
     width: 100%;
+}
+
+
+/*
+ * Styles pour la page FAQ (réutilisables).
+ * Utilise les éléments <details> et <summary> pour un accordéon simple sans JavaScript.
+ */
+.faq-container {
+    max-width: 800px; /* Limite la largeur pour une meilleure lisibilité */
+    margin: var(--spacing-3xl) auto; /* Centre le conteneur et ajoute de l'espace */
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--gray-200); /* Ligne de séparation */
+    margin-bottom: var(--spacing-md);
+}
+
+.faq-item summary {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    padding: var(--spacing-md) 0;
+    cursor: pointer;
+    position: relative;
+    list-style: none; /* Supprime le marqueur par défaut */
+}
+
+/* Style pour l'icône + / - */
+.faq-item summary::after {
+    content: '+';
+    font-size: 1.5rem;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    transition: transform var(--transition-fast);
+}
+
+/* Quand l'accordéon est ouvert */
+.faq-item[open] summary::after {
+    content: '−';
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-answer {
+    padding-bottom: var(--spacing-lg);
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+
+/*
+ * Style pour les pages "Bientôt disponible" (réutilisable).
+ */
+.coming-soon-container {
+    max-width: 700px; /* Limite la largeur pour un look épuré */
+    margin: var(--spacing-4xl) auto; /* Centre le conteneur et ajoute beaucoup d'espace */
+    text-align: center; /* Centre tout le contenu */
+    padding: var(--spacing-2xl);
+    background: var(--gray-50);
+    border-radius: var(--border-radius-xl);
+}
+
+.coming-soon-container .icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+.coming-soon-container h2 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+}
+
+.coming-soon-container p {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
 }
