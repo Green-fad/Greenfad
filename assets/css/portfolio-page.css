@@ -1,0 +1,209 @@
+/*
+ * Applique le défilement par section à la page ENTIÈRE.
+ * C'est la correction majeure qui supprime la double barre de défilement.
+ */
+
+html {
+    scroll-snap-type: y mandatory;
+}
+
+
+/*
+ * Style de base pour chaque section.
+ */
+.portfolio-section {
+    height: 100vh;
+    width: 100%;
+    scroll-snap-align: start;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    padding: 0 var(--spacing-xl);
+    overflow: hidden;
+}
+
+.portfolio-section .bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: -2;
+}
+
+.portfolio-section .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 25, 47, 0.7);
+    z-index: -1;
+}
+
+/*
+ * Styles pour l'animation d'apparition du contenu.
+ */
+.project-content {
+    max-width: 900px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.project-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.project-tags {
+    margin-bottom: var(--spacing-md);
+}
+
+.project-tags .tag {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.project-title {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.1;
+}
+
+.project-description {
+    font-size: var(--font-size-lg);
+    line-height: 1.7;
+    margin-bottom: var(--spacing-xl);
+    color: var(--gray-300);
+    /* text-shadow: 0px 1px 6px rgb(0, 0, 0); */
+}
+
+/*
+ * Ajoute les styles pour le sous-titre et le slogan du projet.
+ */
+.project-subtitle {
+    font-size: var(--font-size-2xl); 
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-sm);
+    color: var(--white);
+}
+
+.project-tagline {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-lg);
+    color: var(--gray-300);
+    font-style: italic;
+    opacity: 0.9;
+}
+
+/*
+ * Section Hero (Introduction)
+ */
+.portfolio-hero .project-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+.portfolio-hero h1 {
+    font-size: clamp(3rem, 7vw, 6rem);
+}
+.portfolio-hero p {
+    font-size: var(--font-size-xl);
+    color: var(--gray-300);
+}
+
+/* Dégradé pour la section d'introduction */
+.portfolio-hero .overlay,
+.coming-soon-section .overlay {
+    background: linear-gradient(135deg, #002a22, #2c2560); /* De vert foncé à violet foncé */
+}
+
+.portfolio-hero .project-content {
+    opacity: 1;
+    transform: translateY(0);
+}
+.portfolio-hero h1 {
+    font-size: clamp(3rem, 7vw, 6rem);
+}
+.portfolio-hero p {
+    font-size: var(--font-size-xl);
+    color: var(--gray-300);
+}
+
+
+/* Position de l'indicateur de défilement */
+.scroll-indicator {
+    position: absolute;
+    bottom: var(--spacing-2xl); /* Déplacé vers le bas */
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+    color: white;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+    40% { transform: translate(-50%, -15px); }
+    60% { transform: translate(-50%, -10px); }
+}
+
+/*
+ * Section finale "Projets à venir".
+ */
+.coming-soon-section .overlay {
+    background: linear-gradient(135deg, #4A5568, #1A202C); /* dégradé pour hero pour la cohérence */
+}
+
+/* Animation pour l'icône */
+.coming-soon-section .icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-color);
+    animation: spin 10s linear infinite; /* Ajout de l'animation de rotation */
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/*
+ * Le footer devient le dernier point de "snap".
+ */
+.footer {
+    scroll-snap-align: end; /* S'assure que le défilement s'arrête proprement sur le footer */
+    position: relative; /* Assure un bon comportement dans le flux de la page */
+}
+
+
+@media (max-width: 768px) {
+    html {
+        scroll-snap-type: none; /* Désactive le snap sur mobile pour un défilement naturel */
+    }
+
+    .portfolio-section {
+        height: auto;
+        min-height: 90vh;
+        padding: var(--spacing-3xl) var(--spacing-md);
+    }
+
+    .portfolio-section .bg-image {
+        background-attachment: scroll;
+    }
+
+    .project-title {
+        font-size: var(--font-size-4xl);
+    }
+
+    .project-description {
+        font-size: var(--font-size-base);
+    }
+}

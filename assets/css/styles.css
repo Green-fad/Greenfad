@@ -2682,3 +2682,108 @@ a:focus {
     width: 100%;
 }
 
+
+
+/* ===== PAGES PAYS DÉDIÉES ===== */
+
+/*
+ * Conteneur principal pour la section hero des pages pays.
+ * On réutilise 'service-hero' pour le fond et l'espacement de base.
+ */
+.country-hero-section {
+    padding: calc(80px + var(--spacing-3xl)) 0 var(--spacing-4xl) !important;
+    background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 50%, #F0F9FF 100%) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/*
+ * Grille pour séparer le contenu (gauche) de l'image (droite).
+ * On réutilise 'service-hero-content' pour la structure.
+ */
+.country-hero-section .service-hero-content {
+    grid-template-columns: 1fr 1fr; /* Assure une division 50/50 */
+    align-items: flex-start; /* Aligne le contenu en haut pour un look propre */
+}
+
+/*
+ * Conteneur pour l'image du pays à droite.
+ */
+.country-hero-visual {
+    display: flex;
+    flex-direction: column; /* Aligne l'image et la légende en colonne (l'une en dessous de l'autre) */
+    align-items: center;
+    justify-content: center;
+    padding-left: var(--spacing-2xl); /* Espace entre le texte et l'image */
+}
+
+/*
+ * Style pour l'image du pays elle-même.
+ */
+.country-hero-visual img {
+    width: 100%;
+    max-width: 500px; /* Limite la taille maximale de l'image */
+    height: auto;
+    border-radius: var(--border-radius-xl); /* Bords arrondis */
+    box-shadow: var(--shadow-xl); /* Ombre prononcée pour un effet de profondeur */
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.country-hero-visual img:hover {
+    transform: scale(1.03); /* Effet de zoom subtil au survol */
+}
+
+/*
+ * Style pour la liste à puces sur la page pays, pour qu'elle soit bien espacée.
+ */
+.country-page-services {
+    list-style: none;
+    margin-top: var(--spacing-xl); /* Espace au-dessus de la liste */
+}
+
+.country-page-services li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+}
+
+.country-page-services li:before {
+    content: "✓";
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/*
+ * Style pour la légende sous l'image du pays.
+ */
+.country-hero-visual figcaption {
+    text-align: center;
+    margin-top: var(--spacing-md); /* Ajoute de l'espace au-dessus */
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+
+/* --- Responsive pour les pages pays --- */
+@media (max-width: 768px) {
+    .country-hero-section .service-hero-content {
+        grid-template-columns: 1fr; /* Passe en une seule colonne sur mobile */
+        text-align: center;
+    }
+
+    .country-hero-visual {
+        order: -1; /* Place l'image au-dessus du texte sur mobile */
+        padding-left: 0;
+        margin-bottom: var(--spacing-2xl);
+    }
+    
+    .country-page-services li {
+       justify-content: center; /* Centre les items de la liste sur mobile */
+    }
+}
