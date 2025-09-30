@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Grille Responsive - Greenfad</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive-enhanced.css">
+    <link rel="stylesheet" href="assets/css/grid-system-demo.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Indicateur de breakpoint -->
+    <div class="breakpoint-indicator" id="breakpointIndicator" data-breakpoint="lg">LG</div>
+    
+    <!-- Indicateur de performance -->
+    <div class="performance-indicator hidden" id="performanceIndicator">
+        <div>FPS: <span id="fpsCounter">60</span></div>
+        <div>Breakpoint: <span id="currentBreakpoint">lg</span></div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html">
+                        <img src="assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="#grid-system" class="nav-link">Système de Grille</a></li>
+                    <li><a href="#containers" class="nav-link">Containers</a></li>
+                    <li><a href="#flexbox" class="nav-link">Flexbox</a></li>
+                    <li><a href="#responsive" class="nav-link">Responsive</a></li>
+                </ul>
+                <div class="nav-cta">
+                    <button id="togglePerformance" class="btn btn-outline">Performance</button>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero section">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="text-display">Système de Grille Responsive</h1>
+                <p class="hero-subtitle">
+                    Démonstration complète du système de grille moderne avec CSS Grid et Flexbox
+                </p>
+                <div class="hero-cta">
+                    <a href="#grid-system" class="btn btn-primary btn-large">
+                        <i class="fas fa-th"></i> Voir les Grilles
+                    </a>
+                    <a href="#responsive" class="btn btn-outline btn-large">
+                        <i class="fas fa-mobile-alt"></i> Responsive Design
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Types de Containers -->
+    <section id="containers" class="section">
+        <div class="container">
+            <h2 class="section-title text-center">Types de Containers</h2>
+            
+            <!-- Container Standard -->
+            <div class="container-demo" data-container-type="Container Standard">
+                <div class="container">
+                    <div class="responsive-text-demo">
+                        <h3>Container Standard</h3>
+                        <p>Largeur maximale de 1200px avec padding responsive. Idéal pour la plupart des contenus.</p>
+                        <div class="code-preview">
+.container {
+    width: min(95%, 1200px);
+    margin: 0 auto;
+    padding-left: var(--fluid-spacing-md);
+    padding-right: var(--fluid-spacing-md);
+}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container Étroit -->
+            <div class="container-demo" data-container-type="Container Étroit">
+                <div class="container-narrow">
+                    <div class="responsive-text-demo">
+                        <h3>Container Étroit</h3>
+                        <p>Largeur maximale de 800px. Parfait pour les articles et le contenu textuel.</p>
+                        <div class="code-preview">
+.container-narrow {
+    width: min(90%, 800px);
+    margin: 0 auto;
+}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Container Large -->
+            <div class="container-demo" data-container-type="Container Large">
+                <div class="container-wide">
+                    <div class="responsive-text-demo">
+                        <h3>Container Large</h3>
+                        <p>Largeur maximale de 1400px. Idéal pour les dashboards et les interfaces complexes.</p>
+                        <div class="code-preview">
+.container-wide {
+    width: min(98%, 1400px);
+    margin: 0 auto;
+}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Système de Grille CSS Grid -->
+    <section id="grid-system" class="section">
+        <div class="container">
+            <h2 class="section-title text-center">CSS Grid System</h2>
+            
+            <!-- Grille 1 Colonne -->
+            <div class="demo-section">
+                <h3 class="demo-title">Grille 1 Colonne</h3>
+                <div class="grid grid-1 grid-demo-1">
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">1</div>
+                        <h3>Colonne Unique</h3>
+                        <p>Parfait pour mobile</p>
+                    </div>
+                </div>
+                <div class="code-preview">
+.grid-1 { grid-template-columns: 1fr; }
+                </div>
+            </div>
+
+            <!-- Grille 2 Colonnes -->
+            <div class="demo-section">
+                <h3 class="demo-title">Grille 2 Colonnes</h3>
+                <div class="grid grid-2 grid-demo-2">
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">1</div>
+                        <h3>Première Colonne</h3>
+                        <p>50% de la largeur</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">2</div>
+                        <h3>Deuxième Colonne</h3>
+                        <p>50% de la largeur</p>
+                    </div>
+                </div>
+                <div class="code-preview">
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+                </div>
+            </div>
+
+            <!-- Grille 3 Colonnes -->
+            <div class="demo-section">
+                <h3 class="demo-title">Grille 3 Colonnes</h3>
+                <div class="grid grid-3 grid-demo-3">
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">1</div>
+                        <h3>Première</h3>
+                        <p>33.33%</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">2</div>
+                        <h3>Deuxième</h3>
+                        <p>33.33%</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">3</div>
+                        <h3>Troisième</h3>
+                        <p>33.33%</p>
+                    </div>
+                </div>
+                <div class="code-preview">
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+                </div>
+            </div>
+
+            <!-- Grille 4 Colonnes -->
+            <div class="demo-section">
+                <h3 class="demo-title">Grille 4 Colonnes</h3>
+                <div class="grid grid-4 grid-demo-4">
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">1</div>
+                        <h3>Une</h3>
+                        <p>25%</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">2</div>
+                        <h3>Deux</h3>
+                        <p>25%</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">3</div>
+                        <h3>Trois</h3>
+                        <p>25%</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">4</div>
+                        <h3>Quatre</h3>
+                        <p>25%</p>
+                    </div>
+                </div>
+                <div class="code-preview">
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+                </div>
+            </div>
+
+            <!-- Grille Automatique -->
+            <div class="demo-section">
+                <h3 class="demo-title">Grille Automatique (Responsive)</h3>
+                <div class="grid grid-auto grid-demo-auto">
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">1</div>
+                        <h3>Auto</h3>
+                        <p>Min 300px</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">2</div>
+                        <h3>Fit</h3>
+                        <p>Responsive</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">3</div>
+                        <h3>Grid</h3>
+                        <p>Intelligent</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">4</div>
+                        <h3>Layout</h3>
+                        <p>Moderne</p>
+                    </div>
+                    <div class="demo-grid-item">
+                        <div class="demo-grid-number">5</div>
+                        <h3>System</h3>
+                        <p>Flexible</p>
+                    </div>
+                </div>
+                <div class="code-preview">
+.grid-auto { 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Système Flexbox -->
+    <section id="flexbox" class="section">
+        <div class="container">
+            <h2 class="section-title text-center">Système Flexbox</h2>
+            
+            <!-- Flex Center -->
+            <div class="demo-section">
+                <h3 class="demo-title">Flex Center</h3>
+                <div class="flex-demo">
+                    <div class="flex flex-center">
+                        <div class="flex-demo-item">Élément 1</div>
+                        <div class="flex-demo-item">Élément 2</div>
+                        <div class="flex-demo-item">Élément 3</div>
+                    </div>
+                </div>
+                <div class="code-preview">
+.flex-center { 
+    align-items: center; 
+    justify-content: center; 
+}
+                </div>
+            </div>
+
+            <!-- Flex Between -->
+            <div class="demo-section">
+                <h3 class="demo-title">Flex Between</h3>
+                <div class="flex-demo">
+                    <div class="flex flex-between">
+                        <div class="flex-demo-item">Gauche</div>
+                        <div class="flex-demo-item">Centre</div>
+                        <div class="flex-demo-item">Droite</div>
+                    </div>
+                </div>
+                <div class="code-preview">
+.flex-between { justify-content: space-between; }
+                </div>
+            </div>
+
+            <!-- Flex Column -->
+            <div class="demo-section">
+                <h3 class="demo-title">Flex Column</h3>
+                <div class="flex-demo">
+                    <div class="flex flex-column">
+                        <div class="flex-demo-item">Haut</div>
+                        <div class="flex-demo-item">Milieu</div>
+                        <div class="flex-demo-item">Bas</div>
+                    </div>
+                </div>
+                <div class="code-preview">
+.flex-column { flex-direction: column; }
+                </div>
+            </div>
+
+            <!-- Flex Wrap -->
+            <div class="demo-section">
+                <h3 class="demo-title">Flex Wrap</h3>
+                <div class="flex-demo">
+                    <div class="flex flex-wrap">
+                        <div class="flex-demo-item">Item 1</div>
+                        <div class="flex-demo-item">Item 2</div>
+                        <div class="flex-demo-item">Item 3</div>
+                        <div class="flex-demo-item">Item 4</div>
+                        <div class="flex-demo-item">Item 5</div>
+                        <div class="flex-demo-item">Item 6</div>
+                    </div>
+                </div>
+                <div class="code-preview">
+.flex-wrap { flex-wrap: wrap; }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Utilitaires de Visibilité -->
+    <section id="responsive" class="section">
+        <div class="container">
+            <h2 class="section-title text-center">Utilitaires Responsive</h2>
+            
+            <div class="demo-section">
+                <h3 class="demo-title">Visibilité par Breakpoint</h3>
+                
+                <div class="visibility-demo">
+                    <p><strong>Instructions :</strong> Redimensionnez votre fenêtre pour voir les éléments apparaître/disparaître selon le breakpoint.</p>
+                    
+                    <div class="visibility-item visibility-mobile show-mobile">
+                        <i class="fas fa-mobile-alt"></i>
+                        <strong>Visible uniquement sur mobile</strong> (< 768px)
+                    </div>
+                    
+                    <div class="visibility-item visibility-tablet show-tablet">
+                        <i class="fas fa-tablet-alt"></i>
+                        <strong>Visible uniquement sur tablette</strong> (768px - 1023px)
+                    </div>
+                    
+                    <div class="visibility-item visibility-desktop show-desktop">
+                        <i class="fas fa-desktop"></i>
+                        <strong>Visible uniquement sur desktop</strong> (> 1024px)
+                    </div>
+                </div>
+
+                <div class="code-preview">
+/* Utilitaires de visibilité */
+.show-mobile { display: none; }
+@media (max-width: 767px) {
+    .show-mobile { display: block !important; }
+}
+
+.show-tablet { display: none; }
+@media (min-width: 768px) and (max-width: 1023px) {
+    .show-tablet { display: block !important; }
+}
+                </div>
+            </div>
+
+            <!-- Aspect Ratios -->
+            <div class="demo-section">
+                <h3 class="demo-title">Aspect Ratios</h3>
+                
+                <div class="grid grid-4">
+                    <div class="aspect-ratio-demo aspect-16-9">
+                        <div class="aspect-ratio-demo-content">16:9</div>
+                    </div>
+                    <div class="aspect-ratio-demo aspect-4-3">
+                        <div class="aspect-ratio-demo-content">4:3</div>
+                    </div>
+                    <div class="aspect-ratio-demo aspect-1-1">
+                        <div class="aspect-ratio-demo-content">1:1</div>
+                    </div>
+                    <div class="aspect-ratio-demo aspect-3-4">
+                        <div class="aspect-ratio-demo-content">3:4</div>
+                    </div>
+                </div>
+
+                <div class="code-preview">
+.aspect-ratio-demo::before {
+    content: '';
+    display: block;
+    padding-top: var(--aspect-ratio, 56.25%);
+}
+
+.aspect-16-9 { --aspect-ratio: 56.25%; }
+.aspect-1-1 { --aspect-ratio: 100%; }
+                </div>
+            </div>
+
+            <!-- Typographie Fluide -->
+            <div class="demo-section">
+                <h3 class="demo-title">Typographie Fluide avec clamp()</h3>
+                
+                <div class="responsive-text-demo">
+                    <h1>Titre H1 Fluide</h1>
+                    <h2>Titre H2 Fluide</h2>
+                    <h3>Titre H3 Fluide</h3>
+                    <p>Ce paragraphe utilise une taille de police fluide qui s'adapte à la taille de l'écran grâce à la fonction CSS clamp().</p>
+                </div>
+
+                <div class="code-preview">
+:root {
+    --fluid-base: clamp(0.9rem, 3vw, 1rem);
+    --fluid-lg: clamp(1rem, 3.5vw, 1.125rem);
+    --fluid-4xl: clamp(1.8rem, 6vw, 2.25rem);
+}
+
+h1 { font-size: var(--fluid-6xl); }
+p { font-size: var(--fluid-base); }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instructions d'utilisation -->
+    <section class="section">
+        <div class="container-narrow">
+            <h2 class="section-title text-center">Guide d'Utilisation</h2>
+            
+            <div class="card">
+                <div class="card-content">
+                    <h3 class="card-title"><i class="fas fa-th"></i> CSS Grid</h3>
+                    <p>Utilisez les classes <code>.grid</code> avec <code>.grid-1</code>, <code>.grid-2</code>, <code>.grid-3</code>, <code>.grid-4</code> ou <code>.grid-auto</code> pour créer des layouts en grille.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <h3 class="card-title"><i class="fas fa-arrows-alt-h"></i> Flexbox</h3>
+                    <p>Combinez <code>.flex</code> avec <code>.flex-center</code>, <code>.flex-between</code>, <code>.flex-column</code>, <code>.flex-wrap</code> pour des alignements flexibles.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <h3 class="card-title"><i class="fas fa-mobile-alt"></i> Responsive</h3>
+                    <p>Utilisez <code>.show-mobile</code>, <code>.show-tablet</code>, <code>.show-desktop</code> et leurs équivalents <code>.hide-*</code> pour contrôler la visibilité.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <h3 class="card-title"><i class="fas fa-expand"></i> Containers</h3>
+                    <p>Choisissez entre <code>.container</code> (standard), <code>.container-narrow</code> (étroit) et <code>.container-wide</code> (large) selon vos besoins.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script src="assets/js/responsive-enhanced.js"></script>
+    
+    <script>
+        // Script spécifique à la démonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            const breakpointIndicator = document.getElementById('breakpointIndicator');
+            const performanceIndicator = document.getElementById('performanceIndicator');
+            const toggleBtn = document.getElementById('togglePerformance');
+            const fpsCounter = document.getElementById('fpsCounter');
+            const currentBreakpoint = document.getElementById('currentBreakpoint');
+            
+            // Mettre à jour l'indicateur de breakpoint
+            function updateBreakpointIndicator() {
+                if (window.responsiveManager) {
+                    const bp = window.responsiveManager.getBreakpoint();
+                    breakpointIndicator.textContent = bp.toUpperCase();
+                    breakpointIndicator.setAttribute('data-breakpoint', bp);
+                    currentBreakpoint.textContent = bp;
+                }
+            }
+            
+            // Écouter les changements de breakpoint
+            window.addEventListener('breakpointChange', updateBreakpointIndicator);
+            
+            // Toggle performance indicator
+            toggleBtn.addEventListener('click', function() {
+                performanceIndicator.classList.toggle('hidden');
+            });
+            
+            // Mettre à jour le FPS
+            function updateFPS() {
+                if (window.performanceMonitor && !performanceIndicator.classList.contains('hidden')) {
+                    const metrics = window.performanceMonitor.getMetrics();
+                    fpsCounter.textContent = metrics.fps || '60';
+                }
+            }
+            
+            setInterval(updateFPS, 1000);
+            
+            // Initialiser
+            updateBreakpointIndicator();
+            
+            // Smooth scroll pour les liens internes
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

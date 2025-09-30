@@ -1,0 +1,541 @@
+/* ===== OPTIMISATION DES IMAGES ET LAZY LOADING ===== */
+
+/* Image de base avec optimisations */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Images responsives avec aspect ratio */
+.img-responsive {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+}
+
+.img-contain {
+    object-fit: contain;
+}
+
+.img-cover {
+    object-fit: cover;
+}
+
+.img-fill {
+    object-fit: fill;
+}
+
+/* Container avec aspect ratio fixe */
+.img-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    background: var(--gray-100);
+}
+
+.img-container::before {
+    content: '';
+    display: block;
+    padding-top: var(--aspect-ratio, 56.25%); /* 16:9 par défaut */
+}
+
+.img-container img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Ratios d'aspect prédéfinis */
+.aspect-16-9 { --aspect-ratio: 56.25%; }
+.aspect-4-3 { --aspect-ratio: 75%; }
+.aspect-1-1 { --aspect-ratio: 100%; }
+.aspect-3-2 { --aspect-ratio: 66.66%; }
+.aspect-2-3 { --aspect-ratio: 150%; }
+.aspect-21-9 { --aspect-ratio: 42.85%; }
+
+/* ===== LAZY LOADING ===== */
+
+/* Image en cours de chargement */
+.img-lazy {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(1.05);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: var(--gray-200);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Placeholder pendant le chargement */
+.img-lazy::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+    z-index: 1;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Icône de chargement */
+.img-lazy::after {
+    content: '\f03e'; /* Icône image Font Awesome */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 2rem;
+    color: var(--gray-400);
+    z-index: 2;
+    position: relative;
+}
+
+/* Image chargée */
+.img-lazy.loaded {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+}
+
+.img-lazy.loaded::before,
+.img-lazy.loaded::after {
+    display: none;
+}
+
+/* Erreur de chargement */
+.img-lazy.error {
+    background: var(--gray-300);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.img-lazy.error::before {
+    display: none;
+}
+
+.img-lazy.error::after {
+    content: '\f071'; /* Icône d'erreur */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: var(--error);
+}
+
+/* ===== IMAGES OPTIMISÉES POUR DIFFÉRENTS ÉCRANS ===== */
+
+/* Système d'images responsives avec srcset simulé via CSS */
+.img-responsive-set {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 200px;
+    border-radius: var(--border-radius-lg);
+}
+
+/* Images spécifiques aux breakpoints */
+@media (max-width: 480px) {
+    .img-mobile {
+        display: block;
+    }
+    
+    .img-tablet,
+    .img-desktop {
+        display: none;
+    }
+    
+    /* Réduire la qualité sur mobile pour les performances */
+    .img-lazy {
+        min-height: 150px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 1023px) {
+    .img-mobile {
+        display: none;
+    }
+    
+    .img-tablet {
+        display: block;
+    }
+    
+    .img-desktop {
+        display: none;
+    }
+}
+
+@media (min-width: 1024px) {
+    .img-mobile,
+    .img-tablet {
+        display: none;
+    }
+    
+    .img-desktop {
+        display: block;
+    }
+}
+
+/* ===== GALERIE D'IMAGES RESPONSIVE ===== */
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--fluid-spacing-md);
+    padding: var(--fluid-spacing-lg) 0;
+}
+
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+    background: var(--gray-100);
+}
+
+.gallery-item:hover {
+    transform: scale(1.02);
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.1);
+}
+
+/* Overlay pour la galerie */
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-overlay-content {
+    text-align: center;
+    color: var(--white);
+    padding: var(--spacing-lg);
+}
+
+.gallery-overlay-title {
+    font-size: var(--fluid-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-sm);
+}
+
+.gallery-overlay-description {
+    font-size: var(--fluid-sm);
+    opacity: 0.9;
+}
+
+/* ===== OPTIMISATIONS PERFORMANCE ===== */
+
+/* Préchargement des images critiques */
+.img-preload {
+    position: relative;
+}
+
+.img-preload::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 70%
+    );
+    animation: preload-shimmer 2s infinite;
+    pointer-events: none;
+}
+
+@keyframes preload-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Images en WebP avec fallback */
+.img-webp {
+    background-image: var(--fallback-image);
+}
+
+.webp .img-webp {
+    background-image: var(--webp-image);
+}
+
+/* Optimisation de la bande passante */
+@media (prefers-reduced-data: reduce) {
+    .img-lazy {
+        min-height: 100px;
+    }
+    
+    .image-gallery {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--spacing-md);
+    }
+    
+    /* Désactiver les animations sur les connexions lentes */
+    .gallery-item img,
+    .img-lazy {
+        transition: none;
+    }
+}
+
+/* ===== LOGOS ET ICÔNES ===== */
+
+.logo {
+    max-height: 60px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-small {
+    max-height: 40px;
+}
+
+.logo-large {
+    max-height: 80px;
+}
+
+.icon-img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.icon-img-small {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-img-large {
+    width: 32px;
+    height: 32px;
+}
+
+/* ===== AVATARS ===== */
+
+.avatar {
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+.avatar-small {
+    width: 40px;
+    height: 40px;
+}
+
+.avatar-medium {
+    width: 60px;
+    height: 60px;
+}
+
+.avatar-large {
+    width: 80px;
+    height: 80px;
+}
+
+.avatar-xl {
+    width: 120px;
+    height: 120px;
+}
+
+/* ===== IMAGES DE FOND RESPONSIVES ===== */
+
+.bg-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.bg-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.bg-image-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Parallax effect (avec intersection observer) */
+.bg-parallax {
+    background-attachment: scroll; /* Performance sur mobile */
+    will-change: transform;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .bg-parallax {
+        background-attachment: fixed;
+    }
+}
+
+/* ===== RESPONSIVE IMAGES DANS LE CONTENU ===== */
+
+.content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+    margin: var(--spacing-lg) 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.content .img-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content .img-left {
+    float: left;
+    margin: 0 var(--spacing-lg) var(--spacing-lg) 0;
+}
+
+.content .img-right {
+    float: right;
+    margin: 0 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+/* Clear float sur mobile */
+@media (max-width: 767px) {
+    .content .img-left,
+    .content .img-right {
+        float: none;
+        margin: var(--spacing-lg) 0;
+        width: 100%;
+    }
+}
+
+/* ===== LIGHTBOX SIMPLE ===== */
+
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+}
+
+.lightbox.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+}
+
+.lightbox-content img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-lg);
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.lightbox-close:hover {
+    color: var(--primary-color);
+}
+
+/* ===== MODE SOMBRE ===== */
+
+@media (prefers-color-scheme: dark) {
+    .img-lazy {
+        background: var(--gray-700);
+    }
+    
+    .img-lazy::before {
+        background: linear-gradient(90deg, var(--gray-700) 25%, var(--gray-600) 50%, var(--gray-700) 75%);
+    }
+    
+    .img-lazy::after {
+        color: var(--gray-500);
+    }
+    
+    .gallery-overlay {
+        background: rgba(0, 0, 0, 0.8);
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+
+@media print {
+    .img-lazy::before,
+    .img-lazy::after,
+    .gallery-overlay,
+    .lightbox {
+        display: none;
+    }
+    
+    .img-lazy {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+    
+    .image-gallery {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        break-inside: avoid;
+    }
+}

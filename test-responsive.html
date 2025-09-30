@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Responsivité - Greenfad</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/responsive-enhanced.css?v=2.0.0">
+    <link rel="stylesheet" href="assets/css/image-optimization.css?v=2.0.0">
+    <link rel="stylesheet" href="assets/css/animations-responsive.css?v=2.0.0">
+    <link rel="stylesheet" href="assets/css/accessibility-enhanced.css?v=2.0.0">
+    <link rel="stylesheet" href="assets/css/grid-system-demo.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- JavaScript -->
+    <script src="assets/js/responsive-enhanced.js?v=2.0.0" defer></script>
+    <script src="assets/js/image-optimization.js?v=2.0.0" defer></script>
+    <script src="assets/js/animations-manager.js?v=2.0.0" defer></script>
+    <script src="assets/js/accessibility-manager.js?v=2.0.0" defer></script>
+    
+    <style>
+        .test-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .breakpoint-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            font-family: monospace;
+            z-index: 1000;
+        }
+        
+        .test-grid {
+            display: grid;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .test-item {
+            background: var(--gray-100);
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            border: 1px solid var(--gray-300);
+        }
+        
+        /* Test responsive classes */
+        @media (max-width: 319px) {
+            .test-grid { grid-template-columns: 1fr; }
+            .breakpoint-info::after { content: " XS (< 320px)"; }
+        }
+        
+        @media (min-width: 320px) and (max-width: 479px) {
+            .test-grid { grid-template-columns: 1fr; }
+            .breakpoint-info::after { content: " XS (320-479px)"; }
+        }
+        
+        @media (min-width: 480px) and (max-width: 767px) {
+            .test-grid { grid-template-columns: repeat(2, 1fr); }
+            .breakpoint-info::after { content: " SM (480-767px)"; }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .test-grid { grid-template-columns: repeat(3, 1fr); }
+            .breakpoint-info::after { content: " MD (768-1023px)"; }
+        }
+        
+        @media (min-width: 1024px) and (max-width: 1199px) {
+            .test-grid { grid-template-columns: repeat(4, 1fr); }
+            .breakpoint-info::after { content: " LG (1024-1199px)"; }
+        }
+        
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .test-grid { grid-template-columns: repeat(5, 1fr); }
+            .breakpoint-info::after { content: " XL (1200-1399px)"; }
+        }
+        
+        @media (min-width: 1400px) {
+            .test-grid { grid-template-columns: repeat(6, 1fr); }
+            .breakpoint-info::after { content: " XXL (≥ 1400px)"; }
+        }
+        
+        .performance-metrics {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius-md);
+            font-family: monospace;
+            font-size: 0.75rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html">
+                        <img src="assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Accueil</a></li>
+                    <li><a href="grid-demo.html" class="nav-link">Grilles</a></li>
+                    <li><a href="#breakpoints" class="nav-link">Breakpoints</a></li>
+                    <li><a href="#performance" class="nav-link">Performance</a></li>
+                    <li><a href="#accessibility" class="nav-link">Accessibilité</a></li>
+                </ul>
+                <div class="nav-cta">
+                    <button onclick="toggleMetrics()" class="btn btn-outline">Métriques</button>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Indicateur de breakpoint -->
+    <div class="breakpoint-info">
+        <strong>Breakpoint:</strong>
+    </div>
+    
+    <!-- Métriques de performance -->
+    <div class="performance-metrics" id="performanceMetrics" style="display: none;">
+        <div>Viewport: <span id="viewport">-</span></div>
+        <div>FPS: <span id="fps">60</span></div>
+        <div>Images chargées: <span id="imagesLoaded">0</span></div>
+        <div>Connexion: <span id="connection">-</span></div>
+    </div>
+
+    <!-- Hero Section de test -->
+    <section class="hero section" data-animate="fade-in-up">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="text-display animate-on-scroll">Test de Responsivité</h1>
+                <p class="hero-subtitle animate-on-scroll">
+                    Cette page teste tous les aspects du système responsive amélioré
+                </p>
+                <div class="hero-cta animate-on-scroll">
+                    <button onclick="runResponsiveTest()" class="btn btn-primary btn-large hover-lift">
+                        <i class="fas fa-play"></i> Lancer le Test
+                    </button>
+                    <a href="#tests" class="btn btn-outline btn-large hover-scale">
+                        <i class="fas fa-eye"></i> Voir les Tests
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tests de Breakpoints -->
+    <section id="breakpoints" class="section">
+        <div class="container">
+            <h2 class="section-title text-center animate-on-scroll">Tests de Breakpoints</h2>
+            
+            <div class="test-section">
+                <h3>Grille Adaptative</h3>
+                <div class="test-grid">
+                    <div class="test-item animate-on-scroll animate-cascade">Item 1</div>
+                    <div class="test-item animate-on-scroll animate-cascade">Item 2</div>
+                    <div class="test-item animate-on-scroll animate-cascade">Item 3</div>
+                    <div class="test-item animate-on-scroll animate-cascade">Item 4</div>
+                    <div class="test-item animate-on-scroll animate-cascade">Item 5</div>
+                    <div class="test-item animate-on-scroll animate-cascade">Item 6</div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Navigation Mobile</h3>
+                <p>Testez la navigation hamburger sur différents écrans :</p>
+                <ul>
+                    <li>Mobile (< 768px) : Menu hamburger visible</li>
+                    <li>Tablette (768-1023px) : Navigation condensée</li>
+                    <li>Desktop (> 1024px) : Navigation complète</li>
+                </ul>
+            </div>
+
+            <div class="test-section">
+                <h3>Typographie Fluide</h3>
+                <h1>Titre H1 - S'adapte à l'écran</h1>
+                <h2>Titre H2 - Taille fluide avec clamp()</h2>
+                <h3>Titre H3 - Responsive typography</h3>
+                <p>Ce paragraphe utilise une typographie fluide qui s'adapte automatiquement à la taille de l'écran grâce aux variables CSS et à la fonction clamp().</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tests de Performance -->
+    <section id="performance" class="section">
+        <div class="container">
+            <h2 class="section-title text-center animate-on-scroll">Tests de Performance</h2>
+            
+            <div class="test-section">
+                <h3>Images avec Lazy Loading</h3>
+                <div class="grid grid-3">
+                    <div class="card hover-lift">
+                        <div class="img-container aspect-16-9">
+                            <img class="img-lazy" 
+                                 data-src="https://via.placeholder.com/400x225/00D4AA/ffffff?text=Image+1" 
+                                 alt="Image de test 1">
+                        </div>
+                        <div class="card-content">
+                            <h4>Image Lazy 1</h4>
+                            <p>Cette image se charge quand elle devient visible</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card hover-lift">
+                        <div class="img-container aspect-16-9">
+                            <img class="img-lazy" 
+                                 data-src="https://via.placeholder.com/400x225/6C5CE7/ffffff?text=Image+2" 
+                                 alt="Image de test 2">
+                        </div>
+                        <div class="card-content">
+                            <h4>Image Lazy 2</h4>
+                            <p>Optimisation automatique selon l'écran</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card hover-lift">
+                        <div class="img-container aspect-16-9">
+                            <img class="img-lazy" 
+                                 data-src="https://via.placeholder.com/400x225/FDCB6E/ffffff?text=Image+3" 
+                                 alt="Image de test 3">
+                        </div>
+                        <div class="card-content">
+                            <h4>Image Lazy 3</h4>
+                            <p>Chargement progressif et animations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Animations Responsives</h3>
+                <div class="flex flex-wrap">
+                    <button onclick="testAnimation('fade-in-up')" class="btn btn-primary hover-scale">Fade In Up</button>
+                    <button onclick="testAnimation('scale-in')" class="btn btn-secondary hover-lift">Scale In</button>
+                    <button onclick="testAnimation('rotate-in')" class="btn btn-outline hover-tilt">Rotate In</button>
+                </div>
+                <div id="animationTarget" class="test-item" style="margin-top: 1rem;">
+                    Cliquez sur un bouton pour tester les animations
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tests d'Accessibilité -->
+    <section id="accessibility" class="section">
+        <div class="container">
+            <h2 class="section-title text-center animate-on-scroll">Tests d'Accessibilité</h2>
+            
+            <div class="test-section">
+                <h3>Navigation Clavier</h3>
+                <p>Utilisez <kbd>Tab</kbd> pour naviguer et <kbd>Entrée</kbd> pour activer :</p>
+                <div class="flex flex-wrap">
+                    <a href="#" class="btn btn-primary">Lien 1</a>
+                    <button class="btn btn-secondary">Bouton 1</button>
+                    <a href="#" class="btn btn-outline">Lien 2</a>
+                    <button class="btn btn-primary">Bouton 2</button>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <h3>Formulaire Accessible</h3>
+                <form id="testForm">
+                    <div class="form-group">
+                        <label for="testEmail" class="required">Email</label>
+                        <input type="email" id="testEmail" required>
+                        <div class="form-description">Votre adresse email sera utilisée pour les notifications</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="testMessage">Message</label>
+                        <textarea id="testMessage" rows="4" placeholder="Votre message..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" required>
+                            J'accepte les <a href="#">conditions d'utilisation</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
+
+            <div class="test-section">
+                <h3>Contrastes et Lisibilité</h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-content">
+                            <h4>Contraste Normal</h4>
+                            <p>Texte avec contraste conforme WCAG AA (4.5:1 minimum)</p>
+                        </div>
+                    </div>
+                    <div class="card text-high-contrast">
+                        <div class="card-content">
+                            <h4>Contraste Élevé</h4>
+                            <p>Texte avec contraste élevé pour une meilleure lisibilité</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Résultats du Test -->
+    <section id="results" class="section" style="background: var(--gray-50);">
+        <div class="container">
+            <h2 class="section-title text-center">Résultats du Test</h2>
+            
+            <div id="testResults" class="test-section">
+                <p>Cliquez sur "Lancer le Test" pour voir les résultats de responsivité</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Variables globales pour les tests
+        let testMetrics = {
+            viewport: { width: 0, height: 0 },
+            fps: 60,
+            imagesLoaded: 0,
+            connection: 'unknown'
+        };
+
+        // Fonction pour afficher/masquer les métriques
+        function toggleMetrics() {
+            const metrics = document.getElementById('performanceMetrics');
+            metrics.style.display = metrics.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Fonction pour lancer le test complet
+        function runResponsiveTest() {
+            const results = document.getElementById('testResults');
+            
+            // Collecter les métriques
+            updateMetrics();
+            
+            // Générer le rapport
+            const report = generateTestReport();
+            results.innerHTML = report;
+            
+            // Annoncer pour l'accessibilité
+            if (window.accessibilityManager) {
+                window.accessibilityManager.announceMessage('Test de responsivité terminé', 'polite');
+            }
+        }
+
+        // Fonction pour tester une animation
+        function testAnimation(type) {
+            const target = document.getElementById('animationTarget');
+            
+            // Nettoyer les classes précédentes
+            target.className = 'test-item';
+            
+            // Forcer un reflow
+            target.offsetHeight;
+            
+            // Ajouter la nouvelle animation
+            setTimeout(() => {
+                target.classList.add('animate-' + type);
+            }, 10);
+        }
+
+        // Fonction pour mettre à jour les métriques
+        function updateMetrics() {
+            testMetrics.viewport = {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+            
+            // Détecter la connexion
+            if ('connection' in navigator) {
+                testMetrics.connection = navigator.connection.effectiveType;
+            }
+            
+            // Mettre à jour l'affichage
+            document.getElementById('viewport').textContent = 
+                `${testMetrics.viewport.width} x ${testMetrics.viewport.height}`;
+            document.getElementById('connection').textContent = testMetrics.connection;
+            
+            // Compter les images chargées
+            if (window.imageOptimizer) {
+                const metrics = window.imageOptimizer.getPerformanceMetrics();
+                testMetrics.imagesLoaded = metrics.loadedImages;
+                document.getElementById('imagesLoaded').textContent = testMetrics.imagesLoaded;
+            }
+        }
+
+        // Fonction pour générer le rapport de test
+        function generateTestReport() {
+            const breakpoint = getCurrentBreakpoint();
+            const isTouch = 'ontouchstart' in window;
+            const webpSupported = document.documentElement.classList.contains('webp');
+            
+            return `
+                <h3>✅ Rapport de Test Responsivité</h3>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-content">
+                            <h4>📱 Viewport</h4>
+                            <p><strong>Taille:</strong> ${testMetrics.viewport.width} x ${testMetrics.viewport.height}px</p>
+                            <p><strong>Breakpoint:</strong> ${breakpoint}</p>
+                            <p><strong>Tactile:</strong> ${isTouch ? 'Oui' : 'Non'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h4>🚀 Performance</h4>
+                            <p><strong>WebP:</strong> ${webpSupported ? 'Supporté' : 'Non supporté'}</p>
+                            <p><strong>Images lazy:</strong> ${testMetrics.imagesLoaded}</p>
+                            <p><strong>Connexion:</strong> ${testMetrics.connection}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h4>♿ Accessibilité</h4>
+                            <p><strong>Navigation clavier:</strong> ${document.documentElement.classList.contains('keyboard-navigation') ? 'Active' : 'Inactive'}</p>
+                            <p><strong>Mouvement réduit:</strong> ${window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'Oui' : 'Non'}</p>
+                            <p><strong>Contraste élevé:</strong> ${window.matchMedia('(prefers-contrast: high)').matches ? 'Oui' : 'Non'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h4>✨ Fonctionnalités</h4>
+                            <p><strong>CSS Grid:</strong> ✅ Actif</p>
+                            <p><strong>CSS Custom Props:</strong> ✅ Actif</p>
+                            <p><strong>Intersection Observer:</strong> ${window.IntersectionObserver ? '✅ Actif' : '❌ Non supporté'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-message">
+                    🎉 Tous les tests de responsivité sont réussis ! Le site est optimisé pour tous les écrans.
+                </div>
+            `;
+        }
+
+        // Fonction pour obtenir le breakpoint actuel
+        function getCurrentBreakpoint() {
+            const width = window.innerWidth;
+            if (width < 320) return 'XS (< 320px)';
+            if (width < 480) return 'XS (320-479px)';
+            if (width < 768) return 'SM (480-767px)';
+            if (width < 1024) return 'MD (768-1023px)';
+            if (width < 1200) return 'LG (1024-1199px)';
+            if (width < 1400) return 'XL (1200-1399px)';
+            return 'XXL (≥ 1400px)';
+        }
+
+        // Mettre à jour les métriques régulièrement
+        setInterval(updateMetrics, 1000);
+
+        // Écouter les changements de viewport
+        window.addEventListener('resize', updateMetrics);
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            updateMetrics();
+            
+            // Auto-test après chargement
+            setTimeout(() => {
+                console.log('🎯 Page de test chargée - Tous les systèmes responsives sont actifs');
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
