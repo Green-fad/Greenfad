@@ -25,6 +25,15 @@
     --skip-link-color: #ffffff;
 }
 
+.header,
+.navbar {
+    overflow: visible !important;
+}
+
+.nav-dropdown {
+    position: relative;
+}
+
 /* ===== NAVIGATION ET FOCUS ===== */
 
 /* Skip to content link */
@@ -245,6 +254,8 @@ select.warning {
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease;
+    z-index: 2000;
+    margin-top: 8px;
 }
 
 .dropdown-menu a:focus-visible {

@@ -246,6 +246,10 @@
     transition: width 0.3s ease;
 }
 
+.nav-link::after {
+    display: none !important;
+}
+
 .nav-link:hover::before,
 .nav-link.active::before {
     width: 100%;
@@ -267,6 +271,12 @@
 .dropdown-menu a:hover {
     background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(108, 92, 231, 0.05) 100%);
     color: #00D4AA;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
 }
 
 /* Amélioration des animations */

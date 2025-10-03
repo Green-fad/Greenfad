@@ -12,6 +12,44 @@
     padding: 1rem 0;
 }
 
+/* --- Dropdown visibility fix for navbar --- */
+.header,
+.navbar,
+.nav-container,
+.nav-menu {
+    overflow: visible !important;
+}
+
+.nav-dropdown {
+    position: relative !important;
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    z-index: 9999 !important;
+    min-width: 250px;
+    margin-top: 8px;
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,212,170,0.2);
+}
+
+.dropdown-menu.js-dropdown-fixed {
+    position: fixed !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+    z-index: 9999999 !important; /* very high for debugging */
+    outline: 2px dashed rgba(255,0,0,0.9) !important; /* visual debug */
+    background: rgba(255,255,255,0.98) !important;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.12) !important;
+}
+.accessibility-panel { display: none !important; }
+
 .nav-link {
     color: #2D3748 !important;
     font-weight: 500 !important;

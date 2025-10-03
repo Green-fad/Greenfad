@@ -216,6 +216,9 @@ button {
 .navbar {
     padding: var(--spacing-md) 0;
 }
+.header, .navbar, .nav-container, .nav-dropdown {
+    overflow: visible !important;
+}
 
 .nav-container {
     max-width: var(--container-max-width);
@@ -269,9 +272,9 @@ button {
 }
 
 .nav-dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
 }
 
 .dropdown-menu li {

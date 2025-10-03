@@ -712,10 +712,13 @@ class AccessibilityManager {
                 dropdown.querySelector('.nav-link').focus();
                 break;
                 
-            case 'Tab':
-                const dropdown = menu.closest('.nav-dropdown');
-                this.closeDropdown(dropdown);
+            case 'Tab': {
+                const parentDropdown = menu.closest('.nav-dropdown');
+                if (parentDropdown) {
+                    this.closeDropdown(parentDropdown);
+                }
                 break;
+            }
         }
     }
 
