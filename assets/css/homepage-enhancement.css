@@ -185,6 +185,7 @@ body {
     margin-bottom: 2rem !important;
     box-shadow: var(--shadow-soft) !important;
     transition: var(--transition-bounce) !important;
+    white-space: nowrap;
 }
 
 .agency-badge::before {
@@ -249,18 +250,22 @@ body {
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 1.5rem !important;
     margin: 3rem 0 !important;
+    max-width: none !important;
 }
 
 .agency-stat {
     background: var(--glass-bg) !important;
     backdrop-filter: blur(20px) !important;
     border: 1px solid var(--glass-border) !important;
-    padding: 2rem 1.5rem !important;
+    padding: 1.5rem 0.75rem !important;
     border-radius: var(--border-radius-card) !important;
     text-align: center !important;
     transition: var(--transition-bounce) !important;
     position: relative !important;
     overflow: hidden !important;
+    display: flex; /* Ajouté pour un meilleur contrôle de l'alignement vertical */
+    flex-direction: column;
+    justify-content: center;
 }
 
 .agency-stat::before {
@@ -298,10 +303,12 @@ body {
 }
 
 .agency-stat-label {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important;
     color: #718096 !important;
     font-weight: 500 !important;
-    line-height: 1.4 !important;
+    line-height: 1.3 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* AMÉLIORATION DES BOUTONS CTA */
@@ -701,6 +708,8 @@ body {
     justify-content: center !important;
     margin-bottom: 2rem !important;
     transition: var(--transition-bounce) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
 }
 
 .expertise-card:hover .expertise-icon {
@@ -710,6 +719,12 @@ body {
 .expertise-icon i {
     font-size: 2rem !important;
     color: white !important;
+    opacity: 1 !important;
+    transform: none !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
 }
 
 .expertise-card-title {
@@ -752,7 +767,7 @@ body {
     display: inline-flex !important;
     align-items: center !important;
     gap: 0.75rem !important;
-    color: #00D4AA !important;
+    color: white !important;
     font-weight: 600 !important;
     font-size: 1rem !important;
     text-decoration: none !important;
@@ -760,8 +775,10 @@ body {
 }
 
 .expertise-cta:hover {
-    color: #00B894 !important;
-    transform: translateX(5px) !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    background: #00B894;
+    box-shadow: 0 8px 24px rgba(0, 212, 170, 0.25);
 }
 
 .expertise-cta i {
