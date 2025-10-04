@@ -2739,3 +2739,109 @@ a:focus {
     font-size: var(--font-size-lg);
     color: var(--text-secondary);
 }
+
+
+/*
+ * ===============================================
+ * CORRECTIONS RESPONSIVES POUR LES PAGES INTERNES
+ * ===============================================
+ */
+
+/* 
+ * Assure que le conteneur de la FAQ a de l'espace sur les côtés sur mobile.
+ */
+.faq-container {
+    padding-left: var(--fluid-spacing-md);
+    padding-right: var(--fluid-spacing-md);
+}
+
+/* 
+ * Cible les écrans mobiles (largeur inférieure à 768px).
+ */
+@media (max-width: 767px) {
+
+    /* 
+     * Réduit la taille des titres et des descriptions dans les en-têtes de page.
+     *    Utilise les variables de typographie fluide pour un ajustement parfait.
+     */
+    .service-hero-title {
+        font-size: var(--fluid-4xl) !important; /* Taille de police fluide pour les grands titres */
+        line-height: 1.2;
+    }
+    
+    .service-hero-description {
+        font-size: var(--fluid-lg) !important; /* Taille de police fluide pour les sous-titres */
+    }
+
+    /* 
+     * Réduit la taille de la police des questions de la FAQ.
+     */
+    .faq-item summary {
+        font-size: var(--fluid-lg) !important;
+    }
+
+    /* 
+     * Améliore la mise en page du footer sur mobile en empilant les colonnes.
+     */
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .footer-brand {
+        align-items: center;
+    }
+
+    .footer-social {
+        justify-content: center;
+    }
+
+    .footer-links {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
+
+
+/*
+ * ===================================================
+ * CORRECTIONS RESPONSIVES POUR LES PAGES PAYS
+ * ===================================================
+ */
+
+/* 
+ * Cible les écrans mobiles (largeur inférieure à 768px).
+ */
+@media (max-width: 767px) {
+
+    /* 
+     * Inverse l'ordre pour que l'image apparaisse en premier sur mobile.
+     *    Transforme le conteneur en colonne.
+     */
+    .country-hero-section .service-hero-content {
+        grid-template-columns: 1fr; /* Empile les éléments verticalement */
+        gap: var(--fluid-spacing-lg); /* Ajoute de l'espace entre l'image et le texte */
+    }
+
+    .country-hero-visual {
+        order: -1; /* Place l'image au-dessus du bloc de texte */
+        padding-left: 0; /* Annule le padding pour le centrage */
+    }
+
+    /* 
+     * Centre le contenu textuel et ajuste les espacements.
+     */
+    .country-hero-section .hero-text {
+        text-align: center; /* Centre tout le texte */
+    }
+
+    .country-page-services {
+        display: inline-block; /* Permet à la liste de se centrer correctement */
+        text-align: left; /* Garde le texte de la liste aligné à gauche */
+    }
+
+    .country-hero-visual img:hover {
+        transform: none; /* Annule l'effet de zoom (scale) */
+    }
+
+}

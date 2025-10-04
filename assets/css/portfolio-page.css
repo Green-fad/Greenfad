@@ -184,26 +184,107 @@ html {
 }
 
 
+/*
+ * =============================================================
+ * AMÉLIORATIONS RESPONSIVES MAJEURES POUR LA PAGE PORTFOLIO
+ * =============================================================
+ */
+
 @media (max-width: 768px) {
+    /*
+     * Comportement de défilement naturel sur mobile.
+     */
     html {
-        scroll-snap-type: none; /* Désactive le snap sur mobile pour un défilement naturel */
+        scroll-snap-type: none !important;
+    }
+    
+    .portfolio-container {
+        scroll-snap-type: none;
+        height: auto;
     }
 
+    /*
+     * Ajustement des sections pour un affichage en bloc.
+     */
     .portfolio-section {
         height: auto;
-        min-height: 90vh;
+        min-height: 90vh; /* Augmenté légèrement pour plus d'espace */
         padding: var(--spacing-3xl) var(--spacing-md);
+        display: flex;
+        align-items: center;
+        background: #1a202c; 
     }
 
-    .portfolio-section .bg-image {
-        background-attachment: scroll;
+    /*
+     * CACHER les éléments de fond desktop.
+     */
+    .portfolio-section .bg-image,
+    .portfolio-section .overlay {
+        display: none; /* Cache complètement les fonds parallax et les superpositions desktop */
     }
 
+    /*
+     * Ajustement de la typographie pour les petits écrans.
+     */
     .project-title {
-        font-size: var(--font-size-4xl);
+        font-size: var(--fluid-4xl) !important;
+    }
+    
+    .project-subtitle {
+        font-size: var(--fluid-2xl) !important;
+    }
+    
+    .project-tagline {
+        font-size: var(--fluid-lg) !important;
     }
 
     .project-description {
-        font-size: var(--font-size-base);
+        font-size: var(--fluid-base) !important;
+    }
+    
+    /*
+     * Section d'introduction (Hero).
+     *    Augmente la taille du titre principal sur mobile.
+     */
+    .portfolio-hero {
+        min-height: 70vh;
+    }
+    
+    .portfolio-hero h1 {
+        font-size: clamp(2rem, 7vw, 6rem); /* Force une plus grande taille pour le titre principal */
+    }
+
+    /*
+     * Correction du footer.
+     */
+    .footer {
+        scroll-snap-align: none;
+    }
+
+    /*
+     * CORRECTION MAJEURE pour les images de projet sur mobile.
+     */
+    .project-image-mobile {
+        display: block;
+        width: 100%;
+        height: auto; /* IMPORTANT : La hauteur est maintenant automatique */
+        aspect-ratio: 16 / 9; /* Force un ratio 16:9 pour des hauteurs cohérentes */
+        object-fit: cover; /* Remis à 'cover' car l'aspect-ratio gère la taille */
+        border-radius: var(--border-radius-lg); /* Coins moins arrondis */
+        margin-bottom: var(--spacing-xl); /* Plus d'espace en dessous */
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Dégradé pour la section d'introduction */
+    .portfolio-hero .overlay,
+    .coming-soon-section .overlay {
+        background: linear-gradient(135deg, #002a22, #2c2560); /* De vert foncé à violet foncé */
+    }
+
+        /*
+    * Section finale "Projets à venir".
+    */
+    .coming-soon-section .overlay {
+        background: linear-gradient(135deg, #4A5568, #1A202C); /* dégradé pour hero pour la cohérence */
     }
 }

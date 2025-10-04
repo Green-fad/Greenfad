@@ -667,6 +667,7 @@ body {
     max-width: 1200px !important;
     margin: 0 auto !important;
     padding: 0 2rem !important;
+    padding-bottom: 2rem !important;
 }
 
 .expertise-card {
@@ -880,5 +881,43 @@ body {
     
     .expertise-icon i {
         font-size: 1.5rem !important;
+    }
+}
+
+/*
+ * ====================================================================
+ * CORRECTIONS RESPONSIVES DÉFINITIVES POUR LA SECTION HERO
+ * Ces règles surchargent les styles desktop uniquement sur les écrans mobiles.
+ * ====================================================================
+ */
+
+/*
+ * Cible les tablettes et tous les mobiles (moins de 1024px)
+*/
+@media (max-width: 1023px) {
+
+    /* Correction pour les boutons CTA principaux */
+    .agency-cta-group {
+        width: 100%;
+        max-width: 400px; /* Limite la largeur pour éviter de toucher les bords */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-agency-primary:hover,
+    .btn-agency-secondary:hover {
+        /* Annule l'effet de zoom qui est coupé */
+        transform: translateY(-2px) !important; 
+    }
+}
+
+/*
+ * Cible uniquement les petits écrans mobiles (moins de 480px)
+*/
+@media (max-width: 480px) {
+
+    /* Correction pour la grille des statistiques */
+    .agency-stats {
+        grid-template-columns: 1fr !important; /* Force une seule colonne */
     }
 }
