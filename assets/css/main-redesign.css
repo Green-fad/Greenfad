@@ -264,6 +264,13 @@ strong {
   padding: 0 var(--container-padding);
 }
 
+.nav-logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 1; /* Permet au logo de se réduire si l'espace est limité */
+  min-width: 0; /* Important pour le flex-shrink */
+}
+
 .nav-logo img {
   height: 48px;
   width: auto;
@@ -1321,11 +1328,39 @@ strong {
 
 /* Mobile Fixes */
 @media (max-width: 768px) {
-  body {
-    overflow-x: hidden;
+  /* Correction du débordement de l'en-tête */
+  .nav-container {
+    padding: 0 var(--space-md); /* Assurer un padding correct */
   }
-
+  
+  .nav-logo {
+    /* Permet au contenu du logo de ne pas déborder */
+    max-width: calc(100% - 60px); /* Laisser de la place pour le hamburger */
+  }
+  
+  .nav-logo a {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .nav-logo img {
+    height: 35px; /* Réduire la taille du logo sur mobile */
+  }
+  
+  /* Correction du centrage du texte */
   .hero-content, .hero-text {
-    text-align: center;
+    text-align: center !important;
+  }
+  
+  .hero-content h1, .hero-text h1 {
+    /* Assurer que le titre ne déborde pas */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .hero-buttons {
+    justify-content: center; /* Centrer les boutons */
   }
 }
