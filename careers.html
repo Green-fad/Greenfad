@@ -1,89 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrières - Rejoignez notre équipe | Greenfad</title>
+    
+    <!-- AMÉLIORATION : Méta-description spécifique pour le SEO de cette page -->
+    <meta name="description" content="Découvrez les opportunités de carrière chez Greenfad. Nous sommes toujours à la recherche de talents passionnés par la technologie et le développement durable en Afrique.">
+    
+    <!-- AMÉLIORATION : URL canonique pour le SEO -->
+    <link rel="canonical" href="https://greenfad.tech/careers.html">
 
+    <!-- Open Graph (pour le partage sur les réseaux sociaux ) -->
+    <meta property="og:title" content="Carrières - Rejoignez notre équipe | Greenfad">
+    <meta property="og:description" content="Nous construisons l'avenir du digital durable en Afrique. Découvrez nos opportunités.">
+    <meta property="og:url" content="https://greenfad.tech/careers.html">
+    <meta property="og:image" content="https://greenfad.tech/assets/images/greenfad-og-image.jpg"> <!-- Image générique du site -->
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     
-    <head>
-        <title>Carrières - Rejoignez notre équipe | Greenfad</title>
-        <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Open Graph -->
-<!-- Favicon -->
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-<link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-<!-- CSS -->
-<link rel="stylesheet" href="assets/css/main-redesign.css">
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<!-- Preload -->
-<link rel="preload" href="assets/images/greenfad-logo-new.svg" as="image">
-    </head>
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/main-redesign.css">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <!-- AMÉLIORATION : Sécurité et performance pour le CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Preload -->
+    <link rel="preload" href="assets/images/greenfad-logo-new.svg" as="image">
+</head>
     
 <body>
     <!-- Header -->
+    <!-- AMÉLIORATION : Liens de navigation mis à jour pour pointer vers la page d'accueil -->
     <header class="header">
-        <nav class="navbar">
+        <nav class="navbar" aria-label="Navigation principale">
             <div class="nav-container">
                 <div class="nav-logo">
-                    <a href="#home" class="logo-link">
+                    <a href="index.html" class="logo-link"> <!-- Lien vers index.html -->
                         <img src="assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
                         <span class="logo-text-desktop d-none-mobile">Digital Solutions</span>
                     </a>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="#home" class="nav-link">Accueil</a></li>
+                    <li><a href="index.html" class="nav-link">Accueil</a></li> <!-- Lien vers index.html -->
                     <li class="nav-dropdown">
-                        <a href="#services" class="nav-link">Services <i class="fas fa-chevron-down"></i></a>
+                        <a href="index.html#services" class="nav-link" aria-haspopup="true" aria-expanded="false">Services <i class="fas fa-chevron-down" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
-                            <li><a href="#solutions-digitales">Solutions Digitales</a></li>
-                            <li><a href="#technologies-vertes">Technologies Vertes</a></li>
-                            <li><a href="#conseil">Conseil & Accompagnement</a></li>
-                            <li><a href="#communication">Communication</a></li>
+                            <li><a href="index.html#solutions-digitales">Solutions Digitales</a></li>
+                            <li><a href="index.html#technologies-vertes">Technologies Vertes</a></li>
+                            <li><a href="index.html#conseil">Conseil & Accompagnement</a></li>
+                            <li><a href="index.html#communication">Communication</a></li>
                         </ul>
                     </li>
-                    <li><a href="#solutions" class="nav-link">Nos Solutions</a></li>
-                    <li><a href="#valeurs" class="nav-link">Valeurs</a></li>
-                    <li><a href="#equipe" class="nav-link">Équipe</a></li>
-                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                    <li><a href="index.html#solutions" class="nav-link">Nos Solutions</a></li>
+                    <li><a href="index.html#valeurs" class="nav-link">Valeurs</a></li>
+                    <li><a href="index.html#equipe" class="nav-link">Équipe</a></li>
+                    <li><a href="index.html#contact" class="nav-link">Contact</a></li>
                 </ul>
                 <div class="nav-cta">
-                    <a href="#contact" class="btn btn-primary">Démarrer un Projet</a>
+                    <a href="index.html#contact" class="btn btn-primary">Démarrer un Projet</a>
                 </div>
-                <div class="hamburger">
+                <button class="hamburger" aria-label="Ouvrir le menu de navigation" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
             </div>
         </nav>
     </header>
 
-    <!-- Hero Section Simple pour la page -->
-    <section class="service-hero">
-        <div class="container" style="text-align: center;">
-            <h1 class="service-hero-title">Carrières</h1>
-            <p class="service-hero-description">Nous construisons l'avenir du digital en Afrique. Rejoignez-nous.</p>
-        </div>
-    </section>
-
-    <!-- Contenu Principal "Bientôt disponible" -->
+    <!-- AMÉLIORATION : La balise <main> doit contenir tout le contenu principal -->
     <main>
-        <div class="container">
-        <div class="coming-soon-container">
-            <div class="icon"><i class="fas fa-briefcase"></i></div>
-            <h2>Opportunités à venir</h2>
-            <p>
-                Nous n'avons pas de postes ouverts pour le moment, mais nous sommes toujours à la recherche de talents exceptionnels pour rejoindre notre équipe. N'hésitez pas à nous envoyer votre candidature spontanée à 
-                <a href="mailto:contact@greenfad.tech" style="color: var(--primary-color); text-decoration: underline;">contact@greenfad.tech</a>.
-            </p>
-        </div>
-    </div>
+        <!-- Hero Section Simple pour la page -->
+        <section class="service-hero" aria-labelledby="page-title">
+            <div class="container" style="text-align: center;">
+                <h1 id="page-title" class="service-hero-title">Carrières</h1>
+                <p class="service-hero-description">Nous construisons l'avenir du digital en Afrique. Rejoignez-nous.</p>
+            </div>
+        </section>
+
+        <!-- Contenu Principal "Bientôt disponible" -->
+        <section class="section">
+            <div class="container">
+                <div class="coming-soon-container">
+                    <div class="icon"><i class="fas fa-briefcase" aria-hidden="true"></i></div>
+                    <h2>Opportunités à venir</h2>
+                    <p>
+                        Nous n'avons pas de postes ouverts pour le moment, mais nous sommes toujours à la recherche de talents exceptionnels pour rejoindre notre équipe. N'hésitez pas à nous envoyer votre candidature spontanée à 
+                        <a href="mailto:contact@greenfad.tech" style="color: var(--color-primary ); text-decoration: underline;">contact@greenfad.tech</a>.
+                    </p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -97,35 +115,28 @@
                         Nous développons des solutions innovantes qui allient technologie et respect de l'environnement.
                     </p>
                     <div class="footer-social">
-                        <a href="#" class="social-icon" aria-label="Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Twitter">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="LinkedIn">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
+                        <!-- AMÉLIORATION : Liens réels et sécurité -->
+                        <a href="https://facebook.com/greenfad" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                        <a href="https://twitter.com/greenfad" class="social-icon" aria-label="Twitter" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                        <a href="https://linkedin.com/company/greenfad" class="social-icon" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a>
+                        <a href="https://instagram.com/greenfad" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram" aria-hidden="true"></i></a>
                     </div>
                 </div>
                 <div class="footer-section">
                     <h4>Services</h4>
                     <ul class="footer-links">
-                        <li><a href="#services">Solutions Digitales</a></li>
-                        <li><a href="#services">Technologies Vertes</a></li>
-                        <li><a href="#services">Communication</a></li>
-                        <li><a href="#services">Conseil Digital</a></li>
+                        <li><a href="index.html#services">Solutions Digitales</a></li>
+                        <li><a href="index.html#technologies-vertes">Technologies Vertes</a></li>
+                        <li><a href="index.html#communication">Communication</a></li>
+                        <li><a href="index.html#conseil">Conseil Digital</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h4>Entreprise</h4>
                     <ul class="footer-links">
-                        <li><a href="#valeurs">Nos Valeurs</a></li>
-                        <li><a href="#equipe">Notre Équipe</a></li>
-                        <li><a href="#solutions">Nos Solutions</a></li>
+                        <li><a href="index.html#valeurs">Nos Valeurs</a></li>
+                        <li><a href="index.html#equipe">Notre Équipe</a></li>
+                        <li><a href="index.html#solutions">Nos Solutions</a></li>
                         <li><a href="careers.html">Carrières</a></li>
                     </ul>
                 </div>
@@ -146,7 +157,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/footer-script.js"></script>
+    <!-- AMÉLIORATION : Attribut 'defer' pour un chargement non-bloquant -->
+    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/footer-script.js" defer></script>
 </body>
 </html>
