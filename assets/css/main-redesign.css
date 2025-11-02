@@ -1402,3 +1402,28 @@ strong {
     padding: 0 var(--space-md) !important;
   }
 }
+
+/* Utility Class for Mobile Hiding */
+@media (max-width: 768px) {
+  .d-none-mobile {
+    display: none !important;
+  }
+}
+
+/* ========================================
+   8. FLOATING EFFECT
+   ======================================== */
+
+.card, .solution-card, .team-card, .value-card {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.card:hover, .solution-card:hover, .team-card:hover, .value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg); /* Utiliser une ombre plus prononcée pour l'effet flottant */
+}
+
+/* Ajustement pour les cartes avec images pour éviter le débordement de l'ombre */
+.card, .solution-card {
+  overflow: hidden;
+}
