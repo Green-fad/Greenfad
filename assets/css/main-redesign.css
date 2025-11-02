@@ -1089,3 +1089,76 @@ strong {
 .card-icon:hover, .value-icon:hover, .contact-icon:hover {
   animation: pulse 0.5s ease-in-out;
 }
+
+/* Correction et Amélioration des effets flottants (Hover Effects) */
+
+/* Effet sur les cartes (Pays, Valeurs, Services) */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Assurer que le contenu est visible */
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-xl); /* Assurer un padding suffisant */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Léger soulèvement */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Ombre plus prononcée */
+}
+
+/* Styles pour les images de service */
+.card-image-container {
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: var(--radius-md); /* Utiliser la variable de rayon de bordure */
+    /* Remplacer l'icône par l'image, donc pas de flex ou de fond coloré */
+    width: 100%;
+    height: 200px; /* Hauteur fixe pour uniformité */
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image {
+    transform: scale(1.05); /* Zoom léger au survol */
+}
+
+/* Masquer l'icône si elle est encore présente dans le HTML pour éviter le chevauchement */
+.card-icon {
+    display: none;
+}
+
+/* Effet sur les boutons */
+.btn {
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-dark);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les liens de navigation */
+.nav-link:hover {
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les icônes (si elles sont utilisées ailleurs) */
+.value-icon, .contact-icon {
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.value-icon:hover, .contact-icon:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
