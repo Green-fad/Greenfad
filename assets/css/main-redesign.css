@@ -1162,3 +1162,158 @@ strong {
     color: var(--color-primary);
     transform: scale(1.1);
 }
+
+/* Amélioration des effets flottants (Hover Effects) */
+
+/* Effet sur les cartes (Pays, Valeurs, Services) */
+.card, .value-card, .service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover, .value-card:hover, .service-card:hover {
+    transform: translateY(-5px); /* Léger soulèvement */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Ombre plus prononcée */
+}
+
+/* Effet sur les boutons */
+.btn {
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-dark);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les liens de navigation */
+.nav-link:hover {
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les icônes (si elles sont utilisées) */
+.card-icon, .value-icon, .contact-icon {
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.card-icon:hover, .value-icon:hover, .contact-icon:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* Amélioration des effets flottants (Hover Effects) */
+
+/* Effet sur les cartes (Pays, Valeurs, Services) */
+.card, .value-card, .service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover, .value-card:hover, .service-card:hover {
+    transform: translateY(-5px); /* Léger soulèvement */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Ombre plus prononcée */
+}
+
+/* Effet sur les boutons */
+.btn {
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-secondary-dark);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les liens de navigation */
+.nav-link:hover {
+    color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+/* Effet sur les icônes (si elles sont utilisées) */
+.card-icon, .value-icon, .contact-icon {
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.card-icon:hover, .value-icon:hover, .contact-icon:hover {
+    color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+/* Styles pour les images de service */
+.card-image-container {
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    width: 100%;
+    height: 200px; /* Hauteur fixe pour uniformité */
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que l'image couvre la zone sans déformation */
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image {
+    transform: scale(1.05); /* Zoom léger au survol */
+}
+
+/* Masquer l'icône si elle est encore présente dans le HTML pour éviter le chevauchement */
+.card-icon {
+    display: none;
+}
+
+/* Optimisation Mobile */
+@media (max-width: 768px) {
+    /* Ajustement de la grille pour mobile */
+    .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr; /* Une seule colonne sur mobile */
+        gap: var(--space-xl);
+    }
+
+    /* Ajustement de la section Hero */
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-image {
+        order: -1; /* Placer l'image au-dessus du texte */
+        margin-bottom: var(--space-xl);
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    /* Ajustement des cartes */
+    .card {
+        padding: var(--space-lg);
+    }
+
+    /* Désactiver les effets flottants sur mobile pour éviter les problèmes de mise en page au toucher */
+    .card:hover, .value-card:hover, .service-card:hover {
+        transform: none;
+        box-shadow: var(--shadow-md);
+    }
+
+    .card:hover .card-image {
+        transform: none;
+    }
+}
