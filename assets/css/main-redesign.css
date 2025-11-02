@@ -1317,3 +1317,15 @@ strong {
         transform: none;
     }
 }
+
+
+/* Mobile Fixes */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .hero-content, .hero-text {
+    text-align: center;
+  }
+}
