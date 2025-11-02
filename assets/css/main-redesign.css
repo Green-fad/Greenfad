@@ -1364,3 +1364,41 @@ strong {
     justify-content: center; /* Centrer les boutons */
   }
 }
+
+
+/* Ultra-Robust Mobile Fixes */
+@media (max-width: 768px) {
+  /* Masquer le texte du logo sur mobile pour éviter le débordement */
+  .logo-text-desktop {
+    display: none !important;
+  }
+  
+  /* Forcer le centrage du texte dans la section hero */
+  .text-center-mobile {
+    text-align: center !important;
+  }
+  
+  /* Assurer que les boutons sont centrés */
+  .hero-buttons {
+    justify-content: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-md) !important;
+  }
+  
+  /* Assurer que le titre ne déborde pas */
+  .hero-text h1 {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+  
+  /* Correction du débordement général */
+  body {
+    overflow-x: hidden !important;
+  }
+  
+  .nav-container {
+    padding: 0 var(--space-md) !important;
+  }
+}
