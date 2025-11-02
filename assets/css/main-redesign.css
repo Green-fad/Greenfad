@@ -1039,6 +1039,18 @@ strong {
 .bg-secondary-pale { background: var(--color-secondary-pale); }
 
 /* Animations */
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -1054,6 +1066,10 @@ strong {
   animation: fadeInUp var(--transition-slow) ease-out;
 }
 
+.animate {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
 /* Scroll Reveal */
 .reveal {
   opacity: 0;
@@ -1064,4 +1080,12 @@ strong {
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+.hero-image img {
+  animation: float 4s ease-in-out infinite;
+}
+
+.card-icon:hover, .value-icon:hover, .contact-icon:hover {
+  animation: pulse 0.5s ease-in-out;
 }

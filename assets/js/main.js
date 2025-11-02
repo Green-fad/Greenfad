@@ -372,7 +372,7 @@ class FormHandler {
 // ===== ANIMATIONS =====
 class AnimationController {
     constructor() {
-        this.animatedElements = $$('.animate-on-scroll, .service-card, .portfolio-item, .testimonial, .step');
+        this.animatedElements = $$('.reveal');
         this.init();
     }
     
@@ -390,15 +390,14 @@ class AnimationController {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('animate');
+                    entry.target.classList.add('active');
                     
                     // Add staggered animation for grid items
-                    if (entry.target.parentElement.classList.contains('services-grid') ||
-                        entry.target.parentElement.classList.contains('portfolio-grid') ||
-                        entry.target.parentElement.classList.contains('testimonials-grid')) {
+                    if (entry.target.parentElement.classList.contains('values-grid') ||
+                        entry.target.parentElement.classList.contains('grid-4')) {
                         const siblings = Array.from(entry.target.parentElement.children);
                         const index = siblings.indexOf(entry.target);
-                        entry.target.style.animationDelay = `${index * 0.1}s`;
+                        entry.target.style.transitionDelay = `${index * 0.1}s`;
                     }
                     
                     observer.unobserve(entry.target);
