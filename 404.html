@@ -24,8 +24,17 @@
   <link as="image" href="assets/images/greenfad-logo-new.svg" rel="preload"/>
  </head>
  <body>
-  <img alt="Greenfad Logo" class="logo" src="assets/images/greenfad-logo.svg"/>
-  <div class="error-container">
+  <!-- Header (Minimal) -->
+  <header class="header-minimal">
+    <div class="nav-container">
+      <a class="logo-link" href="index.html">
+        <img alt="Greenfad Logo" class="logo" src="assets/images/greenfad-logo-new.svg"/>
+        <span class="logo-text-desktop d-none-mobile">Digital Solutions</span>
+      </a>
+    </div>
+  </header>
+  <main>
+    <div class="error-container">
    <div class="error-icon">
     <i class="fas fa-search">
     </i>
@@ -41,17 +50,17 @@
             Elle a peut-être été déplacée ou n'existe plus.
    </p>
    <div class="error-actions">
-    <a class="btn" href="/">
+    <a class="btn" href="index.html">
      <i class="fas fa-home">
      </i>
      Retour à l'accueil
     </a>
-    <a class="btn btn-outline" href="/#services">
+    <a class="btn btn-outline" href="index.html#services">
      <i class="fas fa-cogs">
      </i>
      Nos services
     </a>
-    <a class="btn btn-outline" href="/#contact">
+    <a class="btn btn-outline" href="index.html#contact">
      <i class="fas fa-envelope">
      </i>
      Nous contacter
@@ -74,6 +83,11 @@
             }
         }, 10000);
   </script>
+  </main>
+  <!-- Footer (Minimal) -->
+  <footer class="footer-minimal">
+    <p>© 2025 Greenfad SARL. Tous droits réservés.</p>
+  </footer>
   <script defer="" src="assets/js/main-redesign.js">
   </script>
  </body>
