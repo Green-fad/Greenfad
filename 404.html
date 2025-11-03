@@ -1,61 +1,65 @@
 <!DOCTYPE html>
 <html lang="fr">
-
-    
-    <head>
-        <title>Page non trouvée - Greenfad</title>
-        <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Open Graph -->
-<!-- Favicon -->
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-<link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-<!-- CSS -->
-<link rel="stylesheet" href="assets/css/main-redesign.css">
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<!-- Preload -->
-<link rel="preload" href="assets/images/greenfad-logo-new.svg" as="image">
-    </head>
-    
-    
-<body>
-    <img src="assets/images/greenfad-logo.svg" alt="Greenfad Logo" class="logo">
-    
-    <div class="error-container">
-        <div class="error-icon">
-            <i class="fas fa-search"></i>
-        </div>
-        <div class="error-code">404</div>
-        <h1 class="error-title">Page non trouvée</h1>
-        <p class="error-description">
-            Désolé, la page que vous cherchez semble avoir disparu. 
+ <head>
+  <title>
+   Page non trouvée - Greenfad
+  </title>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <!-- Open Graph -->
+  <!-- Favicon -->
+  <link href="/assets/images/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+  <link href="/assets/images/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+  <link href="/assets/images/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+  <link href="/assets/images/favicon.ico" rel="icon" type="image/x-icon"/>
+  <!-- CSS -->
+  <link href="assets/css/main-redesign.css" rel="stylesheet"/>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <!-- Preload -->
+  <link as="image" href="assets/images/greenfad-logo-new.svg" rel="preload"/>
+ </head>
+ <body>
+  <img alt="Greenfad Logo" class="logo" src="assets/images/greenfad-logo.svg"/>
+  <div class="error-container">
+   <div class="error-icon">
+    <i class="fas fa-search">
+    </i>
+   </div>
+   <div class="error-code">
+    404
+   </div>
+   <h1 class="error-title">
+    Page non trouvée
+   </h1>
+   <p class="error-description">
+    Désolé, la page que vous cherchez semble avoir disparu. 
             Elle a peut-être été déplacée ou n'existe plus.
-        </p>
-        <div class="error-actions">
-            <a href="/" class="btn">
-                <i class="fas fa-home"></i>
-                Retour à l'accueil
-            </a>
-            <a href="/#services" class="btn btn-outline">
-                <i class="fas fa-cogs"></i>
-                Nos services
-            </a>
-            <a href="/#contact" class="btn btn-outline">
-                <i class="fas fa-envelope"></i>
-                Nous contacter
-            </a>
-        </div>
-    </div>
-    
-    <script>
-        // Track 404 errors (replace with your analytics)
+   </p>
+   <div class="error-actions">
+    <a class="btn" href="/">
+     <i class="fas fa-home">
+     </i>
+     Retour à l'accueil
+    </a>
+    <a class="btn btn-outline" href="/#services">
+     <i class="fas fa-cogs">
+     </i>
+     Nos services
+    </a>
+    <a class="btn btn-outline" href="/#contact">
+     <i class="fas fa-envelope">
+     </i>
+     Nous contacter
+    </a>
+   </div>
+  </div>
+  <script>
+   // Track 404 errors (replace with your analytics)
         if (typeof gtag !== 'undefined') {
             gtag('event', 'page_not_found', {
                 'page_location': window.location.href,
@@ -69,7 +73,8 @@
                 window.location.href = '/';
             }
         }, 10000);
-    </script>
-  <script src="assets/js/main.js"></script>
-</body>
+  </script>
+  <script defer="" src="assets/js/main-redesign.js">
+  </script>
+ </body>
 </html>

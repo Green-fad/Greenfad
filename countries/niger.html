@@ -1,164 +1,301 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niger - Nos Projets et Solutions | Greenfad</title>
-    <meta name="description" content="Découvrez les solutions numériques et les projets de transformation digitale menés par Greenfad au Niger.">
-    
-    <!-- FAVICON AMÉLIORÉ -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
-    <link rel="manifest" href="/assets/images/site.webmanifest">
-    <!-- La ligne .ico est une solution de repli pour les anciens navigateurs -->
-    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
-    
-    <!-- CSS -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
-
-    <!-- CSS Optimisé -->
-    <link rel="stylesheet" href="../assets/css/professional-design.min.css">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-
-<body>
-    <header class="header">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-logo">
-                    <a href="../index.html">
-                        <img src="../assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
-                    </a>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="../index.html" class="nav-link">Accueil</a></li>
-                    <li class="nav-dropdown">
-                        <a href="../index.html#services" class="nav-link">Services <i class="fas fa-chevron-down"></i></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="../services/web-development.html">Développement Web</a></li>
-                            <li><a href="../services/mobile-apps.html">Applications Mobiles</a></li>
-                            <li><a href="../services/seo-marketing.html">SEO & Marketing</a></li>
-                            <li><a href="../services/print-communication.html">Impression & Communication</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../index.html#portfolio" class="nav-link">Portfolio</a></li>
-                    <li><a href="../index.html#about" class="nav-link">À propos</a></li>
-                    <li><a href="../index.html#contact" class="nav-link">Contact</a></li>
-                </ul>
-                <div class="nav-cta">
-                    <a href="../index.html#contact" class="btn btn-primary">Devis Gratuit</a>
-                </div>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Section Hero Spécifique au Pays -->
-    <section class="service-hero country-hero-section">
-        <div class="container">
-            <div class="service-hero-content">
-                <!-- PARTIE GAUCHE : CONTENU TEXTE -->
-                <div class="hero-text">
-                    <div class="breadcrumb">
-                        <a href="../index.html">Accueil</a>
-                        <i class="fas fa-chevron-right"></i>
-                        <a href="../index.html#countries">Pays</a>
-                        <i class="fas fa-chevron-right"></i>
-                        <span>Niger</span>
-                    </div>
-                    <h1 class="service-hero-title">Niger</h1>
-                    <p class="service-hero-description">
-                        Accompagnement des <span class="highlight" style="font-weight: bold;" >institutions Nigériennes</span> dans leur transition numérique et le développement de services publics innovants.
-                    </p>
-                    <ul class="country-page-services">
-                        <li>Plateforme e-gouvernement</li>
-                        <li>Plateformes citoyennes</li>
-                        <li>Infrastructure numérique</li>
-                    </ul>
-                </div>
-                <!-- PARTIE DROITE : IMAGE -->
-                <div class="country-hero-visual">
-                    <img src="../assets/images/countries/niger.jpg" alt="Niger - Niamey" loading="lazy">
-                    <figcaption>Succursale - Niamey</figcaption>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <img src="../assets/images/greenfad-logo-footer1.svg" alt="Greenfad Logo" class="footer-logo">
-                    <p class="footer-description">
-                        Votre partenaire pour la transformation digitale. 
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Niger - Nos Projets et Solutions | Greenfad
+  </title>
+  <meta content="Découvrez les solutions numériques et les projets de transformation digitale menés par Greenfad au Niger." name="description"/>
+  <!-- FAVICON AMÉLIORÉ -->
+  <link href="/assets/images/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+  <link href="/assets/images/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+  <link href="/assets/images/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+  <link href="/assets/images/site.webmanifest" rel="manifest"/>
+  <!-- La ligne .ico est une solution de repli pour les anciens navigateurs -->
+  <link href="/assets/images/favicon.ico" rel="icon" type="image/x-icon"/>
+  <!-- CSS -->
+  <link href="../assets/css/styles.css" rel="stylesheet"/>
+  <!-- CSS Optimisé -->
+  <link href="../assets/css/professional-design.min.css" rel="stylesheet"/>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link href="../assets/css/main-redesign.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <header class="header">
+   <nav class="navbar">
+    <div class="nav-container">
+     <div class="nav-logo">
+      <a href="../index.html">
+       <img alt="Greenfad Logo" class="logo" src="../assets/images/greenfad-logo-new.svg"/>
+      </a>
+     </div>
+     <ul class="nav-menu">
+      <li>
+       <a class="nav-link" href="../index.html">
+        Accueil
+       </a>
+      </li>
+      <li class="nav-dropdown">
+       <a class="nav-link" href="../index.html#services">
+        Services
+        <i class="fas fa-chevron-down">
+        </i>
+       </a>
+       <ul class="dropdown-menu">
+        <li>
+         <a href="../services/web-development.html">
+          Développement Web
+         </a>
+        </li>
+        <li>
+         <a href="../services/mobile-apps.html">
+          Applications Mobiles
+         </a>
+        </li>
+        <li>
+         <a href="../services/seo-marketing.html">
+          SEO &amp; Marketing
+         </a>
+        </li>
+        <li>
+         <a href="../services/print-communication.html">
+          Impression &amp; Communication
+         </a>
+        </li>
+       </ul>
+      </li>
+      <li>
+       <a class="nav-link" href="../index.html#portfolio">
+        Portfolio
+       </a>
+      </li>
+      <li>
+       <a class="nav-link" href="../index.html#about">
+        À propos
+       </a>
+      </li>
+      <li>
+       <a class="nav-link" href="../index.html#contact">
+        Contact
+       </a>
+      </li>
+     </ul>
+     <div class="nav-cta">
+      <a class="btn btn-primary" href="../index.html#contact">
+       Devis Gratuit
+      </a>
+     </div>
+     <div class="hamburger">
+      <span>
+      </span>
+      <span>
+      </span>
+      <span>
+      </span>
+     </div>
+    </div>
+   </nav>
+  </header>
+  <!-- Section Hero Spécifique au Pays -->
+  <section class="service-hero country-hero-section">
+   <div class="container">
+    <div class="service-hero-content">
+     <!-- PARTIE GAUCHE : CONTENU TEXTE -->
+     <div class="hero-text">
+      <div class="breadcrumb">
+       <a href="../index.html">
+        Accueil
+       </a>
+       <i class="fas fa-chevron-right">
+       </i>
+       <a href="../index.html#countries">
+        Pays
+       </a>
+       <i class="fas fa-chevron-right">
+       </i>
+       <span>
+        Niger
+       </span>
+      </div>
+      <h1 class="service-hero-title">
+       Niger
+      </h1>
+      <p class="service-hero-description">
+       Accompagnement des
+       <span class="highlight" style="font-weight: bold;">
+        institutions Nigériennes
+       </span>
+       dans leur transition numérique et le développement de services publics innovants.
+      </p>
+      <ul class="country-page-services">
+       <li>
+        Plateforme e-gouvernement
+       </li>
+       <li>
+        Plateformes citoyennes
+       </li>
+       <li>
+        Infrastructure numérique
+       </li>
+      </ul>
+     </div>
+     <!-- PARTIE DROITE : IMAGE -->
+     <div class="country-hero-visual">
+      <img alt="Niger - Niamey" loading="lazy" src="../assets/images/countries/niger.jpg"/>
+      <figcaption>
+       Succursale - Niamey
+      </figcaption>
+     </div>
+    </div>
+   </div>
+  </section>
+  <!-- Footer -->
+  <footer class="footer">
+   <div class="container">
+    <div class="footer-content">
+     <div class="footer-brand">
+      <img alt="Greenfad Logo" class="footer-logo" src="../assets/images/greenfad-logo-footer1.svg"/>
+      <p class="footer-description">
+       Votre partenaire pour la transformation digitale. 
                         Développement web, mobile, SEO et impression.
-                    </p>
-                    <div class="footer-social">
-                        <a href="https://ml.linkedin.com/company/green-fad" class="social-link"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://www.facebook.com/p/Green-fad-100083594433530/" class="social-link"><i class="fab fa-facebook"></i></a>
-                        <a href="https://www.instagram.com/greenfad.tech/" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.tiktok.com/@greenfad1?is_from_webapp=1&sender_device=pc" class="social-link"><i class="fab fa-tiktok"></i></a>
-                        <a href="https://www.youtube.com/@greenfad" class="social-link"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <div class="link-group">
-                        <h4>Services</h4>
-                        <ul>
-                            <li><a href="../services/web-development.html">Développement Web</a></li>
-                            <li><a href="../services/mobile-apps.html">Applications Mobiles</a></li>
-                            <li><a href="../services/seo-marketing.html">SEO & Marketing</a></li>
-                            <li><a href="../services/print-communication.html">Impression</a></li>
-                        </ul>
-                    </div>
-                    <div class="link-group">
-                        <h4>Entreprise</h4>
-                        <ul>
-                            <li><a href="../index.html#about">À propos</a></li>
-                            <li><a href="../index.html#portfolio">Portfolio</a></li>
-                            <li><a href="../index.html#contact">Contact</a></li>
-                            <li><a href="../careers.html">Carrières</a></li>
-                        </ul>
-                    </div>
-                    <div class="link-group">
-                        <h4>Support</h4>
-                        <ul>
-                            <li><a href="../faq.html">FAQ</a></li>
-                            <li><a href="../documentation.html">Documentation</a></li>
-                            <li><a href="../support-technique.html">Support technique</a></li>
-                            <li><a href="../politique-de-confidentialite.html">Politique de confidentialité</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2024</span> Greenfad. Tous droits réservés.</p>
-                <div class="footer-legal">
-                    <a href="../mentions-legales.html">Mentions légales</a>
-                    <a href="../politique-de-confidentialite.html">Politique de confidentialité</a>
-                    <a href="../cgv.html">CGV</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="../assets/js/main.js"></script>
-</body>
+      </p>
+      <div class="footer-social" id="social-links">
+       <a class="social-link" href="https://ml.linkedin.com/company/green-fad">
+        <i class="fab fa-linkedin">
+        </i>
+       </a>
+       <a class="social-link" href="https://www.facebook.com/p/Green-fad-100083594433530/">
+        <i class="fab fa-facebook">
+        </i>
+       </a>
+       <a class="social-link" href="https://www.instagram.com/greenfad.tech/">
+        <i class="fab fa-instagram">
+        </i>
+       </a>
+       <a class="social-link" href="https://www.tiktok.com/@greenfad1?is_from_webapp=1&amp;sender_device=pc">
+        <i class="fab fa-tiktok">
+        </i>
+       </a>
+       <a class="social-link" href="https://www.youtube.com/@greenfad">
+        <i class="fab fa-youtube">
+        </i>
+       </a>
+      </div>
+     </div>
+     <div class="footer-links">
+      <div class="link-group">
+       <h4>
+        Services
+       </h4>
+       <ul>
+        <li>
+         <a href="../services/web-development.html">
+          Développement Web
+         </a>
+        </li>
+        <li>
+         <a href="../services/mobile-apps.html">
+          Applications Mobiles
+         </a>
+        </li>
+        <li>
+         <a href="../services/seo-marketing.html">
+          SEO &amp; Marketing
+         </a>
+        </li>
+        <li>
+         <a href="../services/print-communication.html">
+          Impression
+         </a>
+        </li>
+       </ul>
+      </div>
+      <div class="link-group">
+       <h4>
+        Entreprise
+       </h4>
+       <ul>
+        <li>
+         <a href="../index.html#about">
+          À propos
+         </a>
+        </li>
+        <li>
+         <a href="../index.html#portfolio">
+          Portfolio
+         </a>
+        </li>
+        <li>
+         <a href="../index.html#contact">
+          Contact
+         </a>
+        </li>
+        <li>
+         <a href="../careers.html">
+          Carrières
+         </a>
+        </li>
+       </ul>
+      </div>
+      <div class="link-group">
+       <h4>
+        Support
+       </h4>
+       <ul>
+        <li>
+         <a href="../faq.html">
+          FAQ
+         </a>
+        </li>
+        <li>
+         <a href="../documentation.html">
+          Documentation
+         </a>
+        </li>
+        <li>
+         <a href="../support-technique.html">
+          Support technique
+         </a>
+        </li>
+        <li>
+         <a href="../politique-de-confidentialite.html">
+          Politique de confidentialité
+         </a>
+        </li>
+       </ul>
+      </div>
+     </div>
+    </div>
+    <div class="footer-bottom">
+     <p>
+      ©
+      <span id="copyright-year">
+       2024
+      </span>
+      Greenfad. Tous droits réservés.
+     </p>
+     <div class="footer-legal">
+      <a href="../mentions-legales.html">
+       Mentions légales
+      </a>
+      <a href="../politique-de-confidentialite.html">
+       Politique de confidentialité
+      </a>
+      <a href="../cgv.html">
+       CGV
+      </a>
+     </div>
+    </div>
+   </div>
+  </footer>
+  <!-- Scripts -->
+  <script defer="" src="../assets/js/main-redesign.js">
+  </script>
+ </body>
 </html>

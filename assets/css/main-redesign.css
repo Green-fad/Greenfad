@@ -576,6 +576,13 @@ strong {
     position: relative;
     z-index: 2;
     margin-top: -80px; /* Pour chevaucher l'image */
+    animation: float 4s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+.about-card-new:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
 }
 
 .about-card-new h3 {
