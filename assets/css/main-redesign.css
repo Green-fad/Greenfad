@@ -498,6 +498,128 @@ strong {
    7. CARDS
    ======================================== */
 
+.service-card-new {
+    background-color: var(--color-white);
+    border-radius: var(--radius-xl); /* Coins très arrondis */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: var(--space-2xl);
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.service-card-new:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.service-card-new-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.service-card-new-icon {
+    background-color: var(--color-primary-pale);
+    color: var(--color-primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: 24px;
+    margin-right: var(--space-md);
+    line-height: 1;
+}
+
+.service-card-new h3 {
+    font-size: var(--font-size-h4);
+    margin-bottom: 0;
+    color: var(--color-dark);
+}
+
+.service-card-new p {
+    color: var(--color-gray-dark);
+    margin-bottom: var(--space-lg);
+    flex-grow: 1;
+}
+
+.service-card-new-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--space-2xl);
+}
+
+.service-card-new-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-body);
+    color: var(--color-gray-dark);
+}
+
+.service-card-new-list li i {
+    color: var(--color-primary);
+    margin-right: var(--space-sm);
+    font-size: 18px;
+}
+
+.service-card-new .btn {
+    margin-top: auto; /* Pour aligner le bouton en bas */
+    width: 100%;
+}
+
+/* Style pour la carte de l'image IMG_0545.png (Section À propos de nous) */
+.about-card-new {
+    background-color: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-xl);
+    position: relative;
+    z-index: 2;
+    margin-top: -80px; /* Pour chevaucher l'image */
+}
+
+.about-card-new h3 {
+    font-size: var(--font-size-h4);
+    margin-bottom: var(--space-md);
+}
+
+.about-card-new-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    margin-bottom: var(--space-sm);
+}
+
+.about-card-new ul {
+    list-style: none;
+    padding-left: var(--space-md);
+}
+
+.about-card-new ul li {
+    position: relative;
+    margin-bottom: var(--space-sm);
+    color: var(--color-gray-dark);
+}
+
+.about-card-new ul li::before {
+    content: '•';
+    color: var(--color-primary);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+@media (max-width: 768px) {
+    .service-card-new {
+        padding: var(--space-xl);
+    }
+    .about-card-new {
+        margin-top: -40px;
+    }
+}
+
 .card {
   background: var(--color-white);
   border-radius: var(--radius-lg);

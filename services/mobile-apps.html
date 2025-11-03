@@ -22,13 +22,13 @@
     <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     
     <!-- CSS -->
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/responsive-enhanced.css?v=2.0.0">
+    <link rel="stylesheet" href="../assets/css/main-redesign.css">
+    <link rel="stylesheet" href="../assets/css/mobile-fixes.css">
 
     <!-- CSS Optimisé -->
-    <link rel="stylesheet" href="../assets/css/professional-design.min.css">
-    <link rel="stylesheet" href="../assets/css/improvements.min.css">
-    <link rel="stylesheet" href="../assets/css/agency-identity.min.css">
+    
+    
+    
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,7 +39,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- JavaScript -->
-    <script src="../assets/js/responsive-enhanced.js?v=2.0.0" defer></script>
+    <script src="../assets/js/main-redesign.js" defer></script>
 </head>
 <body>
     <!-- Header & Navigation -->
@@ -47,14 +47,14 @@
         <nav class="navbar">
             <div class="nav-container">
                 <div class="nav-logo">
-                    <a href="../index.html">
+                    <a href="../index.html" class="logo-link">
                         <img src="../assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="logo">
                     </a>
                 </div>
                 <ul class="nav-menu">
                     <li><a href="../index.html" class="nav-link">Accueil</a></li>
                     <li class="nav-dropdown">
-                        <a href="#" class="nav-link active">Services <i class="fas fa-chevron-down"></i></a>
+                        <a href="#" class="nav-link active" aria-haspopup="true" aria-expanded="false">Services <i class="fas fa-chevron-down" aria-hidden="true"></i></a>
                         <ul class="dropdown-menu">
                             <li><a href="web-development.html">Développement Web</a></li>
                             <li><a href="mobile-apps.html" class="active">Applications Mobiles</a></li>
@@ -69,11 +69,11 @@
                 <div class="nav-cta">
                     <a href="#service-cta" class="btn btn-primary">Solution Mobile Gratuit</a>
                 </div>
-                <div class="hamburger">
+                <button class="hamburger" aria-label="Ouvrir le menu de navigation" aria-expanded="false" aria-controls="nav-menu">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
             </div>
         </nav>
     </header>
@@ -84,7 +84,7 @@
             <div class="service-hero-content">
                 <div class="hero-text">
                     <div class="breadcrumb">
-                        <a href="../index.html">Accueil</a>
+                        <a href="../index.html" class="logo-link">Accueil</a>
                         <i class="fas fa-chevron-right"></i>
                         <a href="../index.html#services">Services</a>
                         <i class="fas fa-chevron-right"></i>
@@ -519,6 +519,59 @@
 
     <!-- Footer -->
     <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-about">
+                    <a href="../index.html" class="footer-logo-link">
+                        <img src="../assets/images/greenfad-logo-new.svg" alt="Greenfad Logo" class="footer-logo">
+                    </a>
+                    <p>Votre partenaire pour la transformation digitale durable en Afrique.</p>
+                    <div class="footer-social" id="social-links">
+                        <a href="https://linkedin.com/company/greenfad" class="social-icon" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://facebook.com/greenfad" class="social-icon" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://twitter.com/greenfad" class="social-icon" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://instagram.com/greenfad" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section footer-links">
+                    <h4>Liens Rapides</h4>
+                    <ul>
+                        <li><a href="../index.html#home">Accueil</a></li>
+                        <li><a href="../index.html#services">Services</a></li>
+                        <li><a href="../index.html#portfolio">Portfolio</a></li>
+                        <li><a href="../index.html#about">À propos</a></li>
+                        <li><a href="../index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section footer-services">
+                    <h4>Nos Services</h4>
+                    <ul>
+                        <li><a href="web-development.html">Développement Web</a></li>
+                        <li><a href="mobile-apps.html">Applications Mobiles</a></li>
+                        <li><a href="seo-marketing.html">SEO & Marketing</a></li>
+                        <li><a href="print-communication.html">Technologies Vertes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section footer-contact">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> Missabougou, Bamako, Mali</p>
+                    <p><i class="fas fa-phone"></i> +223 72 19 46 54</p>
+                    <p><i class="fas fa-envelope"></i> contact@greenfad.tech</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Greenfad. Tous droits réservés. | <a href="../mentions-legales.html">Mentions Légales</a> | <a href="../politique-de-confidentialite.html">Politique de Confidentialité</a></p>
+            </div>
+        </div>
+    </footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
