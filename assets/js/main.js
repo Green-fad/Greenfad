@@ -1,21 +1,19 @@
 /**
- * Greenfad Website - Main JavaScript
- * Modern, efficient, and accessible interactions
+ * Greenfad Website - Modern JavaScript
+ * Efficient, accessible, and performant interactions
  */
 
-// ===== UTILITY FUNCTIONS =====
+'use strict';
+
+// ========== UTILITY FUNCTIONS ==========
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 
 const debounce = (func, wait) => {
     let timeout;
     return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func(...args), wait);
     };
 };
 
@@ -32,11 +30,10 @@ const throttle = (func, limit) => {
     };
 };
 
-// ===== NAVIGATION =====
+// ========== NAVIGATION CLASS ==========
 class Navigation {
     constructor() {
         this.header = $('.header');
-        this.navbar = $('.navbar');
         this.hamburger = $('.hamburger');
         this.navMenu = $('.nav-menu');
         this.navLinks = $$('.nav-link');
@@ -49,25 +46,19 @@ class Navigation {
         this.handleScroll();
         this.handleMobileMenu();
         this.handleSmoothScroll();
-        this.handleActiveLink();
+        this.handleDropdowns();
         
-        // Event listeners
         window.addEventListener('scroll', throttle(() => this.handleScroll(), 10));
         window.addEventListener('resize', debounce(() => this.handleResize(), 250));
     }
     
     handleScroll() {
         const scrolled = window.pageYOffset;
-        const shouldAddClass = scrolled > 50;
         
-        if (shouldAddClass && !this.header.classList.contains('scrolled')) {
+        if (scrolled > 50) {
             this.header.classList.add('scrolled');
-            this.header.style.background = 'rgba(255, 255, 255, 0.98)';
-            this.header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
-        } else if (!shouldAddClass && this.header.classList.contains('scrolled')) {
+        } else {
             this.header.classList.remove('scrolled');
-            this.header.style.background = 'rgba(255, 255, 255, 0.95)';
-            this.header.style.boxShadow = 'none';
         }
     }
     
@@ -78,18 +69,18 @@ class Navigation {
             this.toggleMobileMenu();
         });
         
-        // Close menu when clicking nav links
         this.navLinks.forEach(link => {
             link.addEventListener('click', () => {
-                if (this.isMenuOpen) {
+                if (this.isMenuOpen && window.innerWidth < 768) {
                     this.toggleMobileMenu();
                 }
             });
         });
         
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (this.isMenuOpen && !this.navbar.contains(e.target)) {
+            if (this.isMenuOpen && 
+                !this.hamburger.contains(e.target) && 
+                !this.navMenu.contains(e.target)) {
                 this.toggleMobileMenu();
             }
         });
@@ -100,27 +91,25 @@ class Navigation {
         this.hamburger.classList.toggle('active');
         this.navMenu.classList.toggle('active');
         
-        // Animate hamburger
         const spans = this.hamburger.querySelectorAll('span');
         if (this.isMenuOpen) {
             spans[0].style.transform = 'rotate(45deg) translate(6px, 6px)';
             spans[1].style.opacity = '0';
             spans[2].style.transform = 'rotate(-45deg) translate(6px, -6px)';
+            document.body.style.overflow = 'hidden';
         } else {
             spans[0].style.transform = 'none';
             spans[1].style.opacity = '1';
             spans[2].style.transform = 'none';
+            document.body.style.overflow = '';
         }
-        
-        // Prevent body scroll when menu is open
-        document.body.style.overflow = this.isMenuOpen ? 'hidden' : '';
     }
     
     handleSmoothScroll() {
         this.navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
-                if (href.startsWith('#')) {
+                if (href && href.startsWith('#')) {
                     e.preventDefault();
                     const target = $(href);
                     if (target) {
@@ -131,39 +120,27 @@ class Navigation {
                             top: targetPosition,
                             behavior: 'smooth'
                         });
-                        // Close mobile menu after click
-                        if (this.isMenuOpen) {
-                            this.toggleMobileMenu();
-                        }
                     }
                 }
             });
         });
     }
     
-    handleActiveLink() {
-        const sections = $$('section[id]');
+    handleDropdowns() {
+        const dropdowns = $$('.nav-dropdown');
         
-        const updateActiveLink = () => {
-            const scrollPos = window.pageYOffset + this.header.offsetHeight + 100;
+        dropdowns.forEach(dropdown => {
+            const link = dropdown.querySelector('.nav-link');
             
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.offsetHeight;
-                const sectionId = section.getAttribute('id');
-                
-                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
-                    this.navLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${sectionId}`) {
-                            link.classList.add('active');
-                        }
-                    });
-                }
-            });
-        };
-        
-        window.addEventListener('scroll', throttle(updateActiveLink, 100));
+            if (link) {
+                link.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('active');
+                    }
+                });
+            }
+        });
     }
     
     handleResize() {
@@ -173,320 +150,349 @@ class Navigation {
     }
 }
 
-// ===== FORM HANDLING =====
+// ========== FORM HANDLING ==========
 class FormHandler {
     constructor() {
-        this.contactForm = $('#contactForm');
+        this.form = $('.contact-form');
         this.init();
     }
     
     init() {
-        if (this.contactForm) {
-            this.contactForm.addEventListener('submit', (e) => this.handleSubmit(e));
-            this.setupFormValidation();
-        }
-    }
-    
-    async handleSubmit(e) {
-        e.preventDefault();
+        if (!this.form) return;
         
-        const formData = new FormData(this.contactForm);
-        const data = Object.fromEntries(formData.entries());
+        this.form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleSubmit(e);
+        });
         
-        // Validate form
-        if (!this.validateForm(data)) {
-            return;
-        }
-        
-        // Show loading state
-        const submitBtn = this.contactForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
-        submitBtn.disabled = true;
-        
-        try {
-            // Simulate API call (replace with actual endpoint)
-            await this.simulateFormSubmission(data);
-            
-            // Show success message
-            this.showMessage('Merci ! Votre message a été envoyé avec succès. Nous vous recontacterons sous 24h.', 'success');
-            this.contactForm.reset();
-            
-        } catch (error) {
-            // Show error message
-            this.showMessage('Une erreur s\'est produite. Veuillez réessayer ou nous contacter directement.', 'error');
-            console.error('Form submission error:', error);
-        } finally {
-            // Reset button state
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    }
-    
-    validateForm(data) {
-        const errors = [];
-        
-        if (!data.name || data.name.trim().length < 2) {
-            errors.push('Le nom est requis (minimum 2 caractères)');
-        }
-        
-        if (!data.email || !this.isValidEmail(data.email)) {
-            errors.push('Une adresse email valide est requise');
-        }
-        
-        if (!data.message || data.message.trim().length < 10) {
-            errors.push('Le message est requis (minimum 10 caractères)');
-        }
-        
-        if (!data.consent) {
-            errors.push('Vous devez accepter le traitement de vos données');
-        }
-        
-        if (errors.length > 0) {
-            this.showMessage(errors.join('<br>'), 'error');
-            return false;
-        }
-        
-        return true;
-    }
-    
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-    
-    showMessage(message, type = 'info') {
-        // Remove existing messages
-        const existingMessage = $('.form-message');
-        if (existingMessage) {
-            existingMessage.remove();
-        }
-        
-        // Create new message
-        const messageElement = document.createElement('div');
-        messageElement.className = `form-message form-message--${type}`;
-        messageElement.innerHTML = `
-            <div class="form-message__content">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="form-message__close" onclick="this.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        
-        // Insert message
-        this.contactForm.insertBefore(messageElement, this.contactForm.firstChild);
-        
-        // Auto-remove after 5 seconds for success messages
-        if (type === 'success') {
-            setTimeout(() => {
-                if (messageElement.parentElement) {
-                    messageElement.remove();
-                }
-            }, 5000);
-        }
-        
-        // Scroll to message
-        messageElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    
-    setupFormValidation() {
-        const inputs = this.contactForm.querySelectorAll('input, textarea, select');
-        
+        const inputs = this.form.querySelectorAll('input, textarea, select');
         inputs.forEach(input => {
             input.addEventListener('blur', () => this.validateField(input));
-            input.addEventListener('input', () => this.clearFieldError(input));
+            input.addEventListener('input', () => this.clearError(input));
         });
     }
     
     validateField(field) {
-        const value = field.value.trim();
         let isValid = true;
-        let message = '';
-        
-        // Remove previous error state
-        this.clearFieldError(field);
-        
-        switch (field.type) {
-            case 'email':
-                if (value && !this.isValidEmail(value)) {
-                    isValid = false;
-                    message = 'Format d\'email invalide';
-                }
-                break;
-            case 'tel':
-                if (value && !/^[\d\s\+\-\(\)]+$/.test(value)) {
-                    isValid = false;
-                    message = 'Format de téléphone invalide';
-                }
-                break;
-        }
+        const value = field.value.trim();
         
         if (field.hasAttribute('required') && !value) {
+            this.showError(field, 'Ce champ est requis');
             isValid = false;
-            message = 'Ce champ est requis';
-        }
-        
-        if (!isValid) {
-            this.showFieldError(field, message);
+        } else if (field.type === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                this.showError(field, 'Veuillez entrer une adresse email valide');
+                isValid = false;
+            }
+        } else if (field.type === 'tel' && value) {
+            const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+            if (!phoneRegex.test(value)) {
+                this.showError(field, 'Veuillez entrer un numéro valide');
+                isValid = false;
+            }
         }
         
         return isValid;
     }
     
-    showFieldError(field, message) {
+    showError(field, message) {
+        this.clearError(field);
         field.classList.add('error');
         
-        let errorElement = field.parentElement.querySelector('.field-error');
-        if (!errorElement) {
-            errorElement = document.createElement('div');
-            errorElement.className = 'field-error';
-            field.parentElement.appendChild(errorElement);
-        }
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error';
+        errorDiv.textContent = message;
+        errorDiv.style.color = '#F56565';
+        errorDiv.style.fontSize = '0.875rem';
+        errorDiv.style.marginTop = '0.5rem';
         
-        errorElement.textContent = message;
+        field.parentNode.appendChild(errorDiv);
     }
     
-    clearFieldError(field) {
+    clearError(field) {
         field.classList.remove('error');
-        const errorElement = field.parentElement.querySelector('.field-error');
-        if (errorElement) {
-            errorElement.remove();
+        const errorDiv = field.parentNode.querySelector('.form-error');
+        if (errorDiv) {
+            errorDiv.remove();
         }
     }
     
-    async simulateFormSubmission(data) {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    async handleSubmit(e) {
+        const formData = new FormData(this.form);
+        let isValid = true;
         
-        // Simulate random success/failure for demo
-        if (Math.random() > 0.1) { // 90% success rate
-            return { success: true, message: 'Form submitted successfully' };
-        } else {
-            throw new Error('Network error');
-        }
-    }
-}
-
-// ===== ANIMATIONS =====
-class AnimationController {
-    constructor() {
-        this.animatedElements = $$('.reveal');
-        this.init();
-    }
-    
-    init() {
-        this.setupIntersectionObserver();
-        this.animateCounters();
-    }
-    
-    setupIntersectionObserver() {
-        const options = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    
-                    // Add staggered animation for grid items
-                    if (entry.target.parentElement.classList.contains('values-grid') ||
-                        entry.target.parentElement.classList.contains('grid-4')) {
-                        const siblings = Array.from(entry.target.parentElement.children);
-                        const index = siblings.indexOf(entry.target);
-                        entry.target.style.transitionDelay = `${index * 0.1}s`;
-                    }
-                    
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, options);
-        
-        this.animatedElements.forEach(el => {
-            observer.observe(el);
-        });
-    }
-    
-    animateCounters() {
-        const counters = $$('.stat-number');
-        
-        const animateCounter = (counter) => {
-            const target = parseInt(counter.textContent.replace(/[^0-9]/g, ''));
-            const duration = 2000;
-            const step = target / (duration / 16);
-            let current = 0;
-            
-            const updateCounter = () => {
-                current += step;
-                if (current < target) {
-                    counter.textContent = Math.floor(current) + (counter.textContent.includes('%') ? '%' : '+');
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    counter.textContent = counter.textContent.replace(/[0-9]+/, target);
-                }
-            };
-            
-            updateCounter();
-        };
-        
-        const counterObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    animateCounter(entry.target);
-                    counterObserver.unobserve(entry.target);
-                }
-            });
+        const inputs = this.form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            if (!this.validateField(input)) {
+                isValid = false;
+            }
         });
         
-        counters.forEach(counter => {
-            counterObserver.observe(counter);
-        });
-    }
-}
-
-// ===== INITIALIZATION =====
-class App {
-    constructor() {
-        this.components = {};
-        this.init();
-    }
-    
-    init() {
-        // Wait for DOM to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initComponents());
-        } else {
-            this.initComponents();
-        }
-    }
-    
-    initComponents() {
+        if (!isValid) return;
+        
+        const submitButton = this.form.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+        
         try {
-            // Initialize all components
-            this.components.navigation = new Navigation();
-            this.components.animations = new AnimationController();
-            this.components.formHandler = new FormHandler();
+            await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Add loading complete class
-            document.body.classList.add('loaded');
-            
-            console.log('🚀 Greenfad website initialized successfully');
+            this.showSuccessMessage();
+            this.form.reset();
         } catch (error) {
-            console.error('❌ Error initializing website:', error);
+            this.showErrorMessage();
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
         }
     }
     
-    // Public API for external interactions
-    getComponent(name) {
-        return this.components[name];
+    showSuccessMessage() {
+        const message = document.createElement('div');
+        message.className = 'form-message success';
+        message.innerHTML = '<i class="fas fa-check-circle"></i> Merci ! Votre message a été envoyé avec succès.';
+        message.style.cssText = 'background: #48BB78; color: white; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; text-align: center;';
+        
+        this.form.appendChild(message);
+        setTimeout(() => message.remove(), 5000);
+    }
+    
+    showErrorMessage() {
+        const message = document.createElement('div');
+        message.className = 'form-message error';
+        message.innerHTML = '<i class="fas fa-exclamation-circle"></i> Une erreur est survenue. Veuillez réessayer.';
+        message.style.cssText = 'background: #F56565; color: white; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; text-align: center;';
+        
+        this.form.appendChild(message);
+        setTimeout(() => message.remove(), 5000);
     }
 }
 
-// ===== START APPLICATION =====
-const app = new App();
+// ========== SCROLL ANIMATIONS ==========
+class ScrollAnimations {
+    constructor() {
+        this.observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        this.init();
+    }
+    
+    init() {
+        if ('IntersectionObserver' in window) {
+            this.observer = new IntersectionObserver(
+                (entries) => this.handleIntersect(entries),
+                this.observerOptions
+            );
+            
+            const animatedElements = $$('.service-card, .portfolio-item, .testimonial-card, .process-step, .value-item');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                this.observer.observe(el);
+            });
+        }
+    }
+    
+    handleIntersect(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                entry.target.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                this.observer.unobserve(entry.target);
+            }
+        });
+    }
+}
 
-// Make app globally accessible for debugging
-window.GreenfadApp = app;
+// ========== BACK TO TOP BUTTON ==========
+class BackToTop {
+    constructor() {
+        this.button = $('.back-to-top');
+        this.init();
+    }
+    
+    init() {
+        if (!this.button) return;
+        
+        window.addEventListener('scroll', throttle(() => {
+            if (window.pageYOffset > 300) {
+                this.button.classList.add('visible');
+            } else {
+                this.button.classList.remove('visible');
+            }
+        }, 100));
+        
+        this.button.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+}
+
+// ========== LAZY LOADING IMAGES ==========
+class LazyLoader {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        if ('loading' in HTMLImageElement.prototype) {
+            const images = $$('img[loading="lazy"]');
+            images.forEach(img => {
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                }
+            });
+        } else {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js';
+            document.body.appendChild(script);
+        }
+    }
+}
+
+// ========== PERFORMANCE MONITORING ==========
+class PerformanceMonitor {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        if ('PerformanceObserver' in window) {
+            try {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        if (entry.entryType === 'largest-contentful-paint') {
+                            console.log('LCP:', entry.renderTime || entry.loadTime);
+                        }
+                    }
+                });
+                observer.observe({ entryTypes: ['largest-contentful-paint'] });
+            } catch (e) {
+                console.warn('Performance observer not supported');
+            }
+        }
+        
+        window.addEventListener('load', () => {
+            const perfData = window.performance.timing;
+            const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+            console.log('Page Load Time:', pageLoadTime + 'ms');
+        });
+    }
+}
+
+// ========== THEME HANDLER (Optional) ==========
+class ThemeHandler {
+    constructor() {
+        this.theme = localStorage.getItem('theme') || 'light';
+        this.init();
+    }
+    
+    init() {
+        this.applyTheme(this.theme);
+        
+        const themeToggle = $('#theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
+    }
+    
+    toggleTheme() {
+        this.theme = this.theme === 'light' ? 'dark' : 'light';
+        this.applyTheme(this.theme);
+        localStorage.setItem('theme', this.theme);
+    }
+    
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+}
+
+// ========== ACCESSIBILITY ENHANCEMENTS ==========
+class AccessibilityEnhancements {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        this.handleFocusVisible();
+        this.handleKeyboardNavigation();
+        this.enhanceARIA();
+    }
+    
+    handleFocusVisible() {
+        document.addEventListener('mousedown', () => {
+            document.body.classList.add('using-mouse');
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                document.body.classList.remove('using-mouse');
+            }
+        });
+    }
+    
+    handleKeyboardNavigation() {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openDropdowns = $$('.nav-dropdown.active');
+                openDropdowns.forEach(dropdown => {
+                    dropdown.classList.remove('active');
+                });
+            }
+        });
+    }
+    
+    enhanceARIA() {
+        const buttons = $$('button:not([aria-label])');
+        buttons.forEach(button => {
+            if (!button.textContent.trim()) {
+                console.warn('Button without aria-label:', button);
+            }
+        });
+    }
+}
+
+// ========== INITIALIZE ALL ==========
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize all components
+    new Navigation();
+    new FormHandler();
+    new ScrollAnimations();
+    new BackToTop();
+    new LazyLoader();
+    new AccessibilityEnhancements();
+    
+    // Optional: Performance monitoring in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        new PerformanceMonitor();
+    }
+});
+
+// ========== SERVICE WORKER (Optional PWA) ==========
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.warn('Service Worker registration failed:', err));
+    });
+}
+
+// ========== EXPORT FOR TESTING ==========
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        Navigation,
+        FormHandler,
+        ScrollAnimations,
+        BackToTop,
+        LazyLoader
+    };
+}
