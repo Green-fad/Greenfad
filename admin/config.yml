@@ -1,0 +1,27 @@
+backend:
+  name: github
+  repo: Green-fad/Greenfad
+  branch: main
+  auth_endpoint: api/auth
+  base_url: https://greenfad.tech
+
+media_folder: assets/images/blog
+public_folder: /assets/images/blog
+
+collections:
+  - name: "blog"
+    label: "Articles du Blog"
+    folder: "_posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "ID", name: "id", widget: "number" }
+      - { label: "Titre", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Catégorie", name: "category", widget: "select", options: ["seo", "web", "mobile", "digital"] }
+      - { label: "Auteur", name: "author", widget: "string", default: "Greenfad Team" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - { label: "Contenu", name: "content", widget: "markdown" }

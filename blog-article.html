@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Blog - Greenfad</title>
+    <meta name="description" content="Lisez nos articles détaillés sur le développement web, le SEO et les solutions digitales.">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/blog-article.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+</head>
+<body>
+    <!-- Skip to main content -->
+    <a href="#main" class="skip-to-content">Aller au contenu principal</a>
+    
+    <!-- Header & Navigation -->
+    <header class="header" role="banner">
+        <nav class="navbar" role="navigation" aria-label="Navigation principale">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <a href="index.html" aria-label="Retour à l'accueil">
+                        <img src="assets/images/greenfad-logo-new.svg" alt="Greenfad - Solutions Digitales" class="logo" width="180" height="40">
+                    </a>
+                </div>
+                
+                <ul class="nav-menu" role="menubar">
+                    <li role="none"><a href="index.html#home" class="nav-link" role="menuitem">Accueil</a></li>
+                    <li role="none"><a href="blog.html" class="nav-link" role="menuitem">Blog</a></li>
+                    <li role="none"><a href="index.html#contact" class="nav-link" role="menuitem">Contact</a></li>
+                </ul>
+                
+                <div class="hamburger" id="hamburger" aria-label="Menu mobile" role="button" tabindex="0">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main" class="article-main">
+        <article class="article-container" id="articleContainer">
+            <!-- Article content will be loaded here -->
+        </article>
+
+        <!-- Related Articles -->
+        <section class="related-articles">
+            <div class="container">
+                <h2>Articles Connexes</h2>
+                <div class="related-grid" id="relatedGrid">
+                    <!-- Related articles will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="article-cta">
+            <div class="container">
+                <h2>Besoin d'une Solution Digitale ?</h2>
+                <p>Contactez notre équipe pour discuter de votre projet</p>
+                <a href="index.html#contact" class="btn btn-primary">Nous Contacter</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Greenfad</h3>
+                    <p>Accélérateur de la transformation numérique et écologique en Afrique.</p>
+                    <div class="social-links">
+                        <a href="https://web.facebook.com/100083594433530" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://youtube.com/@greenfad" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://www.tiktok.com/@greenfad1" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="index.html#services">Services</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Légal</h4>
+                    <ul>
+                        <li><a href="mentions-legales.html">Mentions Légales</a></li>
+                        <li><a href="politique-de-confidentialite.html">Politique de Confidentialité</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p>Email: <a href="mailto:contact@greenfad.tech">contact@greenfad.tech</a></p>
+                    <p>Téléphone: <a href="tel:+22372194654">+223 72 19 46 54</a></p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 GREEN FAD SARL. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Blog Data -->
+    <script>
+        const blogPosts = [
+            {
+                id: 1,
+                title: "Guide Complet du SEO pour Sites Statiques",
+                description: "Découvrez comment optimiser le référencement de votre blog sur GitHub Pages avec des techniques simples et efficaces.",
+                category: "seo",
+                author: "Greenfad Team",
+                date: "2025-11-10",
+                image: "https://images.unsplash.com/photo-1460925895917-aeb19be489c7?w=1200&h=600&fit=crop",
+                slug: "guide-seo-sites-statiques",
+                tags: ["seo", "github-pages", "blog"],
+                content: `
+                    <h2>Introduction au SEO pour Sites Statiques</h2>
+                    <p>Le SEO (Search Engine Optimization) est crucial pour la visibilité en ligne. Même si votre site est statique, les principes du SEO restent les mêmes. Voici comment optimiser votre blog sur GitHub Pages.</p>
+                    
+                    <h3>1. Optimisation Technique</h3>
+                    <p>La base du SEO commence par une optimisation technique solide. Cela inclut :</p>
+                    <ul>
+                        <li><strong>Sitemap XML</strong> : Générez automatiquement un sitemap.xml pour aider Google à découvrir vos pages</li>
+                        <li><strong>Fichier robots.txt</strong> : Contrôlez l'accès des robots d'exploration</li>
+                        <li><strong>Vitesse de chargement</strong> : Les sites statiques sont naturellement rapides, ce qui est un avantage majeur</li>
+                        <li><strong>Responsive Design</strong> : Assurez-vous que votre site fonctionne parfaitement sur mobile</li>
+                    </ul>
+                    
+                    <h3>2. Optimisation du Contenu</h3>
+                    <p>Le contenu est roi en SEO. Voici les éléments clés :</p>
+                    <ul>
+                        <li><strong>Balises Title et Meta Description</strong> : Uniques et descriptives pour chaque page</li>
+                        <li><strong>Structure des Titres</strong> : Un H1 par page, suivi d'une hiérarchie logique</li>
+                        <li><strong>Maillage Interne</strong> : Liez vos articles entre eux</li>
+                        <li><strong>Données Structurées</strong> : Utilisez Schema.org pour enrichir vos résultats</li>
+                    </ul>
+                    
+                    <h3>3. Stratégie Hors-Site</h3>
+                    <p>Même avec un site statique, vous pouvez :</p>
+                    <ul>
+                        <li>Soumettre votre sitemap à Google Search Console</li>
+                        <li>Partager vos articles sur les réseaux sociaux</li>
+                        <li>Créer du contenu si exceptionnel que d'autres voudront y faire référence</li>
+                    </ul>
+                    
+                    <h3>Conclusion</h3>
+                    <p>Le SEO pour sites statiques est tout aussi efficace que pour les sites dynamiques. L'avantage est que la partie technique est déjà largement acquise. Concentrez-vous sur la création de contenu de haute qualité et sa promotion.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "Architecture Jamstack : Le Futur du Web",
+                description: "Explorez l'architecture Jamstack et ses avantages pour créer des applications web modernes et performantes.",
+                category: "web",
+                author: "Greenfad Team",
+                date: "2025-11-08",
+                image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=600&fit=crop",
+                slug: "jamstack-futur-web",
+                tags: ["jamstack", "web-dev", "performance"],
+                content: `
+                    <h2>Qu'est-ce que Jamstack ?</h2>
+                    <p>Jamstack signifie JavaScript, APIs, et Markup. C'est une architecture moderne pour construire des sites web rapides, sécurisés et scalables.</p>
+                    
+                    <h3>Les Trois Piliers de Jamstack</h3>
+                    <p><strong>1. JavaScript</strong> : Le langage de programmation côté client pour l'interactivité</p>
+                    <p><strong>2. APIs</strong> : Les services externes pour la logique métier et les données</p>
+                    <p><strong>3. Markup</strong> : Le contenu pré-généré en HTML statique</p>
+                    
+                    <h3>Avantages de Jamstack</h3>
+                    <ul>
+                        <li><strong>Performance</strong> : Les sites statiques se chargent instantanément</li>
+                        <li><strong>Sécurité</strong> : Pas de serveur à attaquer</li>
+                        <li><strong>Scalabilité</strong> : Facile à déployer sur CDN global</li>
+                        <li><strong>Expérience Développeur</strong> : Outils modernes et workflow optimisé</li>
+                    </ul>
+                    
+                    <h3>Cas d'Usage Parfaits pour Jamstack</h3>
+                    <ul>
+                        <li>Blogs et sites de contenu</li>
+                        <li>Sites de documentation</li>
+                        <li>Portfolios et sites vitrine</li>
+                        <li>Applications web progressives (PWA)</li>
+                    </ul>
+                    
+                    <h3>Conclusion</h3>
+                    <p>Jamstack représente l'avenir du développement web. Si vous cherchez à construire un site moderne, performant et facile à maintenir, Jamstack est la solution idéale.</p>
+                `
+            },
+            {
+                id: 3,
+                title: "Decap CMS : Gérer votre Blog sans Backend",
+                description: "Comment utiliser Decap CMS pour créer une interface d'administration complète sans serveur backend.",
+                category: "web",
+                author: "Greenfad Team",
+                date: "2025-11-05",
+                image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=600&fit=crop",
+                slug: "decap-cms-gestion-blog",
+                tags: ["cms", "decap", "github"],
+                content: `
+                    <h2>Introduction à Decap CMS</h2>
+                    <p>Decap CMS (anciennement Netlify CMS) est un CMS Git-based qui vous permet de gérer votre contenu directement depuis votre dépôt GitHub, sans aucun serveur backend.</p>
+                    
+                    <h3>Comment Fonctionne Decap CMS</h3>
+                    <p>Decap CMS fournit une interface web pour éditer votre contenu. Quand vous publiez, il crée un commit Git dans votre dépôt. Votre CI/CD (GitHub Actions) se déclenche automatiquement pour reconstruire votre site.</p>
+                    
+                    <h3>Avantages de Decap CMS</h3>
+                    <ul>
+                        <li><strong>Pas de Backend</strong> : Tout fonctionne avec Git</li>
+                        <li><strong>Contrôle de Version</strong> : Chaque changement est un commit</li>
+                        <li><strong>Déploiement Automatique</strong> : Intégration native avec GitHub</li>
+                        <li><strong>Gratuit</strong> : Aucun coût de serveur</li>
+                    </ul>
+                    
+                    <h3>Configuration de Base</h3>
+                    <p>Pour configurer Decap CMS, vous avez besoin d'un fichier config.yml à la racine de votre site. Ce fichier définit la structure de votre contenu et les champs d'édition.</p>
+                    
+                    <h3>Conclusion</h3>
+                    <p>Decap CMS est la solution idéale pour les blogs statiques. Elle combine la simplicité d'un CMS traditionnel avec la puissance et la flexibilité de Git.</p>
+                `
+            }
+        ];
+    </script>
+
+    <!-- JavaScript -->
+    <script src="assets/js/blog-article.js"></script>
+</body>
+</html>
