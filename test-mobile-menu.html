@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Menu Mobile - GREEN FAD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .test-info {
+            background: #00D4AA;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .test-info h1 {
+            margin-bottom: 10px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            padding: 20px;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00D4AA;
+        }
+
+        /* Desktop Menu */
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 15px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #00D4AA;
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background: #333;
+            transition: all 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Status indicators */
+        .status {
+            padding: 20px;
+            margin: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #ddd;
+            padding-left: 15px;
+        }
+
+        .status-item.success {
+            border-color: #48BB78;
+            background: #f0fff4;
+        }
+
+        .status-item.error {
+            border-color: #F56565;
+            background: #fff5f5;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 85%;
+                max-width: 400px;
+                height: calc(100vh - 80px);
+                background: white;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 30px 20px;
+                box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+                transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-y: auto;
+                z-index: 999;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu li {
+                width: 100%;
+                padding: 15px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .nav-link {
+                display: block;
+                width: 100%;
+                font-size: 18px;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            body.menu-open::before {
+                content: '';
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+            }
+        }
+
+        .content {
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-box {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="test-info">
+        <h1>🧪 Test Menu Mobile</h1>
+        <p>Testez le menu hamburger sur mobile (< 768px)</p>
+        <p><strong>Version de l'écran:</strong> <span id="screen-width"></span></p>
+    </div>
+
+    <!-- Header & Navigation -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    GREEN FAD
+                </div>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link">Accueil</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#about" class="nav-link">À propos</a></li>
+                    <li><a href="#equipe" class="nav-link">Équipe</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="content">
+        <div class="status">
+            <h2>📊 Status du Menu</h2>
+            <div class="status-item" id="status-js">
+                <i class="fas fa-spinner fa-spin"></i> Chargement JavaScript...
+            </div>
+            <div class="status-item" id="status-menu">
+                <i class="fas fa-spinner fa-spin"></i> État du menu...
+            </div>
+            <div class="status-item" id="status-screen">
+                <i class="fas fa-spinner fa-spin"></i> Détection écran...
+            </div>
+        </div>
+
+        <div class="demo-box">
+            <h2>✅ Instructions de Test</h2>
+            <ol style="line-height: 2;">
+                <li><strong>Sur Desktop (> 768px)</strong>: Le menu est visible en haut</li>
+                <li><strong>Sur Mobile (< 768px)</strong>: Cliquez sur le hamburger (☰)</li>
+                <li><strong>Menu ouvert</strong>: Vous devriez voir les liens à gauche</li>
+                <li><strong>Fermeture</strong>: Cliquez sur un lien ou en dehors</li>
+            </ol>
+        </div>
+
+        <div class="demo-box">
+            <h2>🎯 Événements JavaScript</h2>
+            <div id="events-log" style="background: #f5f5f5; padding: 15px; border-radius: 5px; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 14px;">
+                <div style="color: #666;">Attendez des événements...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logger
+        function log(message, type = 'info') {
+            const eventsLog = document.getElementById('events-log');
+            const time = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#0066cc',
+                success: '#00aa00',
+                error: '#cc0000',
+                warning: '#ff8800'
+            };
+            const div = document.createElement('div');
+            div.style.color = colors[type];
+            div.style.marginBottom = '5px';
+            div.innerHTML = `[${time}] ${message}`;
+            eventsLog.appendChild(div);
+            eventsLog.scrollTop = eventsLog.scrollHeight;
+        }
+
+        // Update screen width
+        function updateScreenWidth() {
+            const width = window.innerWidth;
+            document.getElementById('screen-width').textContent = width + 'px';
+            
+            const statusScreen = document.getElementById('status-screen');
+            if (width <= 768) {
+                statusScreen.className = 'status-item success';
+                statusScreen.innerHTML = '<i class="fas fa-mobile-alt"></i> Mode Mobile (' + width + 'px)';
+            } else {
+                statusScreen.className = 'status-item';
+                statusScreen.innerHTML = '<i class="fas fa-desktop"></i> Mode Desktop (' + width + 'px)';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('✅ DOM chargé', 'success');
+            
+            const hamburger = document.getElementById('hamburger');
+            const navMenu = document.getElementById('navMenu');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Update status
+            const statusJs = document.getElementById('status-js');
+            statusJs.className = 'status-item success';
+            statusJs.innerHTML = '<i class="fas fa-check-circle"></i> JavaScript actif';
+            
+            updateScreenWidth();
+            window.addEventListener('resize', updateScreenWidth);
+            
+            if (!hamburger || !navMenu) {
+                log('❌ Éléments non trouvés!', 'error');
+                const statusMenu = document.getElementById('status-menu');
+                statusMenu.className = 'status-item error';
+                statusMenu.innerHTML = '<i class="fas fa-times-circle"></i> Erreur: Éléments manquants';
+                return;
+            }
+            
+            log('✅ Hamburger et menu trouvés', 'success');
+            const statusMenu = document.getElementById('status-menu');
+            statusMenu.className = 'status-item success';
+            statusMenu.innerHTML = '<i class="fas fa-check-circle"></i> Menu prêt';
+            
+            // Toggle menu
+            hamburger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isActive = hamburger.classList.contains('active');
+                
+                if (isActive) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                    log('❌ Menu fermé', 'warning');
+                } else {
+                    hamburger.classList.add('active');
+                    navMenu.classList.add('active');
+                    document.body.classList.add('menu-open');
+                    log('✅ Menu ouvert', 'success');
+                }
+            });
+            
+            // Close menu on link click
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                    log('🔗 Lien cliqué: ' + this.textContent, 'info');
+                });
+            });
+            
+            // Close menu on outside click
+            document.addEventListener('click', function(e) {
+                if (navMenu.classList.contains('active') && 
+                    !navMenu.contains(e.target) && 
+                    !hamburger.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.classList.remove('menu-open');
+                    log('🔒 Menu fermé (clic extérieur)', 'info');
+                }
+            });
+            
+            log('🚀 Menu mobile initialisé!', 'success');
+        });
+    </script>
+</body>
+</html>

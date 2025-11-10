@@ -272,37 +272,13 @@
     }
 
     // ========== MOBILE MENU TOGGLE ==========
+    // NOTE: Mobile menu is now handled by mobile-menu.js
+    // This function is kept for reference but not used
     
     function initMobileMenu() {
-        const menuToggle = document.querySelector('.menu-toggle');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (menuToggle && navMenu) {
-            menuToggle.addEventListener('click', function() {
-                this.classList.toggle('active');
-                navMenu.classList.toggle('active');
-                document.body.classList.toggle('menu-open');
-            });
-            
-            // Close menu when clicking on a link
-            const navLinks = navMenu.querySelectorAll('a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    menuToggle.classList.remove('active');
-                    navMenu.classList.remove('active');
-                    document.body.classList.remove('menu-open');
-                });
-            });
-            
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-                    menuToggle.classList.remove('active');
-                    navMenu.classList.remove('active');
-                    document.body.classList.remove('menu-open');
-                }
-            });
-        }
+        // Mobile menu functionality moved to mobile-menu.js
+        // to avoid conflicts and provide better organization
+        console.log('⚠️ Mobile menu is handled by mobile-menu.js');
     }
 
     // ========== TESTIMONIAL SLIDER ==========
@@ -409,7 +385,7 @@
             initFormEnhancements();
             initParallax();
             initLazyLoading();
-            initMobileMenu();
+            // initMobileMenu(); // Handled by mobile-menu.js
             initTestimonialSlider();
             initCopyButtons();
             initBackToTop();
