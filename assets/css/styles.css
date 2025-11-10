@@ -528,35 +528,77 @@ img {
 }
 
 .clients-logos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-8);
-    align-items: center;
-    justify-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    background: white;
+    padding: var(--space-6) 0;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.clients-logos::before,
+.clients-logos::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 100px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.clients-logos::before {
+    left: 0;
+    background: linear-gradient(to right, white, transparent);
+}
+
+.clients-logos::after {
+    right: 0;
+    background: linear-gradient(to left, white, transparent);
+}
+
+.clients-logos-track {
+    display: flex;
+    gap: var(--space-12);
+    animation: scroll-logos 30s linear infinite;
+    width: fit-content;
+}
+
+.clients-logos-track:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scroll-logos {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 .client-logo {
-    opacity: 0.6;
+    flex-shrink: 0;
+    opacity: 0.7;
     transition: all var(--transition-normal);
     filter: grayscale(100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-4);
+    padding: var(--space-4) var(--space-6);
     background: white;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    width: 100%;
     min-height: 80px;
+    width: 180px;
 }
 
 .client-logo:hover {
     opacity: 1;
     filter: grayscale(0%);
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.1);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 212, 170, 0.15);
 }
 
 .client-logo img {
