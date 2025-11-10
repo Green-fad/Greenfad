@@ -1,0 +1,287 @@
+/* ========================================
+   GREENFAD - SERVICES SECTION ENHANCED
+   Design amélioré pour les 4 Piliers Stratégiques
+   ======================================== */
+
+/* ========== SERVICES GRID IMPROVEMENTS ========== */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+/* ========== ENHANCED SERVICE CARDS ========== */
+.service-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 212, 170, 0.2);
+}
+
+/* ========== SERVICE IMAGE ========== */
+.service-image {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+}
+
+.service-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-card:hover .service-image img {
+    transform: scale(1.08);
+}
+
+/* Image overlay pour meilleur contraste */
+.service-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.1) 100%
+    );
+    pointer-events: none;
+}
+
+/* ========== SERVICE CONTENT ========== */
+.service-content {
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========== SERVICE ICON (now smaller badge) ========== */
+.service-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 16px rgba(0, 212, 170, 0.3);
+    transition: all 0.3s ease;
+}
+
+.service-icon i {
+    font-size: 1.75rem;
+    color: white;
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
+}
+
+/* Color variations for each pillar */
+.service-card:nth-child(1) .service-icon {
+    background: linear-gradient(135deg, #00D4AA 0%, #00B894 100%);
+}
+
+.service-card:nth-child(2) .service-icon {
+    background: linear-gradient(135deg, #6C5CE7 0%, #5848C7 100%);
+}
+
+.service-card:nth-child(3) .service-icon {
+    background: linear-gradient(135deg, #FDCB6E 0%, #F8B500 100%);
+}
+
+.service-card:nth-child(4) .service-icon {
+    background: linear-gradient(135deg, #00D4AA 0%, #6C5CE7 100%);
+}
+
+/* ========== SERVICE TITLE ========== */
+.service-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1A202C;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+/* ========== SERVICE DESCRIPTION ========== */
+.service-card > p {
+    color: #4A5568;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* ========== SERVICE FEATURES LIST ========== */
+.service-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    flex: 1;
+}
+
+.service-features li {
+    padding: 0.75rem 0;
+    color: #2D3748;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.5;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.service-features li:last-child {
+    border-bottom: none;
+}
+
+.service-features li i {
+    color: #00D4AA;
+    font-size: 1rem;
+    margin-right: 0.75rem;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.service-card:hover .service-features li i {
+    color: #00B894;
+}
+
+/* ========== SERVICE BUTTON ========== */
+.service-card .btn {
+    margin-top: auto;
+    width: 100%;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #00D4AA;
+    color: #00D4AA;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-outline:hover {
+    background: #00D4AA;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 170, 0.3);
+}
+
+/* Button color variations */
+.service-card:nth-child(2) .btn-outline {
+    border-color: #6C5CE7;
+    color: #6C5CE7;
+}
+
+.service-card:nth-child(2) .btn-outline:hover {
+    background: #6C5CE7;
+    color: white;
+}
+
+.service-card:nth-child(3) .btn-outline {
+    border-color: #FDCB6E;
+    color: #D9A744;
+}
+
+.service-card:nth-child(3) .btn-outline:hover {
+    background: #FDCB6E;
+    color: #1A202C;
+}
+
+.service-card:nth-child(4) .btn-outline {
+    border-color: #00D4AA;
+    color: #00D4AA;
+}
+
+.service-card:nth-child(4) .btn-outline:hover {
+    background: linear-gradient(135deg, #00D4AA, #6C5CE7);
+    border-color: #00D4AA;
+    color: white;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1200px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .service-image {
+        height: 200px;
+    }
+    
+    .service-content {
+        padding: 1.5rem;
+    }
+    
+    .service-card h3 {
+        font-size: 1.25rem;
+    }
+    
+    .service-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .service-icon i {
+        font-size: 1.5rem;
+    }
+}
+
+/* ========== LOADING STATE ========== */
+.service-card.loading {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.service-card.loaded {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation delay */
+.service-card:nth-child(1).loaded { animation-delay: 0.1s; }
+.service-card:nth-child(2).loaded { animation-delay: 0.2s; }
+.service-card:nth-child(3).loaded { animation-delay: 0.3s; }
+.service-card:nth-child(4).loaded { animation-delay: 0.4s; }
