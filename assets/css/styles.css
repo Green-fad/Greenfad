@@ -559,14 +559,15 @@ img {
 }
 
 .clients-logos-track {
-    display: flex;
+    display: flex !important;
     gap: var(--space-12);
-    animation: scroll-logos 30s linear infinite;
-    width: fit-content;
+    animation: scroll-logos 30s linear infinite !important;
+    width: fit-content !important;
+    will-change: transform;
 }
 
 .clients-logos-track:hover {
-    animation-play-state: paused;
+    animation-play-state: paused !important;
 }
 
 @keyframes scroll-logos {
@@ -579,11 +580,11 @@ img {
 }
 
 .client-logo {
-    flex-shrink: 0;
+    flex-shrink: 0 !important;
     opacity: 0.7;
     transition: all var(--transition-normal);
     filter: grayscale(100%);
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     padding: var(--space-4) var(--space-6);
