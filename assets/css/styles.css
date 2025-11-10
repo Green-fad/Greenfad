@@ -1269,14 +1269,10 @@ img {
         text-align: center;
     }
     
-    /* Better client logos layout on tablets */
-    .clients-logos {
-        grid-template-columns: repeat(3, 1fr);
-        gap: var(--space-6);
-    }
-    
+    /* Client logos carousel on tablets - keep animation */
     .client-logo {
         min-height: 70px;
+        width: 160px;
     }
     
     .client-logo img {
@@ -1301,16 +1297,15 @@ img {
         font-size: var(--font-size-3xl);
     }
     
-    /* Optimized client logos for mobile phones */
-    .clients-logos {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-4);
-        padding: 0 var(--space-4);
+    /* Client logos carousel on mobile - keep animation */
+    .clients-logos-track {
+        gap: var(--space-8);
     }
     
     .client-logo {
         min-height: 65px;
         padding: var(--space-3);
+        width: 140px;
     }
     
     .client-logo img {
