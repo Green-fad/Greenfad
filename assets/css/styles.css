@@ -282,7 +282,7 @@ img {
     right: 0;
     z-index: var(--z-fixed);
     background: var(--bg-overlay);
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(3px);
     border-bottom: 1px solid rgba(0, 212, 170, 0.1);
     transition: all var(--transition-normal);
 }
