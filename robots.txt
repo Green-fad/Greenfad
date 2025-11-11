@@ -5,9 +5,11 @@ Allow: /
 Sitemap: https://greenfad.tech/sitemap.xml
 
 # Disallow sensitive areas
+Disallow: /admin/
 Disallow: /assets/
 Disallow: /components/
 Disallow: /docs/
+Disallow: /_posts/
 
 # Allow important files
 Allow: /assets/css/styles.css
