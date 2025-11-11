@@ -14,7 +14,7 @@ html {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(40px);
+        transform: translateY(15px);
     }
     to {
         opacity: 1;
@@ -26,7 +26,7 @@ html {
 @keyframes fadeInLeft {
     from {
         opacity: 0;
-        transform: translateX(-40px);
+        transform: translateX(-15px);
     }
     to {
         opacity: 1;
@@ -38,7 +38,7 @@ html {
 @keyframes fadeInRight {
     from {
         opacity: 0;
-        transform: translateX(40px);
+        transform: translateX(15px);
     }
     to {
         opacity: 1;
@@ -228,7 +228,7 @@ html {
 .badge {
     position: relative;
     overflow: hidden;
-    animation: fadeInUp 0.6s ease;
+    animation: fadeInUp 0.4s ease;
 }
 
 .badge::before {
@@ -251,7 +251,7 @@ html {
 .section-header h2 {
     position: relative;
     display: inline-block;
-    animation: fadeInUp 0.8s ease;
+    animation: fadeInUp 0.4s ease;
 }
 
 .section-header h2::after {
@@ -639,7 +639,7 @@ body.menu-open {
 
 /* ========== REVEALED ELEMENTS ========== */
 .revealed {
-    animation: fadeInUp 0.8s ease both;
+    animation: fadeInUp 0.4s ease both;
 }
 
 /* ========== MOBILE OPTIMIZATIONS ========== */

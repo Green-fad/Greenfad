@@ -118,7 +118,7 @@ function createBlogCard(post) {
                 </div>
             </div>
             
-            <a href="blog-article.html?id=${post.id}" class="blog-card-link">
+            <a href="blog-article.html?slug=${post.slug}" class="blog-card-link">
                 Lire l'article <i class="fas fa-arrow-right"></i>
             </a>
         </div>

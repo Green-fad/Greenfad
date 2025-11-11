@@ -268,13 +268,13 @@
 }
 
 .service-card.loaded {
-    animation: fadeInUp 0.6s ease forwards;
+    animation: fadeInUp 0.4s ease forwards;
 }
 
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
     }
     to {
         opacity: 1;
@@ -283,7 +283,7 @@
 }
 
 /* Stagger animation delay */
-.service-card:nth-child(1).loaded { animation-delay: 0.1s; }
-.service-card:nth-child(2).loaded { animation-delay: 0.2s; }
-.service-card:nth-child(3).loaded { animation-delay: 0.3s; }
-.service-card:nth-child(4).loaded { animation-delay: 0.4s; }
+.service-card:nth-child(1).loaded { animation-delay: 0.05s; }
+.service-card:nth-child(2).loaded { animation-delay: 0.1s; }
+.service-card:nth-child(3).loaded { animation-delay: 0.15s; }
+.service-card:nth-child(4).loaded { animation-delay: 0.2s; }

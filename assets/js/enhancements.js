@@ -43,9 +43,9 @@
             revealElements.forEach((element, index) => {
                 if (isInViewport(element) && !element.classList.contains('revealed')) {
                     setTimeout(() => {
-                        element.style.animation = `fadeInUp 0.8s ease ${index * 0.1}s both`;
+                        element.style.animation = `fadeInUp 0.4s ease ${index * 0.05}s both`;
                         element.classList.add('revealed');
-                    }, 100);
+                    }, 50);
                 }
             });
         }
