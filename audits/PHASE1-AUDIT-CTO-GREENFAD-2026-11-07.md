@@ -4,7 +4,7 @@
 > 
 > Référentiel audité : `Green-fad/Greenfad`, branche `main`, commit de tête `46bd28e` · Production mesurée : https://greenfad.tech (Cloudflare → Hostinger) et https://green-fad.github.io/Greenfad/ (GitHub Pages).
 > 
-> Archivage du rapport : dossier `audits/`, commit (commit à venir lors de l'archivage) · Preuves : `audits/proofs-phase1-2026-11-07/`
+> Archivage du rapport : dossier `audits/`, commit e1849a44d71a · Preuves : `audits/proofs-phase1-2026-11-07/`
 
 
 ## 1. Synthèse exécutive
