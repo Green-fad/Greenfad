@@ -1,0 +1,20 @@
+# GREEN FAD — Plateforme corporate (Cloudflare Pages, mode avancé _worker.js)
+name = "greenfad"
+pages_build_output_dir = "dist"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "greenfad-production"
+database_id = "1ad64fe1-427a-4784-8afe-3567aa662eda"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "greenfad-media"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "4d8efa4efac74c7faae30dd533f86353"
+
+[vars]
+SITE_URL = "https://greenfad.tech"
