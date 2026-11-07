@@ -7,6 +7,7 @@ import { can } from "../rbac";
 import { audit } from "../audit";
 import { esc, parseJSON, fmtDate } from "../utils";
 import { validateBlocks, BLOCK_LABELS, Block, BlockType } from "../blocks";
+import { icon } from "../icons";
 import { slugify } from "../utils";
 
 type PageRow = Record<string, unknown>;
@@ -37,9 +38,9 @@ export function builderRouter(): Hono<{ Bindings: Env }> {
         <td>v${p.version}</td>
         <td class="muted">${fmtDate(String(p.updated_at), "short")}</td>
         <td class="adm-actions">
-          ${can(user.role, "pages", "edit") ? `<a class="btn btn--sm" href="/admin/pages/${p.id}/builder">✦ Construire</a><a class="btn btn--sm" href="/admin/pages/${p.id}">Meta & SEO</a>` : ""}
+          ${can(user.role, "pages", "edit") ? `<a class="btn btn--sm" href="/admin/pages/${p.id}/builder">${icon("layers")} Construire</a><a class="btn btn--sm" href="/admin/pages/${p.id}">Meta & SEO</a>` : ""}
           ${can(user.role, "pages", "publish") && !p.is_home ? `<form method="post" action="/admin/pages/${p.id}/status" class="inline"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="status" value="${p.status === "publie" ? "depublie" : "publie"}"><button class="btn btn--sm">${p.status === "publie" ? "Dépublier" : "Publier"}</button></form>` : ""}
-          <a class="btn btn--sm" href="${p.is_home ? "/" : "/p/" + esc(String(p.slug))}" target="_blank">↗ Voir</a>
+          <a class="btn btn--sm" href="${p.is_home ? "/" : "/p/" + esc(String(p.slug))}" target="_blank">${icon("external-link")} Voir</a>
           ${can(user.role, "pages", "edit") ? `<a class="btn btn--sm" href="/admin/pages/${p.id}/versions">Versions</a>` : ""}
           ${can(user.role, "pages", "delete") && !p.is_home ? `<form method="post" action="/admin/pages/${p.id}/delete" data-confirm="Supprimer la page « ${esc(String(p.title))} » ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>` : ""}
         </td></tr>`
@@ -103,7 +104,7 @@ export function builderRouter(): Hono<{ Bindings: Env }> {
       <label class="adm-field full"><span>Description SEO</span><textarea name="meta_description" rows="2">${esc(String(p.meta_description || ""))}</textarea></label>
       <label class="adm-field adm-field--check"><input type="checkbox" name="show_in_nav" value="1" ${p.show_in_nav ? "checked" : ""}><span>Afficher dans le menu</span></label>
       <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button>
-      ${can(user.role, "pages", "edit") ? `<a class="btn btn--outline" href="/admin/pages/${p.id}/builder">✦ Ouvrir le Page Builder</a>` : ""}</div></form>`;
+      ${can(user.role, "pages", "edit") ? `<a class="btn btn--outline" href="/admin/pages/${p.id}/builder">${icon("layers")} Ouvrir le Page Builder</a>` : ""}</div></form>`;
     return c.html(adminLayout(c, user, `Page : ${p.title}`, body, "/admin/pages"));
   });
 
@@ -144,10 +145,10 @@ export function builderRouter(): Hono<{ Bindings: Env }> {
       <div class="builder__bar">
         <div><strong>${esc(String(p.title))}</strong> <code>/${esc(String(p.slug))}</code> <span class="pill ${p.status === "publie" ? "ok" : ""}">${esc(String(p.status))}</span> <span class="muted">v${p.version}</span></div>
         <div class="builder__bar-actions">
-          ${canEdit ? `<button type="button" class="btn btn--primary" data-save-blocks>💾 Enregistrer (brouillon)</button>` : ""}
-          ${can(user.role, "pages", "publish") ? `<button type="button" class="btn btn--ok" data-publish>🚀 Publier</button>` : ""}
-          <a class="btn" href="/__preview/${p.id}" target="_blank">👁 Aperçu brouillon</a>
-          ${canEdit ? `<a class="btn" href="/admin/pages/${p.id}/versions">🕘 Versions</a>` : ""}
+          ${canEdit ? `<button type="button" class="btn btn--primary" data-save-blocks>${icon("check")} Enregistrer (brouillon)</button>` : ""}
+          ${can(user.role, "pages", "publish") ? `<button type="button" class="btn btn--ok" data-publish>${icon("rocket")} Publier</button>` : ""}
+          <a class="btn" href="/__preview/${p.id}" target="_blank">${icon("eye")} Aperçu brouillon</a>
+          ${canEdit ? `<a class="btn" href="/admin/pages/${p.id}/versions">${icon("history")} Versions</a>` : ""}
         </div>
       </div>
       <div class="builder__layout">
@@ -159,9 +160,9 @@ export function builderRouter(): Hono<{ Bindings: Env }> {
       </div>
       <div class="builder__preview-bar">
         <span>Aperçu :</span>
-        <button type="button" class="btn btn--sm" data-device="desktop">🖥 Ordinateur</button>
-        <button type="button" class="btn btn--sm" data-device="tablet">📱 Tablette</button>
-        <button type="button" class="btn btn--sm" data-device="mobile">📱 Mobile</button>
+        <button type="button" class="btn btn--sm" data-device="desktop">${icon("monitor")} Ordinateur</button>
+        <button type="button" class="btn btn--sm" data-device="tablet">${icon("layers")} Tablette</button>
+        <button type="button" class="btn btn--sm" data-device="mobile">${icon("smartphone")} Mobile</button>
       </div>
       <div class="builder__preview"><iframe data-preview-frame src="/__preview/${p.id}" loading="lazy" title="Aperçu de la page"></iframe></div>
     </div>
@@ -282,11 +283,11 @@ function builderBlockCard(b: Block, index: number): string {
       <strong>${esc(info?.label || b.type)}</strong>
       <em class="bblock__summary">${esc(summary)}</em>
       <span class="bblock__tools">
-        <button type="button" title="Monter" data-move="-1">↑</button>
-        <button type="button" title="Descendre" data-move="1">↓</button>
-        <button type="button" title="Dupliquer" data-duplicate>⧉</button>
-        <button type="button" title="${b.visible === false ? "Afficher" : "Masquer"}" data-toggle-vis>${b.visible === false ? "👁" : "🙈"}</button>
-        <button type="button" title="Supprimer" data-remove class="danger">✕</button>
+        <button type="button" title="Monter" data-move="-1">${icon("arrow-right", "flip")}</button>
+        <button type="button" title="Descendre" data-move="1">${icon("arrow-right")}</button>
+        <button type="button" title="Dupliquer" data-duplicate>${icon("copy")}</button>
+        <button type="button" title="${b.visible === false ? "Afficher" : "Masquer"}" data-toggle-vis>${icon(b.visible === false ? "x-circle" : "eye")}</button>
+        <button type="button" title="Supprimer" data-remove class="danger">${icon("trash")}</button>
       </span>
     </div></div>`;
 }

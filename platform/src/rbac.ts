@@ -115,6 +115,8 @@ export const PERMISSIONS: Record<string, Partial<Record<Action, Role[]>>> = {
   media: {
     view: ["admin", "responsable_medias", "responsable_editorial", "gestionnaire_produits", "gestionnaire_services", "responsable_commercial", "lecteur"],
     create: ["admin", "responsable_medias", "responsable_editorial", "gestionnaire_produits", "gestionnaire_services"],
+    edit: ["admin", "responsable_medias", "responsable_editorial"],
+    publish: ["admin", "responsable_medias", "responsable_editorial"],
     delete: ["admin", "responsable_medias"],
   },
   contact_messages: {

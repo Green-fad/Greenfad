@@ -2,6 +2,7 @@
 // Usage : node scripts/smoke.mjs [baseUrl] "$(sed -n 's/^Mot de passe: //p' ../../../backups/greenfad-admin-initial-password.txt)"
 const BASE = process.argv[2] || "http://localhost:8788";
 const ADMIN_PW = process.argv[3] || "";
+const RUN_ID = Date.now().toString(36);
 let cookie = "";
 let passed = 0, failed = 0;
 
@@ -30,9 +31,9 @@ console.log("— Site public (SSR depuis D1) —");
 let r = await get("/");
 let html = await r.text();
 ok("GET / → 200", r.status === 200);
-ok("accueil rend le hero réel", html.includes("Accélérateur de la Transformation Numérique"));
-ok("accueil rend les 6 produits réels (FAD CARD présent)", html.includes("FAD CARD"));
-ok("accueil rend les piliers réels", html.includes("Quatre Piliers Stratégiques"));
+ok("accueil rend le hero réel", html.includes("Nous concevons les produits numériques"));
+ok("accueil rend les 7 produits réels (FAD CARD présent)", html.includes("FAD CARD"));
+ok("accueil rend les piliers réels", html.includes("Quatre piliers stratégiques"));
 ok("accueil rend les services dynamiques", html.includes("Développement Web"));
 ok("accueil rend l'implantation (pays)", html.includes("Burkina Faso"));
 ok("JSON-LD Organization", html.includes('"@type":"Organization"'));
@@ -46,14 +47,19 @@ r = await get("/produits/fad-card");
 html = await r.text();
 ok("page produit rend FAD CARD + fonctionnalités", r.status === 200 && html.includes("NFC"));
 
-r = await get("/actualites");
+r = await get("/galerie");
 html = await r.text();
-ok("liste blog", r.status === 200);
+ok("galerie multimédia (albums)", r.status === 200 && html.includes("Produits Green FAD"));
+
+r = await get("/innovation");
+html = await r.text();
+ok("liste innovation", r.status === 200);
 ok("article 'Tendances du Développement Web 2025' présent", html.includes("Tendances du Développement Web"));
 
-r = await get("/actualites/tendances-developpement-web-2025");
+r = await get("/innovation/tendances-developpement-web-2025");
 html = await r.text();
 ok("article rendu avec date éditoriale originale (8 nov 2025)", r.status === 200 && html.includes("8 novembre 2025"));
+ok("JSON-LD Article", html.includes('"@type":"Article"'));
 
 r = await get("/implantation/mali");
 html = await r.text();
@@ -61,18 +67,20 @@ ok("page pays Mali + bureau HQ réel", r.status === 200 && html.includes("Missab
 
 r = await get("/faq");
 html = await r.text();
-ok("FAQ réelle rendue", r.status === 200 && html.includes("Quels types de services proposez-vous"));
+ok("FAQ réelle rendue", r.status === 200 && html.includes("Qui est GREEN FAD ?"));
 
 r = await get("/sitemap.xml");
 html = await r.text();
-ok("sitemap contient produits+pays+articles", r.status === 200 && html.includes("/produits/fad-card") && html.includes("/implantation/mali") && html.includes("/actualites/tendances-developpement-web-2025"));
+ok("sitemap contient produits+pays+articles+albums", r.status === 200 && html.includes("/produits/fad-card") && html.includes("/implantation/mali") && html.includes("/innovation/tendances-developpement-web-2025") && html.includes("/galerie/album/produits-green-fad"));
 
 // ---------- 2. Redirections SEO ----------
 console.log("\n— Redirections anciennes URL —");
 r = await get("/services/web-development.html");
 ok("301 /services/web-development.html → /expertises/developpement-web", r.status === 301 && r.headers.get("location") === "/expertises/developpement-web");
 r = await get("/blog.html");
-ok("301 /blog.html → /actualites", r.status === 301 && r.headers.get("location") === "/actualites");
+ok("301 /blog.html → /innovation", r.status === 301 && r.headers.get("location") === "/innovation");
+r = await get("/actualites/tendances-developpement-web-2025");
+ok("301 /actualites/[slug] → /innovation/[slug]", r.status === 301 && r.headers.get("location") === "/innovation/tendances-developpement-web-2025");
 r = await get("/countries/mali.html");
 ok("301 /countries/mali.html → /implantation/mali", r.status === 301);
 
@@ -105,7 +113,7 @@ ok("statistiques réelles affichées", html.includes("Tableau de bord"));
 
 r = await get("/admin/products");
 html = await r.text();
-ok("module produits liste les 6 produits réels", r.status === 200 && html.includes("SARAPAY"));
+ok("module produits liste les 7 produits réels", r.status === 200 && html.includes("SARAPAY") && html.includes("FAD CARD"));
 
 // ---------- 5. CRUD complet (création + édition + statut) ----------
 console.log("\n— CRUD serveur —");
@@ -230,13 +238,13 @@ ok("honeypot : bot silencieusement ignoré", r.status === 302);
 console.log("\n— RBAC (8 rôles, contrôle serveur) —");
 // créer un lecteur
 r = await post("/admin/users", new URLSearchParams({
-  _csrf: csrf, name: "Auditeur QA", email: "auditeur@greenfad.tech", role: "lecteur", password: "LecteurQA-2026-Pass",
+  _csrf: csrf, name: "Auditeur QA", email: "auditeur-" + RUN_ID + "@greenfad.tech", role: "lecteur", password: "LecteurQA-2026-Pass",
 }), { "content-type": "application/x-www-form-urlencoded" });
 ok("création utilisateur lecteur → 302", r.status === 302);
 
 // session lecteur séparée
 let adminCookie = cookie;
-r = await post("/admin/login", new URLSearchParams({ email: "auditeur@greenfad.tech", password: "LecteurQA-2026-Pass" }), { "content-type": "application/x-www-form-urlencoded" });
+r = await post("/admin/login", new URLSearchParams({ email: "auditeur-" + RUN_ID + "@greenfad.tech", password: "LecteurQA-2026-Pass" }), { "content-type": "application/x-www-form-urlencoded" });
 cookie = (r.headers.get("set-cookie") || "").split(";")[0] || "";
 ok("login lecteur → 302", r.status === 302);
 

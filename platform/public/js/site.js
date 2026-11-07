@@ -1,4 +1,4 @@
-// GREEN FAD — Site public : menu mobile, reveal au scroll, retours formulaires
+// GREEN FAD — Site public v2 : menu mobile, reveal au scroll, lightbox galerie, retours formulaires
 (function () {
   "use strict";
 
@@ -26,19 +26,37 @@
       function (entries) {
         entries.forEach(function (en) {
           if (en.isIntersecting) {
-            en.target.classList.add("is-visible");
+            en.target.classList.add("is-in");
             io.unobserve(en.target);
           }
         });
       },
       { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
     );
-    revealEls.forEach(function (el) {
-      io.observe(el);
-    });
+    revealEls.forEach(function (el) { io.observe(el); });
   } else {
-    revealEls.forEach(function (el) {
-      el.classList.add("is-visible");
+    revealEls.forEach(function (el) { el.classList.add("is-in"); });
+  }
+
+  // Lightbox galerie
+  var galleries = document.querySelectorAll("[data-lightbox]");
+  if (galleries.length) {
+    var lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.innerHTML =
+      '<button class="lightbox__close" aria-label="Fermer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><img alt="">';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector("img");
+    var close = function () { lb.classList.remove("is-open"); };
+    lb.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    galleries.forEach(function (g) {
+      g.addEventListener("click", function (e) {
+        var fig = e.target.closest("figure");
+        if (!fig) return;
+        var full = fig.getAttribute("data-full") || (fig.querySelector("img") || {}).src;
+        if (full) { lbImg.src = full; lb.classList.add("is-open"); }
+      });
     });
   }
 

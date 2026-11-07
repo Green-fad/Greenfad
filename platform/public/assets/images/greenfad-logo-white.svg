@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 64" role="img" aria-label="GREEN FAD">
+  <defs>
+    <g id="gf-mark-w">
+      <circle cx="32" cy="32" r="29" fill="transparent" stroke="#ffffff" stroke-width="3"/>
+      <path d="M17 48V18h30v30" fill="none" stroke="#ffffff" stroke-width="2.6"/>
+      <path d="M24 41V23h18v18" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+      <path d="M31 34v-6h6v6" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+      <path d="M24 37h23M24 42.5h23M24 48h23" stroke="#ffffff" stroke-width="2"/>
+      <rect x="17" y="18" width="7" height="30" fill="#5FBFD2"/>
+    </g>
+  </defs>
+  <use href="#gf-mark-w"/>
+  <text x="76" y="40" font-family="'Arial','Helvetica Neue',sans-serif" font-size="26" font-weight="800" letter-spacing="1.5"><tspan fill="#ffffff">GREEN</tspan><tspan fill="#5FBFD2" dx="7">FAD</tspan></text>
+  <rect x="77" y="48" width="30" height="3" fill="#D9A927"/>
+  <rect x="109" y="48" width="88" height="3" fill="#ffffff"/>
+</svg>

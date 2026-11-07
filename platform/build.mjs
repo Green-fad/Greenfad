@@ -25,11 +25,12 @@ await build({
   logLevel: "info",
 });
 
-// 2) Static assets (css/js/favicon)
-if (existsSync(join(root, "public"))) cpSync(join(root, "public"), dist, { recursive: true });
-
-// 3) Legacy images from the previous site — preserves /assets/images/* URLs after the DNS switch
+// 2) Images legacy de l'ancien site — préserve les URLs /assets/images/* après la bascule DNS
+// (copiées AVANT public/ : les fichiers du nouveau site gagnent en cas de collision de nom, ex : logo)
 if (existsSync(join(root, "legacy-assets")))
-  cpSync(join(root, "legacy-assets"), join(dist, "assets"), { recursive: true });
+  cpSync(join(root, "legacy-assets"), join(dist, "assets", "images"), { recursive: true });
+
+// 3) Fichiers statiques du nouveau site (css/js/favicon/logos officiels) — prioritaires
+if (existsSync(join(root, "public"))) cpSync(join(root, "public"), dist, { recursive: true });
 
 console.log("✔ build → dist/ (_worker.js + static assets)");

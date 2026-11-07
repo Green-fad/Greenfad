@@ -28,6 +28,7 @@ export type Env = {
   DB: D1Database;
   MEDIA: R2Bucket;
   KV: KVNamespace;
+  ASSETS: { fetch: (request: Request) => Promise<Response> };
   SITE_URL: string;
 };
 

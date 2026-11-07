@@ -12,7 +12,21 @@ import { esc } from "./utils";
 
 const app = new Hono<{ Bindings: Env }>();
 
-// Sessions sur toutes les routes
+// ---------- Fichiers statiques (css/js/images/favicon) ----------
+// En mode Pages avancé (_worker.js), TOUTES les requêtes passent par le Worker.
+// Les fichiers statiques doivent être servis via le binding ASSETS — AVANT tout middleware.
+const STATIC_RE = /\.(css|js|mjs|map|jpg|jpeg|png|webp|avif|gif|svg|ico|woff2?|ttf|eot|txt|xml|json|webmanifest)$/i;
+app.on(["GET", "HEAD"], "*", async (c, next) => {
+  const p = c.req.path;
+  if (p.startsWith("/api") || p.startsWith("/admin") || p.startsWith("/media/") || p === "/sitemap.xml") return next();
+  if (STATIC_RE.test(p) || p.startsWith("/assets/") || p.startsWith("/css/") || p.startsWith("/js/") || p === "/favicon.svg" || p === "/robots.txt") {
+    const res = await c.env.ASSETS.fetch(c.req.raw);
+    if (res.status !== 404) return res;
+  }
+  return next();
+});
+
+// Sessions sur toutes les routes (public + admin + api)
 app.use("*", authMiddleware);
 
 // ---------- Médias R2 ----------
@@ -55,10 +69,10 @@ app.route("/", publicRoutes);
 app.notFound(async (c) => {
   if (c.req.path.startsWith("/api/")) return c.json({ error: "Route inconnue" }, 404);
   if (c.req.path.startsWith("/admin/")) return c.redirect("/admin");
-  const isMedia = /\.(jpg|jpeg|png|webp|gif|svg|ico|css|js)$/i.test(c.req.path);
-  if (isMedia) return c.notFound();
+  // Fichiers statiques introuvables : réponse minimale (jamais c.notFound() ici — récursion interdite)
+  const isMedia = /\.(jpg|jpeg|png|webp|avif|gif|svg|ico|css|js|mjs|map|woff2?|ttf)$/i.test(c.req.path);
+  if (isMedia) return new Response("Not found", { status: 404, headers: { "content-type": "text/plain" } });
   const { loadSiteData, layout } = await import("./render/layout");
-  const { getSetting } = await import("./db");
   try {
     const site = await loadSiteData(c);
     const seo = { title: "Page introuvable" };

@@ -9,8 +9,10 @@ import { esc, slugify, md, parseJSON, fmtDate, fmtBytes } from "../utils";
 import { audit } from "../audit";
 import { can } from "../rbac";
 import { saveToR2 } from "../media";
+import { icon } from "../icons";
+import { validateBlocks } from "../blocks";
 
-type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "readonly" | "url";
+type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "readonly" | "url" | "media_multi";
 
 export type Field = {
   name: string;
@@ -35,6 +37,7 @@ export type ResourceDef = {
   slugFrom?: string;
   order?: string;
   searchable?: string[];
+  relationsKey?: "product" | "project"; // médias liés via content_relations
   columns: Field[];
   fields: Field[];
   intro?: string;
@@ -43,26 +46,67 @@ export type ResourceDef = {
 const STATUS_OPTIONS = CONTENT_STATUSES.map((s) => ({ value: s, label: s.replace("_", " ") }));
 const PUBLIE = "publie";
 
+// Bibliothèque d'icônes autorisée (noms de src/icons.ts) — aucune emoji saisie possible
+const ICON_OPTIONS = ["cpu", "code", "cloud", "database", "server", "shield", "zap", "layers", "globe", "lightbulb", "rocket", "flask", "compass", "target", "briefcase", "building", "users", "smartphone", "monitor", "bar-chart", "trending-up", "book-open", "newspaper", "camera", "leaf", "workflow", "route", "git-branch", "package", "settings"].map((n) => ({ value: n, label: n }));
+
+const PRODUCT_STATES = [
+  { value: "developpement", label: "En développement" },
+  { value: "beta", label: "Bêta" },
+  { value: "disponible", label: "Disponible" },
+  { value: "evolution", label: "En évolution" },
+  { value: "archive", label: "Archivé" },
+];
+
+const POST_KINDS = [
+  { value: "article", label: "Actualité" },
+  { value: "analyse", label: "Analyse technologique" },
+  { value: "recherche", label: "Recherche & développement" },
+  { value: "prototype", label: "Innovation / prototype" },
+  { value: "veille", label: "Veille technologique" },
+  { value: "publication", label: "Publication institutionnelle" },
+  { value: "guide", label: "Guide & ressources" },
+  { value: "opinion", label: "Opinion & perspectives" },
+  { value: "recit", label: "Histoire de projet / retour d'expérience" },
+];
+
 export const RESOURCES: Record<string, ResourceDef> = {
   products: {
-    key: "products", table: "products", title: "Produits", single: "produit", perm: "products", statusable: true,
-    slugFrom: "name", order: "sort_order ASC", searchable: ["name", "tagline"],
-    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }, { name: "sort_order", label: "Ordre", type: "number", list: true }],
+    key: "products", table: "products", title: "Produits technologiques", single: "produit", perm: "products", statusable: true,
+    slugFrom: "name", order: "sort_order ASC", searchable: ["name", "tagline"], relationsKey: "product",
+    intro: "Chaque produit dispose d'une fiche portfolio complète (problème, vision, architecture, démonstrations, versions). La page publique est générée automatiquement.",
+    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "state", label: "État", type: "select", options: PRODUCT_STATES, list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }, { name: "sort_order", label: "Ordre", type: "number", list: true }],
     fields: [
-      { name: "name", label: "Nom du produit", type: "text", required: true },
+      { name: "name", label: "Nom officiel du produit", type: "text", required: true },
       { name: "slug", label: "Identifiant URL (slug)", type: "text", help: "Laisser vide pour générer automatiquement" },
       { name: "tagline", label: "Accroche", type: "textarea", form_span: true },
-      { name: "category", label: "Catégorie", type: "text" },
-      { name: "icon", label: "Icône (emoji)", type: "text" },
+      { name: "category", label: "Secteur d'activité / catégorie", type: "text" },
+      { name: "state", label: "État du produit", type: "select", options: PRODUCT_STATES },
       { name: "image_key", label: "Image principale", type: "image" },
-      { name: "description_md", label: "Description complète (markdown)", type: "markdown", form_span: true },
-      { name: "features", label: "Fonctionnalités", type: "json", form_span: true, help: '[{"title":"…","text":"…"}]' },
-      { name: "external_url", label: "URL externe (app déployée)", type: "url" },
+      { name: "icon", label: "Icône (bibliothèque SVG)", type: "select", options: ICON_OPTIONS },
+      { name: "description_md", label: "Présentation générale (markdown)", type: "markdown", form_span: true },
+      { name: "problem_md", label: "Problème auquel le produit répond", type: "markdown", form_span: true },
+      { name: "vision_md", label: "Vision et objectif", type: "markdown", form_span: true },
+      { name: "origin_md", label: "Origine et contexte de création", type: "markdown", form_span: true },
+      { name: "features", label: "Fonctionnalités détaillées", type: "json", form_span: true, help: 'Liste : ["Fonctionnalité 1","Fonctionnalité 2"]' },
+      { name: "modules_md", label: "Modules et services intégrés", type: "markdown", form_span: true },
+      { name: "architecture_md", label: "Architecture et technologies (si publication autorisée)", type: "markdown", form_span: true },
+      { name: "ux_md", label: "Expérience utilisateur et interfaces", type: "markdown", form_span: true },
+      { name: "audience", label: "Publics et utilisateurs cibles", type: "textarea", form_span: true },
+      { name: "benefits_md", label: "Bénéfices et valeur ajoutée", type: "markdown", form_span: true },
+      { name: "differentiators_md", label: "Éléments différenciateurs", type: "markdown", form_span: true },
+      { name: "use_cases_md", label: "Cas d'utilisation", type: "markdown", form_span: true },
+      { name: "links_json", label: "Liens officiels", type: "json", form_span: true, help: '[{"label":"Site du produit","url":"https://…"}]' },
+      { name: "versions_json", label: "Historique des versions publiables", type: "json", form_span: true, help: '[{"version":"1.0","date":"2025","note":"…"}]' },
+      { name: "external_url", label: "URL de l'application / démo", type: "url" },
+      { name: "blocks", label: "Sections éditoriales supplémentaires (JSON blocs)", type: "json", form_span: true, help: "Optionnel — structure identique au Page Builder" },
       { name: "sort_order", label: "Ordre d'affichage", type: "number" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "published_at", label: "Date de publication", type: "datetime" },
       { name: "meta_title", label: "Titre SEO", type: "text" },
       { name: "meta_description", label: "Description SEO", type: "textarea" },
+      { name: "seo_keywords", label: "Mots-clés éditoriaux", type: "text" },
+      { name: "og_image", label: "Image de partage Open Graph", type: "image" },
+      { name: "_media", label: "Médias liés (galerie & vidéos du produit)", type: "media_multi", form_span: true, help: "Cochez les médias du Media Center à associer — réutilisables sans duplication" },
     ],
   },
   services: {
@@ -73,7 +117,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "name", label: "Nom du service", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text", help: "Laisser vide pour générer automatiquement" },
       { name: "summary", label: "Résumé (cartes & SEO)", type: "textarea", form_span: true },
-      { name: "icon", label: "Icône (emoji)", type: "text" },
+      { name: "icon", label: "Icône (bibliothèque SVG)", type: "select", options: ICON_OPTIONS },
       { name: "image_key", label: "Image", type: "image" },
       { name: "content_md", label: "Contenu commercial complet (markdown)", type: "markdown", form_span: true },
       { name: "sort_order", label: "Ordre", type: "number" },
@@ -84,56 +128,73 @@ export const RESOURCES: Record<string, ResourceDef> = {
     ],
   },
   posts: {
-    key: "posts", table: "posts", title: "Blog & Actualités", single: "article", perm: "posts", statusable: true,
+    key: "posts", table: "posts", title: "Innovation & publications", single: "article", perm: "posts", statusable: true,
     slugFrom: "title", order: "published_at DESC", searchable: ["title", "excerpt"],
-    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "published_at", label: "Date éditoriale", type: "datetime", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    intro: "Espace Innovation & Connaissance : analyses, R&D, prototypes, veille, guides et retours d'expérience — reliés aux produits, projets et pays.",
+    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "kind", label: "Type", type: "select", options: POST_KINDS, list: true }, { name: "published_at", label: "Date éditoriale", type: "datetime", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "title", label: "Titre de l'article", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text", help: "Laisser vide pour générer automatiquement" },
+      { name: "kind", label: "Type de publication", type: "select", options: POST_KINDS },
       { name: "excerpt", label: "Chapeau / résumé", type: "textarea", form_span: true },
       { name: "cover_key", label: "Image de couverture", type: "image" },
-      { name: "category", label: "Catégorie", type: "text", help: "seo, web, mobile, digital…" },
+      { name: "category", label: "Catégorie libre", type: "text", help: "seo, web, mobile, digital…" },
       { name: "tags", label: "Tags", type: "tags" },
       { name: "author", label: "Auteur", type: "text" },
-      { name: "content_md", label: "Contenu (markdown)", type: "markdown", form_span: true, help: "Images : ![alt](/media/…). Vidéos : passez par le Page Builder sur les pages." },
+      { name: "content_md", label: "Contenu (markdown)", type: "markdown", form_span: true, help: "Images : ![alt](/media/…). Citations : > texte. Blocs techniques : ```code```" },
+      { name: "related_product_id", label: "Produit lié", type: "relation", relation: { table: "products", label: "name", value: "id" } },
+      { name: "related_project_id", label: "Projet lié", type: "relation", relation: { table: "projects", label: "title", value: "id" } },
+      { name: "related_service_id", label: "Service lié", type: "relation", relation: { table: "services", label: "name", value: "id" } },
+      { name: "country_id", label: "Pays concerné", type: "relation", relation: { table: "countries", label: "name", value: "id" } },
       { name: "is_featured", label: "À la une", type: "boolean" },
       { name: "published_at", label: "Date éditoriale affichée", type: "datetime", required: true, help: "Indépendante de la date technique — permet de publier des archives avec leur vraie date historique" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "meta_title", label: "Titre SEO", type: "text" },
       { name: "meta_description", label: "Description SEO", type: "textarea" },
+      { name: "seo_keywords", label: "Mots-clés éditoriaux", type: "text" },
+      { name: "og_image", label: "Image de partage Open Graph", type: "image" },
     ],
   },
   projects: {
     key: "projects", table: "projects", title: "Projets & Réalisations", single: "projet", perm: "projects", statusable: true,
-    slugFrom: "title", order: "sort_order ASC", searchable: ["title", "summary"],
-    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "client", label: "Client", type: "text", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    slugFrom: "title", order: "sort_order ASC", searchable: ["title", "summary"], relationsKey: "project",
+    intro: "Études de cas des prestations et partenariats — distinctes des produits propriétaires. Ne jamais publier de résultats ou références non autorisés.",
+    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "client", label: "Client", type: "text", list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "title", label: "Titre du projet", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text" },
-      { name: "client", label: "Client", type: "text" },
+      { name: "client", label: "Client (si autorisé)", type: "text" },
+      { name: "client_type", label: "Type de relation", type: "select", options: [{ value: "client", label: "Client direct" }, { value: "partenaire", label: "Partenaire technologique" }, { value: "interne", label: "Projet interne / expérimentation" }, { value: "solution", label: "Solution personnalisée" }] },
       { name: "country_id", label: "Pays", type: "relation", relation: { table: "countries", label: "name", value: "id" } },
       { name: "category", label: "Catégorie", type: "text" },
       { name: "summary", label: "Résumé", type: "textarea", form_span: true },
       { name: "content_md", label: "Étude de cas (markdown)", type: "markdown", form_span: true },
+      { name: "need_md", label: "Contexte & besoin", type: "markdown", form_span: true },
+      { name: "approach_md", label: "Approche", type: "markdown", form_span: true },
+      { name: "solution_md", label: "Solution livrée", type: "markdown", form_span: true },
+      { name: "tech_stack", label: "Technologies utilisées (public)", type: "markdown", form_span: true },
+      { name: "results_md", label: "Résultats vérifiés (jamais inventés)", type: "markdown", form_span: true },
       { name: "image_key", label: "Image principale", type: "image" },
-      { name: "gallery", label: "Galerie", type: "json", form_span: true, help: '["clé-image1","clé-image2"]' },
+      { name: "gallery", label: "Galerie simple (clés R2)", type: "json", form_span: true, help: '["clé-image1","clé-image2"]' },
       { name: "completed_at", label: "Livré le", type: "date" },
       { name: "sort_order", label: "Ordre", type: "number" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "published_at", label: "Date de publication", type: "datetime" },
       { name: "meta_title", label: "Titre SEO", type: "text" },
       { name: "meta_description", label: "Description SEO", type: "textarea" },
+      { name: "seo_keywords", label: "Mots-clés éditoriaux", type: "text" },
+      { name: "og_image", label: "Image de partage Open Graph", type: "image" },
+      { name: "_media", label: "Médias liés (galerie du projet)", type: "media_multi", form_span: true, help: "Médias du Media Center réutilisables sans duplication" },
     ],
   },
   countries: {
     key: "countries", table: "countries", title: "Pays", single: "pays", perm: "countries", statusable: true,
     slugFrom: "name", order: "sort_order ASC", searchable: ["name"],
-    columns: [{ name: "name", label: "Pays", type: "text", list: true }, { name: "flag_emoji", label: "Drapeau", type: "text", list: true }, { name: "is_registered", label: "Immatriculé", type: "boolean", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    columns: [{ name: "name", label: "Pays", type: "text", list: true }, { name: "iso2", label: "Code", type: "text", list: true }, { name: "is_registered", label: "Immatriculé", type: "boolean", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "name", label: "Nom du pays", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text" },
-      { name: "iso2", label: "Code ISO (ML, BF…)", type: "text" },
-      { name: "flag_emoji", label: "Drapeau (emoji)", type: "text" },
+      { name: "iso2", label: "Code ISO (ML, BF, NI, CD, CI…)", type: "text", required: true, help: "Affiché en badge sur les cartes — les drapeaux emoji sont remplacés par des badges ISO modernes" },
       { name: "is_registered", label: "Immatriculation officielle", type: "boolean", help: "Cocher si GREEN FAD est immatriculée dans ce pays" },
       { name: "presentation_md", label: "Présentation (markdown)", type: "markdown", form_span: true },
       { name: "sort_order", label: "Ordre", type: "number" },
@@ -297,7 +358,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
 };
 
 // ---------- Rendus de champs ----------
-function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { value: string; label: string }[]): string {
+function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { value: string; label: string }[], mediaItems: { id: number; title: string; kind: string; thumb: string }[] = []): string {
   const v = value == null ? "" : String(value);
   const full = f.form_span ? " full" : "";
   switch (f.type) {
@@ -342,6 +403,12 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
       return `<label class="adm-field"><span>${esc(f.label)}</span><input type="number" name="${f.name}" value="${esc(v)}"></label>`;
     case "url":
       return `<label class="adm-field"><span>${esc(f.label)}</span><input type="url" name="${f.name}" value="${esc(v)}"></label>`;
+    case "media_multi": {
+      const selected = new Set(String((value as unknown) || "").split(",").filter(Boolean));
+      return `<div class="adm-field${full}" data-media-multi><span>${esc(f.label)}</span><p class="muted" style="font-size:.82rem">${esc(f.help || "")}</p><div class="media-multi-grid">${mediaItems
+        .map((mi) => `<label class="media-multi-item"><input type="checkbox" name="${f.name}" value="${mi.id}" ${selected.has(String(mi.id)) ? "checked" : ""}>${mi.thumb ? `<img src="${esc(mi.thumb)}" alt="">` : `<span class="media-multi-item__icon">${icon("video")}</span>`}<span>${esc(mi.title)}<em>${esc(mi.kind)}</em></span></label>`)
+        .join("")}</div></div>`;
+    }
     case "readonly":
       return v ? `<div class="adm-field"><span>${esc(f.label)}</span><p class="adm-static">${esc(v)}</p></div>` : "";
     default:
@@ -365,6 +432,30 @@ const RESOURCE_ALIASES: Record<string, string> = {
   press: "press_releases",
   newsletter: "newsletter_subscribers",
 };
+
+// ---------- Médias liés (content_relations) ----------
+async function loadMediaOptions(db: D1Database): Promise<{ id: number; title: string; kind: string; thumb: string }[]> {
+  const images = await q(db, "SELECT mi.id, mi.title, m.r2_key FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE mi.type='image' AND mi.status='publie' ORDER BY mi.sort_order LIMIT 200");
+  const videos = await q(db, "SELECT id, title, provider FROM media_items WHERE type='video' AND status='publie' ORDER BY sort_order LIMIT 50");
+  return [
+    ...images.map((i) => ({ id: Number(i.id), title: String(i.title), kind: "image", thumb: `/media/${i.r2_key}` })),
+    ...videos.map((v) => ({ id: Number(v.id), title: String(v.title), kind: `vidéo ${String(v.provider || "")}`, thumb: "" })),
+  ];
+}
+
+async function loadSelectedRelations(db: D1Database, content_type: string, content_id: string): Promise<string> {
+  const rows = await q(db, "SELECT media_item_id FROM content_relations WHERE content_type = ? AND content_id = ? ORDER BY sort_order", content_type, content_id);
+  return rows.map((r) => String(r.media_item_id)).join(",");
+}
+
+async function syncRelations(c: Context<{ Bindings: Env }>, content_type: string, content_id: number, form: Record<string, unknown>): Promise<void> {
+  const raw = form["_media"];
+  const ids = Array.isArray(raw) ? raw.map((x) => Number(x)).filter((n) => Number.isInteger(n) && n > 0) : Number(raw) ? [Number(raw)] : [];
+  await c.env.DB.prepare("DELETE FROM content_relations WHERE content_type = ? AND content_id = ?").bind(content_type, content_id).run();
+  for (let i = 0; i < ids.length; i++) {
+    await c.env.DB.prepare("INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) VALUES (?1,?2,?3,?4) ON CONFLICT DO NOTHING").bind(content_type, content_id, ids[i], i).run();
+  }
+}
 
 // ---------- Router CRUD ----------
 export function crudRouter(): Hono<{ Bindings: Env }> {
@@ -428,9 +519,9 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
             const v = row[f.name];
             if (f.type === "relation") return `<td>${esc(relLabels[f.name]?.[String(v)] || "")}</td>`;
             if (f.name === "status") return `<td>${statusPill(String(v))}</td>`;
-            if (f.type === "boolean") return `<td>${v && v !== "0" ? "✔" : "—"}</td>`;
+            if (f.type === "boolean") return `<td>${v && v !== "0" ? icon("check-circle", "ok-ic") : "—"}</td>`;
             if (f.type === "datetime") return `<td class="muted">${fmtDate(String(v || ""), "short")}</td>`;
-            if (f.type === "url") return `<td class="muted">${v ? `<a href="${esc(String(v))}" target="_blank" rel="noopener">lien ↗</a>` : ""}</td>`;
+            if (f.type === "url") return `<td class="muted">${v ? `<a href="${esc(String(v))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} lien</a>` : ""}</td>`;
             return `<td>${esc(String(v ?? "")).slice(0, 90)}</td>`;
           })
           .join("");
@@ -449,7 +540,7 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     </div>
     ${total === 0 ? `<div class="adm-empty">Aucun ${esc(res.single)} pour le moment.${canCreate ? " Utilisez « + Nouveau » pour créer le premier." : ""}</div>` : `
     <div class="adm-table-wrap"><table class="adm-table"><thead><tr><th></th>${res.columns.map((f) => `<th>${esc(f.label)}</th>`).join("")}<th>Actions</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>
-    <div class="pager adm-pager">${page > 1 ? `<a href="/admin/${res.key}?page=${page - 1}">← Préc.</a>` : ""}<span>Page ${page} / ${pages} — ${total} élément${total > 1 ? "s" : ""}</span>${page < pages ? `<a href="/admin/${res.key}?page=${page + 1}">Suiv. →</a>` : ""}</div>`}`;
+    <div class="pager adm-pager">${page > 1 ? `<a href="/admin/${res.key}?page=${page - 1}">${icon("arrow-right", "flip")} Préc.</a>` : ""}<span>Page ${page} / ${pages} — ${total} élément${total > 1 ? "s" : ""}</span>${page < pages ? `<a href="/admin/${res.key}?page=${page + 1}">Suiv. ${icon("arrow-right")}</a>` : ""}</div>`}`;
     return c.html(adminLayout(c, user, res.title, body, `/admin/${res.key}`));
   });
 
@@ -463,9 +554,10 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const relFields = res.fields.filter((f) => f.type === "relation");
     const relOpts: Record<string, { value: string; label: string }[]> = {};
     for (const f of relFields) relOpts[f.name] = await relationLabelOptions(c.env.DB, f);
+    const mediaOpts = res.fields.some((f) => f.type === "media_multi") ? await loadMediaOptions(c.env.DB) : [];
     const body = `<form method="post" action="/admin/${res.key}" class="adm-form" data-confirm-leave>
       <input type="hidden" name="_csrf" value="${user.csrf}">
-      ${res.fields.map((f) => fieldInput(f, "", user.csrf, relOpts[f.name])).join("")}
+      ${res.fields.map((f) => fieldInput(f, "", user.csrf, relOpts[f.name], mediaOpts)).join("")}
       <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Créer</button><a class="btn" href="/admin/${res.key}">Annuler</a></div>
     </form>`;
     return c.html(adminLayout(c, user, `Nouveau ${res.single}`, body, `/admin/${res.key}`));
@@ -485,6 +577,7 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const cols = Object.keys(data);
     await c.env.DB.prepare(`INSERT INTO ${res.table} (${cols.join(",")}, created_at, updated_at) VALUES (${cols.map((_, i) => `?${i + 1}`).join(",")}, datetime('now'), datetime('now'))`).bind(...cols.map((k) => data[k])).run();
     const created = await q1<{ id: number }>(c.env.DB, `SELECT id FROM ${res.table} ORDER BY id DESC LIMIT 1`);
+    if (created && res.relationsKey) await syncRelations(c, res.relationsKey, created.id, form);
     await audit(c, "creation", res.table, created?.id, { slug: data.slug });
     return c.redirect(`/admin/${res.key}?msg=créé`);
   });
@@ -501,8 +594,10 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const relFields = res.fields.filter((f) => f.type === "relation");
     const relOpts: Record<string, { value: string; label: string }[]> = {};
     for (const f of relFields) relOpts[f.name] = await relationLabelOptions(c.env.DB, f);
+    const mediaOpts = res.fields.some((f) => f.type === "media_multi") ? await loadMediaOptions(c.env.DB) : [];
+    const selectedMedia = res.relationsKey ? await loadSelectedRelations(c.env.DB, res.relationsKey, c.req.param("id")) : "";
     const canEdit = can(user.role, res.perm, "edit");
-    const formFields = res.fields.map((f) => fieldInput(f, row[f.name], user.csrf, relOpts[f.name])).join("");
+    const formFields = res.fields.map((f) => fieldInput(f, f.type === "media_multi" ? selectedMedia : row[f.name], user.csrf, relOpts[f.name], mediaOpts)).join("");
     const body = canEdit
       ? `<form method="post" action="/admin/${res.key}/${row.id}" class="adm-form" data-confirm-leave>
           <input type="hidden" name="_csrf" value="${user.csrf}">
@@ -526,6 +621,7 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     if (error) return c.html(adminLayout(c, user, "Erreur", `<div class="adm-alert adm-alert--error">${esc(error)}</div><a class="btn" href="/admin/${res.key}/${c.req.param('id')}">Retour au formulaire</a>`), 400);
     const cols = Object.keys(data);
     await c.env.DB.prepare(`UPDATE ${res.table} SET ${cols.map((k, i) => `${k} = ?${i + 1}`).join(",")}, updated_at = datetime('now') WHERE id = ?${cols.length + 1}`).bind(...cols.map((k) => data[k]), c.req.param("id")).run();
+    if (res.relationsKey) await syncRelations(c, res.relationsKey, Number(c.req.param("id")), form);
     await audit(c, "modification", res.table, c.req.param("id"), { champs: cols });
     return c.redirect(`/admin/${res.key}?msg=enregistré`);
   });
@@ -538,6 +634,7 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const d = deny(c, res.perm, "delete");
     if (d) return d;
     await c.env.DB.prepare(`DELETE FROM ${res.table} WHERE id = ?`).bind(c.req.param("id")).run();
+    if (res.relationsKey) await c.env.DB.prepare("DELETE FROM content_relations WHERE content_type = ? AND content_id = ?").bind(res.relationsKey, c.req.param("id")).run();
     await audit(c, "suppression", res.table, c.req.param("id"));
     return c.redirect(`/admin/${res.key}?msg=supprimé`);
   });
@@ -549,7 +646,7 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
 async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, form: Record<string, unknown>, id: string | null): Promise<{ data: Record<string, unknown>; error?: string }> {
   const data: Record<string, unknown> = {};
   for (const f of res.fields) {
-    if (f.type === "readonly" || f.type === "file") continue;
+    if (f.type === "readonly" || f.type === "file" || f.type === "media_multi") continue;
     const raw = form[f.name];
     if (f.required && (raw == null || String(raw).trim() === "")) return { data, error: `Le champ « ${f.label} » est obligatoire.` };
     if (raw == null) {
@@ -571,11 +668,17 @@ async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, fo
       }
       case "json": {
         if (s === "") {
-          data[f.name] = f.name === "features" || f.name === "gallery" ? "[]" : "{}";
+          data[f.name] = f.name === "features" || f.name === "gallery" || f.name === "links_json" || f.name === "versions_json" || f.name === "blocks" ? "[]" : "{}";
           break;
         }
         try {
           const parsed = JSON.parse(s);
+          if (f.name === "blocks") {
+            const v = validateBlocks(parsed);
+            if (!v.ok) return { data, error: `Sections éditoriales : ${v.error}` };
+            data[f.name] = JSON.stringify(v.blocks);
+            break;
+          }
           data[f.name] = JSON.stringify(parsed);
         } catch {
           return { data, error: `Format JSON invalide pour « ${f.label} ».` };

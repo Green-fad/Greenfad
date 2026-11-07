@@ -115,11 +115,11 @@
         "<strong>" + b.type + "</strong>" +
         '<em class="bblock__summary">' + String(summary(b)).replace(/[<>&]/g, "").slice(0, 60) + "</em>" +
         '<span class="bblock__tools">' +
-        '<button type="button" title="Monter" data-move="-1">↑</button>' +
-        '<button type="button" title="Descendre" data-move="1">↓</button>' +
-        '<button type="button" title="Dupliquer" data-duplicate>⧉</button>' +
-        '<button type="button" title="Afficher/Masquer" data-toggle-vis>' + (b.visible === false ? "👁" : "🙈") + "</button>" +
-        '<button type="button" title="Supprimer" data-remove class="danger">✕</button></span></div>';
+        '<button type="button" title="Monter" data-move="-1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:scaleX(-1)"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>' +
+        '<button type="button" title="Descendre" data-move="1"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>' +
+        '<button type="button" title="Dupliquer" data-duplicate><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>' +
+        '<button type="button" title="Afficher/Masquer" data-toggle-vis><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>' +
+        '<button type="button" title="Supprimer" data-remove class="danger"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></span></div>';
       el.addEventListener("click", function (e) {
         if (e.target.closest("[data-move]")) {
           var d = parseInt(e.target.getAttribute("data-move"), 10);
@@ -218,10 +218,10 @@
     })
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
-        flash(res.ok ? (publish ? "✔ Page publiée (version v" + res.j.version + ")" : "✔ Brouillon enregistré (v" + res.j.version + ")") : "✘ " + (res.j.error || "Erreur d'enregistrement"), res.ok);
+        flash(res.ok ? (publish ? "Page publiée (version v" + res.j.version + ")" : "Brouillon enregistré (v" + res.j.version + ")") : "Erreur : " + (res.j.error || "Erreur d'enregistrement"), res.ok);
         if (res.ok) frame.src = "/__preview/" + pageId + "&r=" + Date.now();
       })
-      .catch(function () { flash("✘ Erreur réseau", false); });
+      .catch(function () { flash("Erreur réseau", false); });
   }
 
   root.querySelectorAll("[data-save-blocks]").forEach(function (b) { b.addEventListener("click", function () { save(false); }); });

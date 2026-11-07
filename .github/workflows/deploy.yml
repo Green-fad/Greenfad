@@ -62,6 +62,25 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Mise à jour du contenu éditorial (si version changée)
+        run: |
+          VERSION=$(npx wrangler d1 execute greenfad-production --remote \
+            --command "SELECT COALESCE((SELECT json_extract(value,'$.') FROM settings WHERE key='content_version'),'0') AS v" --json \
+            | jq -r '.[0].results[0].v')
+          if [ "$VERSION" != "2" ]; then
+            echo "Contenu v2 détecté dans le dépôt (base en v$VERSION) — synchronisation du contenu réel…"
+            npx wrangler d1 execute greenfad-production --remote --file=seed/content-update.sql
+            for KEY in cache:settings cache:menus cache:footer_sections cache:redirects; do
+              npx wrangler kv key delete "$KEY" --namespace-id=4d8efa4efac74c7faae30dd533f86353 2>/dev/null || true
+            done
+            echo "Contenu v2 appliqué et caches KV purgés."
+          else
+            echo "Contenu déjà en v2 — aucune mise à jour."
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Déploiement Cloudflare Pages
         run: npx wrangler pages deploy dist --project-name=greenfad --branch=main --commit-dirty=true
         env:

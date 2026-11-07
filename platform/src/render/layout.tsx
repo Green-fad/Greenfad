@@ -1,8 +1,9 @@
-// GREEN FAD — Layout public : navigation, footer, SEO pilotés par la base de données
+// GREEN FAD — Layout public v2 : navigation, footer, SEO pilotés par la base de données
 import { Context } from "hono";
 import { Env } from "../types";
-import { q, loadSettings, getSetting, cached } from "../db";
+import { q, loadSettings, cached } from "../db";
 import { esc, parseJSON } from "../utils";
+import { icon } from "../icons";
 
 export type MenuItem = { label: string; url: string; children?: MenuItem[] };
 
@@ -29,19 +30,33 @@ export async function loadSiteData(c: Context<{ Bindings: Env }>): Promise<SiteD
   };
 }
 
-export async function cachedHeaderNav(c: Context<{ Bindings: Env }>): Promise<MenuItem[]> {
-  return cached(c.env, "menus", 120, async () => {
-    const rows = await q<{ location: string; items: string }>(c.env.DB, "SELECT location, items FROM menus");
-    const m = Object.fromEntries(rows.map((r) => [r.location, parseJSON<MenuItem[]>(r.items, [])]));
-    return m.header || [];
-  });
-}
-
 export function footerMenu(items: MenuItem[]): string {
-  return items.map((i) => `<li><a href="${esc(i.url)}">${esc(i.label)}</a>${i.children?.length ? `<ul>${i.children.map((c2) => `<li><a href="${esc(c2.url)}">${esc(c2.label)}</a></li>`).join("")}</ul>` : ""}</li>`).join("");
+  return items
+    .map((i) => `<li><a href="${esc(i.url)}">${esc(i.label)}</a>${i.children?.length ? `<ul>${i.children.map((c2) => `<li><a href="${esc(c2.url)}">${esc(c2.label)}</a></li>`).join("")}</ul>` : ""}</li>`)
+    .join("");
 }
 
-export type PageSEO = { title: string; description?: string; ogImage?: string; canonicalPath?: string; noindex?: boolean };
+export type Crumb = { label: string; url?: string };
+
+export function crumbsHTML(crumbs: Crumb[]): string {
+  if (!crumbs.length) return "";
+  const parts = crumbs.map((cr, idx) =>
+    idx === crumbs.length - 1 || !cr.url
+      ? `<span>${esc(cr.label)}</span>`
+      : `<a href="${esc(cr.url)}">${esc(cr.label)}</a><span class="crumbs__sep">${icon("chevron-right", "")}</span>`
+  );
+  return `<nav class="crumbs" aria-label="Fil d'Ariane">${parts.join("")}</nav>`;
+}
+
+export type PageSEO = {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  canonicalPath?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+  crumbs?: Crumb[];
+};
 
 export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo: PageSEO, body: string, opts?: { skipHeader?: boolean }): Promise<string> {
   const s = site.settings;
@@ -50,17 +65,43 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
   const phone = String(s.contact_phone || "");
   const email = String(s.contact_email || "");
   const address = String(s.contact_address || "");
-  const logo = String(s.logo_key || "/assets/images/greenfad-logo-new.svg");
-  const logoFooter = String(s.logo_footer_key || logo);
+  const logo = String(s.logo_key || "/assets/images/greenfad-logo.svg");
+  const logoFooter = String(s.logo_footer_key || "/assets/images/greenfad-logo-white.svg");
   const socials = parseJSON<Record<string, string>>(JSON.stringify(s.socials || "{}"), {});
   const url = new URL(c.req.url);
-  const canonical = `${String(s.site_url || c.env.SITE_URL)}${seo.canonicalPath || url.pathname}`;
+  const siteUrl = String(s.site_url || c.env.SITE_URL || "https://greenfad.tech");
+  const canonical = `${siteUrl}${seo.canonicalPath || url.pathname}`;
   const ogImg = seo.ogImage || String(s.og_default_image || "");
+
+  const jsonLd: (Record<string, unknown> | null)[] = [null];
+  // L'Organization est émise sur toutes les pages ; les types spécifiques viennent s'ajouter
+  if (seo.jsonLd?.length) jsonLd.push(...seo.jsonLd);
+  if (seo.crumbs?.length) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: seo.crumbs.map((cr, i) => ({ "@type": "ListItem", position: i + 1, name: cr.label, item: cr.url ? siteUrl + cr.url : undefined })),
+    });
+  }
+  const organizationLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteName,
+    url: siteUrl,
+    logo: logo.startsWith("http") ? logo : siteUrl + logo,
+    description: tagline,
+    address: address ? { "@type": "PostalAddress", streetAddress: address } : undefined,
+    contactPoint: phone ? { "@type": "ContactPoint", telephone: phone, contactType: "customer service", availableLanguage: ["fr", "en"] } : undefined,
+    sameAs: Object.values(socials).filter(Boolean),
+  };
+  const jsonLdHTML = [organizationLd, ...jsonLd].filter(Boolean).map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n");
+
+  const socialIconMap: Record<string, string> = { facebook: "globe", youtube: "play", tiktok: "video", linkedin: "briefcase" };
   const socialLinks: string[] = [];
-  if (socials.facebook) socialLinks.push(`<a href="${esc(socials.facebook)}" aria-label="Facebook" target="_blank" rel="noopener">Facebook</a>`);
-  if (socials.youtube) socialLinks.push(`<a href="${esc(socials.youtube)}" aria-label="YouTube" target="_blank" rel="noopener">YouTube</a>`);
-  if (socials.tiktok) socialLinks.push(`<a href="${esc(socials.tiktok)}" aria-label="TikTok" target="_blank" rel="noopener">TikTok</a>`);
-  if (socials.linkedin) socialLinks.push(`<a href="${esc(socials.linkedin)}" aria-label="LinkedIn" target="_blank" rel="noopener">LinkedIn</a>`);
+  for (const [name, url2] of Object.entries(socials)) {
+    if (!url2) continue;
+    socialLinks.push(`<a href="${esc(url2)}" aria-label="${esc(name)}" target="_blank" rel="noopener" title="${esc(name)}">${icon(socialIconMap[name] || "globe")}</a>`);
+  }
 
   const navHtml = site.header
     .map((i) => {
@@ -84,35 +125,24 @@ ${seo.noindex ? `<meta name="robots" content="noindex,nofollow">` : `<meta name=
 <meta property="og:title" content="${esc(seo.title)}">
 ${seo.description ? `<meta property="og:description" content="${esc(seo.description)}">` : ""}
 <meta property="og:url" content="${esc(canonical)}">
-${ogImg ? `<meta property="og:image" content="${esc(ogImg.startsWith("http") ? ogImg : String(s.site_url || "") + ogImg)}">` : ""}
+${ogImg ? `<meta property="og:image" content="${esc(ogImg.startsWith("http") ? ogImg : siteUrl + ogImg)}">` : ""}
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">${JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteName,
-    url: String(s.site_url || c.env.SITE_URL),
-    logo: logo.startsWith("http") ? logo : String(s.site_url || "") + logo,
-    description: tagline,
-    address: address ? { "@type": "PostalAddress", streetAddress: address } : undefined,
-    contactPoint: phone ? { "@type": "ContactPoint", telephone: phone, contactType: "customer service", availableLanguage: ["fr", "en"] } : undefined,
-    sameAs: Object.values(socials).filter(Boolean),
-  })}</script>
+${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=1">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/main.css?v=2">
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
 <header class="site-head">
   <div class="container site-head__row">
     <a class="brand" href="/">
-      <img src="${esc(logo.startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(siteName)}" class="brand__logo">
-      <span class="brand__txt"><strong>${esc(siteName)}</strong><em>${esc(tagline)}</em></span>
+      <img src="${esc(logo.startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(siteName)} — ${esc(tagline)}" class="brand__logo">
     </a>
-    <nav class="nav" aria-label="Navigation principale"><ul>${navHtml}</ul></nav>
+    <nav class="nav" id="mainnav" aria-label="Navigation principale"><ul>${navHtml}</ul></nav>
     <a class="btn btn--primary btn--sm site-head__cta" href="/contact">Nous contacter</a>
-    <button class="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainnav">${icon("menu")}</button>
   </div>
 </header>
 <main id="main">
@@ -123,7 +153,7 @@ ${body}
     <div class="site-foot__brand">
       <img src="${esc(logoFooter.startsWith("/") ? logoFooter : "/media/" + logoFooter)}" alt="${esc(siteName)}" class="site-foot__logo">
       <p>${esc(tagline)}</p>
-      ${address ? `<p class="muted">${esc(address)}</p>` : ""}
+      ${address ? `<p><span class="i i--inline">${icon("map-pin")}</span>${esc(address)}</p>` : ""}
       ${phone ? `<p><a href="tel:${esc(phone.replace(/\s/g, ""))}">${esc(phone)}</a></p>` : ""}
       ${email ? `<p><a href="mailto:${esc(email)}">${esc(email)}</a></p>` : ""}
       ${socialLinks.length ? `<nav class="socials" aria-label="Réseaux sociaux">${socialLinks.join("")}</nav>` : ""}
@@ -132,13 +162,13 @@ ${body}
     ${site.footerSections
       .map((sec) => {
         const content = parseJSON<{ text?: string; email?: string; items?: { label: string; url: string }[] }>(JSON.stringify(sec.content || "{}"), {});
-        return `<div class="site-foot__sec"><h4>${esc(sec.title)}</h4>${content.text ? `<p class="muted">${esc(content.text)}</p>` : ""}${content.email ? `<p><a href="mailto:${esc(content.email)}">${esc(content.email)}</a></p>` : ""}${content.items?.length ? `<ul>${content.items.map((i) => `<li><a href="${esc(i.url)}">${esc(i.label)}</a></li>`).join("")}</ul>` : ""}</div>`;
+        return `<div class="site-foot__sec"><h4>${esc(sec.title)}</h4>${content.text ? `<p>${esc(content.text)}</p>` : ""}${content.email ? `<p><a href="mailto:${esc(content.email)}">${esc(content.email)}</a></p>` : ""}${content.items?.length ? `<ul>${content.items.map((i) => `<li><a href="${esc(i.url)}">${esc(i.label)}</a></li>`).join("")}</ul>` : ""}</div>`;
       })
       .join("")}
   </div>
   <div class="container site-foot__legal">
     <p>© ${new Date().getFullYear()} ${esc(siteName)} — Tous droits réservés.</p>
-    <p><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/admin">Espace administrateur</a></p>
+    <p><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a></p>
   </div>
 </footer>
 <script src="/js/site.js" defer></script>

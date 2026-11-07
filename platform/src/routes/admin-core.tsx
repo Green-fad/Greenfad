@@ -8,6 +8,7 @@ import { can } from "../rbac";
 import { audit } from "../audit";
 import { saveToR2, deleteMedia, isAllowedMime } from "../media";
 import { esc, fmtDate, fmtBytes, parseJSON, slugify } from "../utils";
+import { icon } from "../icons";
 
 export function adminCore(): Hono<{ Bindings: Env }> {
   const r = new Hono<{ Bindings: Env }>();
@@ -103,41 +104,68 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     return c.html(adminLayout(c, user, "Tableau de bord", body, "/admin"));
   });
 
-  // ---------- MÉDIAS (R2) ----------
+  // ---------- MEDIA CENTER : bibliothèque R2 ----------
   r.get("/media", async (c) => {
     const user = c.get("user")!;
     const d = deny(c, "media", "view");
     if (d) return d;
     const folder = c.req.query("folder") || "/";
-    const rows = await q(c.env.DB, "SELECT * FROM media WHERE folder = ? ORDER BY id DESC LIMIT 120", folder === "documents" ? "documents" : "/");
+    const rows = await q(c.env.DB, "SELECT * FROM media WHERE folder = ? ORDER BY id DESC LIMIT 200", folder === "documents" ? "documents" : "/");
     const canUp = can(user.role, "media", "create");
     const canDel = can(user.role, "media", "delete");
 
     const itemHtml = (m: Record<string, unknown>) => {
       const isImg = /image/.test(String(m.mime || ""));
-      const preview = isImg ? `<img src="/media/${esc(m.r2_key)}" alt="${esc(String(m.alt || m.filename))}" loading="lazy">` : `<div class="media-item__doc">📄</div>`;
+      const preview = isImg ? `<img src="/media/${esc(m.r2_key)}" alt="${esc(String(m.alt || m.filename))}" loading="lazy">` : `<div class="media-item__doc">${icon("file-text")}</div>`;
       const delForm = canDel
-        ? `<form method="post" action="/admin/media/${m.id}/delete" data-confirm="Supprimer ce média de R2 et de la base ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>`
+        ? `<form method="post" action="/admin/media/${m.id}/delete" data-confirm="Supprimer ce média de R2 et de la base ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">${icon("trash")} Suppr.</button></form>`
         : "";
       return `<div class="media-item">${preview}
         <div class="media-item__meta"><strong title="${esc(String(m.filename))}">${esc(String(m.filename).slice(0, 30))}</strong><span class="muted">${fmtBytes(Number(m.size))}</span>
         <span class="muted">${esc(String(m.r2_key))}</span></div>
-        <div class="media-item__actions"><button class="btn btn--sm" data-copy="/media/${esc(String(m.r2_key))}">Copier l'URL</button>${delForm}</div></div>`;
+        <div class="media-item__actions"><a class="btn btn--sm" href="/admin/media/${m.id}/edit">${icon("edit")} Métadonnées</a><button class="btn btn--sm" data-copy="/media/${esc(String(m.r2_key))}">${icon("link")} URL</button>${delForm}</div></div>`;
     };
 
     const uploadBar = canUp
-      ? `<form method="post" action="/admin/media/upload" enctype="multipart/form-data" class="adm-upload"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="folder" value="${folder === "documents" ? "docs" : "media"}"><input type="file" name="file" multiple required><button class="btn btn--primary">⬆ Téléverser</button></form>`
+      ? `<form method="post" action="/admin/media/upload" enctype="multipart/form-data" class="adm-upload"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="folder" value="${folder === "documents" ? "docs" : "media"}"><input type="file" name="file" multiple required><button class="btn btn--primary">${icon("upload")} Téléverser</button></form>`
       : "";
-
-    const grid = rows.map(itemHtml).join("");
-    const emptyNote = `<div class="adm-empty">Bibliothèque vide — téléversez vos premières images${canUp ? " ci-dessus" : ""}.</div>`;
 
     const body = `<div class="adm-toolbar">
       <div class="adm-filters"><a class="chip ${folder === "/" ? "is-on" : ""}" href="/admin/media">Images</a><a class="chip ${folder === "documents" ? "is-on" : ""}" href="/admin/media?folder=documents">Documents</a></div>
       ${uploadBar}
     </div>
-    ${rows.length === 0 ? emptyNote : `<div class="media-grid">${grid}</div>`}`;
+    <p class="adm-intro">${icon("info", "i--inline")} Les images téléversées ici deviennent publiables dans la <a href="/admin/media/albums">galerie publique</a> via les albums du Media Center.</p>
+    ${rows.length === 0 ? `<div class="adm-empty">Bibliothèque vide — téléversez vos premières images${canUp ? " ci-dessus" : ""}.</div>` : `<div class="media-grid">${rows.map(itemHtml).join("")}</div>`}`;
     return c.html(adminLayout(c, user, "Bibliothèque médias (R2)", body, "/admin/media"));
+  });
+
+  // Métadonnées d'un fichier média
+  r.get("/media/:id/edit", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const m = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media WHERE id = ?", c.req.param("id"));
+    if (!m) return c.notFound();
+    const body = `<div class="adm-panel">
+      ${/image/.test(String(m.mime)) ? `<img src="/media/${esc(String(m.r2_key))}" alt="" style="max-height:300px;border-radius:10px">` : ""}
+      <form method="post" action="/admin/media/${m.id}/edit" class="adm-form" style="margin-top:16px">
+        <input type="hidden" name="_csrf" value="${user.csrf}">
+        <label class="adm-field"><span>Nom de fichier</span><input value="${esc(String(m.filename))}" disabled></label>
+        <label class="adm-field full"><span>Texte alternatif (SEO & accessibilité)</span><input name="alt" value="${esc(String(m.alt || ""))}" maxlength="300"></label>
+        <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/media">Retour</a></div>
+      </form></div>`;
+    return c.html(adminLayout(c, user, `Média #${m.id}`, body, "/admin/media"));
+  });
+
+  r.post("/media/:id/edit", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media");
+    await c.env.DB.prepare("UPDATE media SET alt = ? WHERE id = ?").bind(String(form.alt || "").slice(0, 300), c.req.param("id")).run();
+    await audit(c, "modification_media_meta", "media", c.req.param("id"));
+    return c.redirect("/admin/media");
   });
 
   r.post("/media/upload", async (c) => {
@@ -170,6 +198,262 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       await audit(c, "suppression_media", "media", c.req.param("id"), { key: m.r2_key });
     }
     return c.redirect(c.req.header("referer") || "/admin/media");
+  });
+
+  // ---------- MEDIA CENTER : albums & galeries publiques ----------
+  const ALBUM_CATEGORIES = [
+    { value: "general", label: "Galerie générale" },
+    { value: "produits", label: "Produits technologiques" },
+    { value: "projets", label: "Projets & réalisations" },
+    { value: "evenements", label: "Événements" },
+    { value: "institution", label: "Institutionnel & équipes" },
+    { value: "bureaux", label: "Bureaux & implantations" },
+    { value: "demonstrations", label: "Démonstrations" },
+  ];
+
+  r.get("/media/albums", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const rows = await q(c.env.DB, "SELECT a.*, (SELECT COUNT(*) FROM media_items mi WHERE mi.album_id = a.id) AS n FROM media_albums a ORDER BY a.sort_order");
+    const canEdit = can(user.role, "media", "create");
+    const body = `<div class="adm-toolbar"><span class="muted">Chaque album devient une galerie publique à l'adresse /galerie/album/&lt;slug&gt;.</span>
+      ${canEdit ? `<a class="btn btn--primary adm-new" href="/admin/media/albums/new">${icon("plus")} Nouvel album</a>` : ""}</div>
+    ${rows.length ? `<table class="adm-table"><thead><tr><th>#</th><th>Album</th><th>Catégorie</th><th>Visuels</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${rows
+      .map((a) => `<tr><td>${a.id}</td><td><strong>${esc(String(a.name))}</strong><br><code class="muted">/galerie/album/${esc(String(a.slug))}</code></td><td>${esc(String(a.category))}</td><td>${a.n}</td>
+      <td><span class="pill ${a.status === "publie" ? "ok" : a.status === "brouillon" ? "" : "warn"}">${esc(String(a.status))}</span></td>
+      <td class="adm-actions"><a class="btn btn--sm" href="/admin/media/albums/${a.id}">${icon("edit")} Gérer</a>
+      ${can(user.role, "media", "delete") ? `<form method="post" action="/admin/media/albums/${a.id}/delete" data-confirm="Supprimer cet album ? Les visuels ne sont pas supprimés de la bibliothèque."><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>` : ""}</td></tr>`)
+      .join("")}</tbody></table>` : `<div class="adm-empty">Aucun album — créez le premier pour organiser la galerie publique.</div>`}`;
+    return c.html(adminLayout(c, user, "Albums & galeries", body, "/admin/media/albums"));
+  });
+
+  function albumForm(a: Record<string, unknown> | null, csrf: string, action: string): string {
+    const v = (k: string) => esc(String(a?.[k] ?? ""));
+    return `<form method="post" action="${action}" class="adm-form" data-confirm-leave>
+      <input type="hidden" name="_csrf" value="${csrf}">
+      <label class="adm-field"><span>Nom de l'album *</span><input name="name" value="${v("name")}" required maxlength="120"></label>
+      <label class="adm-field"><span>Slug (URL)</span><input name="slug" value="${v("slug")}" placeholder="généré automatiquement"></label>
+      <label class="adm-field full"><span>Description</span><textarea name="description" rows="2" maxlength="400">${v("description")}</textarea></label>
+      <label class="adm-field"><span>Catégorie</span><select name="category">${ALBUM_CATEGORIES.map((o) => `<option value="${o.value}" ${v("category") === o.value ? "selected" : ""}>${o.label}</option>`).join("")}</select></label>
+      <label class="adm-field"><span>Image de couverture (clé R2 ou /assets/…)</span><input name="cover_key" value="${v("cover_key")}" placeholder="media/2025/01/…jpg"></label>
+      <label class="adm-field"><span>Ordre</span><input type="number" name="sort_order" value="${v("sort_order") || "0"}"></label>
+      <label class="adm-field"><span>Statut</span><select name="status">${["brouillon", "publie", "depublie", "archive"].map((s) => `<option ${v("status") === s ? "selected" : ""}>${s}</option>`).join("")}</select></label>
+      <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/media/albums">Retour</a></div></form>`;
+  }
+
+  r.get("/media/albums/new", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    return c.html(adminLayout(c, user, "Nouvel album", albumForm(null, user.csrf, "/admin/media/albums"), "/admin/media/albums"));
+  });
+
+  r.post("/media/albums", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/albums/new");
+    const slug = slugify(String(form.slug || form.name || `album-${Date.now()}`));
+    const exists = await q1(c.env.DB, "SELECT id FROM media_albums WHERE slug = ?", slug);
+    const finalSlug = exists ? `${slug}-${Date.now().toString(36).slice(-4)}` : slug;
+    await c.env.DB.prepare("INSERT INTO media_albums (slug, name, description, category, cover_key, sort_order, status, published_at, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,?6,?7,CASE WHEN ?7='publie' THEN datetime('now') END,datetime('now'),datetime('now'))")
+      .bind(finalSlug, String(form.name || "").slice(0, 120), String(form.description || "").slice(0, 400), String(form.category || "general"), String(form.cover_key || "").slice(0, 300), Number(form.sort_order) || 0, String(form.status || "brouillon"))
+      .run();
+    await audit(c, "creation_album", "media_albums", null, { slug: finalSlug });
+    return c.redirect("/admin/media/albums");
+  });
+
+  r.get("/media/albums/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const a = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media_albums WHERE id = ?", c.req.param("id"));
+    if (!a) return c.notFound();
+    const items = await q(c.env.DB, "SELECT mi.*, m.r2_key, m.mime FROM media_items mi LEFT JOIN media m ON m.id = mi.media_id WHERE mi.album_id = ? ORDER BY mi.type, mi.sort_order", a.id);
+    const canEdit = can(user.role, "media", "edit");
+    const body = albumForm(a, user.csrf, `/admin/media/albums/${a.id}`) + `
+      <section class="adm-panel" style="margin-top:22px"><h3>Visuels de l'album (${items.length})</h3>
+      ${canEdit ? `<form method="post" action="/admin/media/albums/${a.id}/items" class="adm-form adm-form--inline">
+        <input type="hidden" name="_csrf" value="${user.csrf}">
+        <label class="adm-field"><span>Image de la bibliothèque (clé R2)</span><input name="r2_key" placeholder="media/2025/01/…jpg" required></label>
+        <label class="adm-field"><span>Titre public</span><input name="title" maxlength="160" required></label>
+        <label class="adm-field"><span>Crédit photo</span><input name="credit" maxlength="160"></label>
+        <label class="adm-field"><span>Texte alternatif</span><input name="alt" maxlength="300"></label>
+        <button class="btn btn--primary" type="submit">${icon("plus")} Ajouter au album</button>
+      </form>` : ""}
+      ${items.length ? `<table class="adm-table"><thead><tr><th>Aperçu</th><th>Titre</th><th>Type</th><th>Statut</th><th></th></tr></thead><tbody>${items
+        .map((it) => `<tr><td>${it.r2_key ? `<img src="/media/${esc(String(it.r2_key))}" style="height:44px;border-radius:6px" alt="">` : `<span class="pill">${icon("video")}</span>`}</td>
+        <td><strong>${esc(String(it.title))}</strong>${it.credit ? `<br><span class="muted">crédit : ${esc(String(it.credit))}</span>` : ""}</td><td>${esc(String(it.type))}</td>
+        <td><span class="pill ${it.status === "publie" ? "ok" : ""}">${esc(String(it.status))}</span></td>
+        <td class="adm-actions">
+          ${canEdit ? `<form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/status" class="inline"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="status" value="${it.status === "publie" ? "depublie" : "publie"}"><button class="btn btn--sm">${it.status === "publie" ? "Dépublier" : "Publier"}</button></form>` : ""}
+          ${can(user.role, "media", "delete") ? `<form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/delete" data-confirm="Retirer ce visuel de l'album ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Retirer</button></form>` : ""}
+        </td></tr>`).join("")}</tbody></table>` : `<p class="muted">Aucun visuel dans cet album.</p>`}
+      </section>`;
+    return c.html(adminLayout(c, user, `Album : ${String(a.name)}`, body, "/admin/media/albums"));
+  });
+
+  r.post("/media/albums/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/albums");
+    const slug = slugify(String(form.slug || form.name || `album-${Date.now()}`));
+    await c.env.DB.prepare("UPDATE media_albums SET slug=?1, name=?2, description=?3, category=?4, cover_key=?5, sort_order=?6, status=?7, published_at=CASE WHEN ?7='publie' AND published_at IS NULL THEN datetime('now') ELSE published_at END, updated_at=datetime('now') WHERE id=?8")
+      .bind(slug, String(form.name || "").slice(0, 120), String(form.description || "").slice(0, 400), String(form.category || "general"), String(form.cover_key || "").slice(0, 300), Number(form.sort_order) || 0, String(form.status || "brouillon"), c.req.param("id"))
+      .run();
+    await audit(c, "modification_album", "media_albums", c.req.param("id"));
+    return c.redirect("/admin/media/albums");
+  });
+
+  r.post("/media/albums/:id/items", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/albums");
+    const media = await q1<{ id: number }>(c.env.DB, "SELECT id FROM media WHERE r2_key = ?", String(form.r2_key || "").trim());
+    await c.env.DB.prepare("INSERT INTO media_items (type, media_id, title, alt, credit, album_id, status, uploaded_by, created_at, updated_at) VALUES ('image',?1,?2,?3,?4,?5,'publie',?6,datetime('now'),datetime('now'))")
+      .bind(media?.id ?? null, String(form.title || "").slice(0, 160), String(form.alt || "").slice(0, 300), String(form.credit || "").slice(0, 160), c.req.param("id"), user.email)
+      .run();
+    await audit(c, "ajout_visuel_album", "media_items", null, { album: c.req.param("id") });
+    return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+  });
+
+  r.post("/media/albums/:id/items/:itemId/status", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    const status = typeof form !== "string" && ["publie", "depublie", "brouillon", "archive"].includes(String(form.status)) ? String(form.status) : "brouillon";
+    await c.env.DB.prepare("UPDATE media_items SET status = ?1, published_at = CASE WHEN ?1='publie' AND published_at IS NULL THEN datetime('now') ELSE published_at END, updated_at = datetime('now') WHERE id = ?2 AND album_id = ?3")
+      .bind(status, c.req.param("itemId"), c.req.param("id")).run();
+    await audit(c, "statut_visuel", "media_items", c.req.param("itemId"), { status });
+    return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+  });
+
+  r.post("/media/albums/:id/items/:itemId/delete", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "delete");
+    if (d) return d;
+    await c.env.DB.prepare("DELETE FROM media_items WHERE id = ? AND album_id = ?").bind(c.req.param("itemId"), c.req.param("id")).run();
+    await audit(c, "retrait_visuel_album", "media_items", c.req.param("itemId"));
+    return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+  });
+
+  r.post("/media/albums/:id/delete", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "delete");
+    if (d) return d;
+    await c.env.DB.prepare("DELETE FROM media_albums WHERE id = ?").bind(c.req.param("id")).run();
+    await audit(c, "suppression_album", "media_albums", c.req.param("id"));
+    return c.redirect("/admin/media/albums");
+  });
+
+  // ---------- MEDIA CENTER : vidéos par URL (YouTube / Vimeo) ----------
+  function parseVideoMeta(raw: string): { provider: string; providerId: string } {
+    const yt = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/.exec(raw);
+    if (yt) return { provider: "youtube", providerId: yt[1] };
+    const vm = /vimeo\.com\/(?:video\/)?(\d{6,})/.exec(raw);
+    if (vm) return { provider: "vimeo", providerId: vm[1] };
+    return { provider: "url", providerId: "" };
+  }
+
+  r.get("/media/videos", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const rows = await q(c.env.DB, "SELECT * FROM media_items WHERE type = 'video' ORDER BY id DESC LIMIT 100");
+    const canEdit = can(user.role, "media", "create");
+    const body = `<div class="adm-toolbar"><span class="muted">Les vidéos sont référencées par URL (YouTube, Vimeo, plateformes officielles) — aucun fichier lourd, aucune duplication.</span>
+      ${canEdit ? `<a class="btn btn--primary adm-new" href="/admin/media/videos/new">${icon("plus")} Ajouter une vidéo</a>` : ""}</div>
+    ${rows.length ? `<table class="adm-table"><thead><tr><th>#</th><th>Titre</th><th>Plateforme</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${rows
+      .map((v) => `<tr><td>${v.id}</td><td><strong>${esc(String(v.title))}</strong>${v.description ? `<br><span class="muted">${esc(String(v.description).slice(0, 80))}</span>` : ""}</td>
+      <td><span class="pill">${esc(String(v.provider || "url"))}</span></td>
+      <td><span class="pill ${v.status === "publie" ? "ok" : ""}">${esc(String(v.status))}</span></td>
+      <td class="adm-actions">${canEdit ? `<a class="btn btn--sm" href="/admin/media/videos/${v.id}">${icon("edit")} Modifier</a>` : ""}
+      ${can(user.role, "media", "delete") ? `<form method="post" action="/admin/media/videos/${v.id}/delete" data-confirm="Supprimer cette référence vidéo ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>` : ""}</td></tr>`)
+      .join("")}</tbody></table>` : `<div class="adm-empty">Aucune vidéo référencée — ajoutez la première par URL.</div>`}`;
+    return c.html(adminLayout(c, user, "Vidéos (références URL)", body, "/admin/media/videos"));
+  });
+
+  function videoForm(v: Record<string, unknown> | null, csrf: string, action: string, albums: { value: string; label: string }[]): string {
+    const val = (k: string) => esc(String(v?.[k] ?? ""));
+    return `<form method="post" action="${action}" class="adm-form" data-confirm-leave>
+      <input type="hidden" name="_csrf" value="${csrf}">
+      <label class="adm-field full"><span>URL de la vidéo (YouTube, Vimeo…) *</span><input type="url" name="source_url" value="${val("source_url")}" required placeholder="https://www.youtube.com/watch?v=…" maxlength="500"></label>
+      <label class="adm-field"><span>Titre *</span><input name="title" value="${val("title")}" required maxlength="160"></label>
+      <label class="adm-field"><span>Catégorie</span><input name="category" value="${val("category")}" maxlength="80" placeholder="démonstration, événement…"></label>
+      <label class="adm-field full"><span>Description</span><textarea name="description" rows="2" maxlength="600">${val("description")}</textarea></label>
+      <label class="adm-field"><span>Attribution / source</span><input name="credit" value="${val("credit")}" maxlength="160"></label>
+      <label class="adm-field"><span>Album (optionnel)</span><select name="album_id"><option value="">—</option>${albums.map((o) => `<option value="${o.value}" ${val("album_id") === o.value ? "selected" : ""}>${esc(o.label)}</option>`).join("")}</select></label>
+      <label class="adm-field"><span>Ordre</span><input type="number" name="sort_order" value="${val("sort_order") || "0"}"></label>
+      <label class="adm-field"><span>Statut</span><select name="status">${["brouillon", "publie", "depublie"].map((s) => `<option ${val("status") === s ? "selected" : ""}>${s}</option>`).join("")}</select></label>
+      <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/media/videos">Retour</a></div></form>`;
+  }
+
+  r.get("/media/videos/new", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const albums = await q(c.env.DB, "SELECT id, name FROM media_albums ORDER BY name").then((rows) => rows.map((r) => ({ value: String(r.id), label: String(r.name) })));
+    return c.html(adminLayout(c, user, "Nouvelle vidéo", videoForm(null, user.csrf, "/admin/media/videos", albums), "/admin/media/videos"));
+  });
+
+  r.post("/media/videos", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/videos/new");
+    const url = String(form.source_url || "").trim();
+    if (!/^https?:\/\//.test(url)) return c.html(adminLayout(c, user, "Erreur", `<div class="adm-alert adm-alert--error">URL vidéo invalide.</div><a class="btn" href="/admin/media/videos/new">Retour</a>`), 400);
+    const meta = parseVideoMeta(url);
+    await c.env.DB.prepare("INSERT INTO media_items (type, source_url, provider, provider_id, title, description, credit, category, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) VALUES ('video',?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,CASE WHEN ?10='publie' THEN datetime('now') END,?11,datetime('now'),datetime('now'))")
+      .bind(url.slice(0, 500), meta.provider, meta.providerId, String(form.title || "").slice(0, 160), String(form.description || "").slice(0, 600), String(form.credit || "").slice(0, 160), String(form.category || "").slice(0, 80), form.album_id ? Number(form.album_id) : null, Number(form.sort_order) || 0, String(form.status || "brouillon"), user.email)
+      .run();
+    await audit(c, "creation_video", "media_items", null, { provider: meta.provider });
+    return c.redirect("/admin/media/videos");
+  });
+
+  r.get("/media/videos/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const v = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media_items WHERE id = ? AND type='video'", c.req.param("id"));
+    if (!v) return c.notFound();
+    const albums = await q(c.env.DB, "SELECT id, name FROM media_albums ORDER BY name").then((rows) => rows.map((r) => ({ value: String(r.id), label: String(r.name) })));
+    const meta = parseVideoMeta(String(v.source_url || ""));
+    const preview = meta.provider === "youtube" ? `<div class="video-embed" style="max-width:560px"><iframe src="https://www.youtube-nocookie.com/embed/${esc(meta.providerId)}" allowfullscreen title="Aperçu"></iframe></div>` : meta.provider === "vimeo" ? `<div class="video-embed" style="max-width:560px"><iframe src="https://player.vimeo.com/video/${esc(meta.providerId)}" allowfullscreen title="Aperçu"></iframe></div>` : "";
+    const body = `${preview}${videoForm(v, user.csrf, `/admin/media/videos/${v.id}`, albums)}`;
+    return c.html(adminLayout(c, user, `Vidéo : ${String(v.title)}`, body, "/admin/media/videos"));
+  });
+
+  r.post("/media/videos/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/videos");
+    const url = String(form.source_url || "").trim();
+    const meta = parseVideoMeta(url);
+    await c.env.DB.prepare("UPDATE media_items SET source_url=?1, provider=?2, provider_id=?3, title=?4, description=?5, credit=?6, category=?7, album_id=?8, sort_order=?9, status=?10, published_at=CASE WHEN ?10='publie' AND published_at IS NULL THEN datetime('now') ELSE published_at END, updated_at=datetime('now') WHERE id=?11 AND type='video'")
+      .bind(url.slice(0, 500), meta.provider, meta.providerId, String(form.title || "").slice(0, 160), String(form.description || "").slice(0, 600), String(form.credit || "").slice(0, 160), String(form.category || "").slice(0, 80), form.album_id ? Number(form.album_id) : null, Number(form.sort_order) || 0, String(form.status || "brouillon"), c.req.param("id"))
+      .run();
+    await audit(c, "modification_video", "media_items", c.req.param("id"));
+    return c.redirect("/admin/media/videos");
+  });
+
+  r.post("/media/videos/:id/delete", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "delete");
+    if (d) return d;
+    await c.env.DB.prepare("DELETE FROM media_items WHERE id = ? AND type='video'").bind(c.req.param("id")).run();
+    await audit(c, "suppression_video", "media_items", c.req.param("id"));
+    return c.redirect("/admin/media/videos");
   });
 
   // ---------- MESSAGES ----------
@@ -230,7 +514,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const body = `<div class="adm-toolbar"><span class="muted">8 rôles disponibles — les permissions sont vérifiées côté serveur sur chaque requête.</span>
       ${can(user.role, "users", "create") ? `<a class="btn btn--primary adm-new" href="/admin/users/new">+ Nouvel utilisateur</a>` : ""}</div>
     <table class="adm-table"><thead><tr><th>#</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Actif</th><th>Dernière connexion</th><th></th></tr></thead><tbody>${rows
-      .map((u) => `<tr><td>${u.id}</td><td><strong>${esc(u.name)}</strong></td><td>${esc(u.email)}</td><td>${esc(String(u.role))}</td><td>${u.is_active ? "✔" : "✖"}</td><td class="muted">${u.last_login_at ? fmtDate(String(u.last_login_at), "short") : "—"}</td>
+      .map((u) => `<tr><td>${u.id}</td><td><strong>${esc(u.name)}</strong></td><td>${esc(u.email)}</td><td>${esc(String(u.role))}</td><td>${u.is_active ? icon("check-circle", "ok-ic") : icon("x-circle", "ko-ic")}</td><td class="muted">${u.last_login_at ? fmtDate(String(u.last_login_at), "short") : "—"}</td>
       <td class="adm-actions">${can(user.role, "users", "edit") ? `<a class="btn btn--sm" href="/admin/users/${u.id}">Modifier</a>` : ""}${can(user.role, "users", "delete") && u.id !== user.userId ? `<form method="post" action="/admin/users/${u.id}/delete" data-confirm="Supprimer cet utilisateur ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>` : ""}</td></tr>`)
       .join("")}</tbody></table>`;
     return c.html(adminLayout(c, user, "Utilisateurs & permissions", body, "/admin/users"));
@@ -404,7 +688,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       <label class="adm-field full"><span>Suffixe de titre (ex : « | GREEN FAD »)</span><input name="title_suffix" value="${esc(defaults.title_suffix || "")}"></label>
       <label class="adm-field full"><span>Description par défaut</span><textarea name="default_description" rows="2">${esc(defaults.default_description || "")}</textarea></label>
       <button class="btn btn--primary" type="submit">Enregistrer</button></form></section>
-    <section class="adm-panel"><h3>Redirections 301/302 (anciennes URL → nouvelles)</h3>
+    <section class="adm-panel"><h3>Redirections 301/302 (anciennes URL vers nouvelles)</h3>
       <form method="post" action="/admin/seo/redirects" class="adm-form adm-form--inline">
       <input type="hidden" name="_csrf" value="${user.csrf}">
       <label class="adm-field"><span>Depuis (ancienne URL)</span><input name="from_path" placeholder="/services/web-development.html" required></label>
@@ -412,7 +696,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       <label class="adm-field"><span>Code</span><select name="code"><option>301</option><option>302</option></select></label>
       <button class="btn btn--primary" type="submit">+ Ajouter</button></form>
       ${reds.length ? `<table class="adm-table"><thead><tr><th>Depuis</th><th>Vers</th><th>Code</th><th>Active</th><th></th></tr></thead><tbody>${reds
-        .map((rd) => `<tr><td><code>${esc(rd.from_path)}</code></td><td><code>${esc(rd.to_path)}</code></td><td>${rd.code}</td><td>${rd.is_active ? "✔" : "✖"}</td><td class="adm-actions"><form method="post" action="/admin/seo/redirects/${rd.id}/delete"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form></td></tr>`)
+        .map((rd) => `<tr><td><code>${esc(rd.from_path)}</code></td><td><code>${esc(rd.to_path)}</code></td><td>${rd.code}</td><td>${rd.is_active ? icon("check-circle", "ok-ic") : icon("x-circle", "ko-ic")}</td><td class="adm-actions"><form method="post" action="/admin/seo/redirects/${rd.id}/delete"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form></td></tr>`)
         .join("")}</tbody></table>` : `<p class="muted">Aucune redirection configurée.</p>`}
     </section>`;
     return c.html(adminLayout(c, user, "SEO & Redirections", body, "/admin/seo"));
@@ -523,10 +807,10 @@ export function adminCore(): Hono<{ Bindings: Env }> {
 function adminLoginHTML(error = "", email = ""): string {
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>Connexion — GREEN FAD Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/admin.css?v=1"></head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/admin.css?v=2"></head>
 <body class="adm-login-bg"><div class="adm-login">
-<div class="adm-login__brand"><span class="adm-side__logo">GF</span><div><strong>GREEN FAD</strong><em>Centre de contrôle numérique</em></div></div>
+<div class="adm-login__brand"><img src="/assets/images/greenfad-logo.svg" alt="GREEN FAD — Future, Authentique, Dynamique" style="height:56px;width:auto"></div>
 ${error ? `<div class="adm-alert adm-alert--error">${esc(error)}</div>` : ""}
 <form method="post" action="/admin/login" class="adm-login__form">
   <label>Email professionnel<input type="email" name="email" required autofocus value="${esc(email)}" autocomplete="username"></label>

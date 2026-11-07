@@ -18,7 +18,7 @@
     var url = location.origin + b.getAttribute("data-copy");
     navigator.clipboard.writeText(url).then(function () {
       var old = b.textContent;
-      b.textContent = "✔ Copié";
+      b.textContent = "Copié";
       setTimeout(function () { b.textContent = old; }, 1600);
     });
   });
@@ -69,7 +69,7 @@
             btn.type = "button";
             btn.className = "media-modal__item";
             btn.innerHTML =
-              (isImg ? '<img src="/media/' + m.r2_key + '" alt="" loading="lazy">' : '<div class="media-modal__item is-doc">📄</div>') +
+              (isImg ? '<img src="/media/' + m.r2_key + '" alt="" loading="lazy">' : '<div class="media-modal__item is-doc"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h5"/></svg></div>') +
               "<span>" + m.filename.replace(/</g, "&lt;").slice(0, 26) + "</span>";
             btn.addEventListener("click", function () {
               currentInput.value = m.r2_key;
