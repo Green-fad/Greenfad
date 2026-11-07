@@ -359,11 +359,18 @@ function relationLabelOptions(db: D1Database, f: Field): Promise<{ value: string
   return q(db, `SELECT ${f.relation.value} AS v, ${f.relation.label} AS l FROM ${f.relation.table} ORDER BY l`).then((rows) => rows.map((r) => ({ value: String(r.v), label: String(r.l) })));
 }
 
+// Alias d'URL pour une navigation lisible (/admin/team → team_members…)
+const RESOURCE_ALIASES: Record<string, string> = {
+  team: "team_members",
+  press: "press_releases",
+  newsletter: "newsletter_subscribers",
+};
+
 // ---------- Router CRUD ----------
 export function crudRouter(): Hono<{ Bindings: Env }> {
   const r = new Hono<{ Bindings: Env }>();
 
-  const getRes = (key: string): ResourceDef | null => RESOURCES[key] || null;
+  const getRes = (key: string): ResourceDef | null => RESOURCES[key] || RESOURCES[RESOURCE_ALIASES[key] || ""] || null;
 
   const deny = (c: Context<{ Bindings: Env }>, perm: string, action: "view" | "create" | "edit" | "delete" | "publish"): Response | null => {
     const user = c.get("user")!;
