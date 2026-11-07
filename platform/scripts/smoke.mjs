@@ -147,11 +147,11 @@ ok("produit supprimé → 404 côté public", r.status === 404);
 
 // ---------- 6. Page Builder ----------
 console.log("\n— Page Builder —");
-// nettoyage d'éventuels résidus de runs précédents
+// nettoyage ciblé : uniquement les pages créées par les runs de test (jamais les pages réelles)
 r = await get("/admin/pages");
 html = await r.text();
-for (const m of [...html.matchAll(/\/admin\/pages\/(\d+)\/delete/g)]) {
-  await post(`/admin/pages/${m[1]}/delete`, new URLSearchParams({ _csrf: csrf }), { "content-type": "application/x-www-form-urlencoded" });
+for (const m of [...html.matchAll(/<tr><td>(\d+)<\/td>\s*<td><strong>Page Test Builder<\/strong>.*?<form method="post" action="\/admin\/pages\/(\d+)\/delete"/g)]) {
+  await post(`/admin/pages/${m[2]}/delete`, new URLSearchParams({ _csrf: csrf }), { "content-type": "application/x-www-form-urlencoded" });
 }
 const RUN = Date.now().toString(36);
 r = await post("/admin/pages", new URLSearchParams({ _csrf: csrf, title: "Page Test Builder", slug: `page-test-${RUN}`, status: "brouillon", show_in_nav: "0" }), { "content-type": "application/x-www-form-urlencoded" });
