@@ -81,8 +81,13 @@ publicRoutes.use("*", async (c, next) => {
   );
   const hit = rows.find((r) => r.from_path === path || (r.from_path.endsWith("*") && path.startsWith(r.from_path.slice(0, -1))));
   if (hit) {
-    const to = hit.to_path.includes("*") ? path.replace(hit.from_path.slice(0, -1), hit.to_path.slice(0, -1)) : hit.to_path;
-    return c.redirect(to, (hit.code as 301 | 302) || 301);
+    // Les anciennes URL se terminaient souvent par .html — on le retire pour la nouvelle cible
+    if (hit.to_path.includes("*")) {
+      const prefix = hit.from_path.slice(0, -1);
+      const suffix = path.slice(prefix.length).replace(/\.html?$/i, "");
+      return c.redirect(hit.to_path.slice(0, -1) + suffix, (hit.code as 301 | 302) || 301);
+    }
+    return c.redirect(hit.to_path, (hit.code as 301 | 302) || 301);
   }
   return next();
 });
