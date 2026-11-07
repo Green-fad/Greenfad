@@ -82,10 +82,11 @@ export function adminLayout(c: Context<{ Bindings: Env }>, user: SessionUser, ti
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/admin.css?v=2">
+<link rel="stylesheet" href="/css/admin.css?v=3">
 </head>
 <body class="adm">
-<aside class="adm-side">
+<div class="adm-backdrop" id="admBackdrop"></div>
+<aside class="adm-side" id="admSide">
   <a class="adm-side__brand" href="/admin"><img src="/assets/images/greenfad-logo-white.svg" alt="GREEN FAD" class="adm-side__logoimg"></a>
   <nav class="adm-nav" aria-label="Modules">${nav}</nav>
   <div class="adm-side__foot">
@@ -95,7 +96,10 @@ export function adminLayout(c: Context<{ Bindings: Env }>, user: SessionUser, ti
 </aside>
 <div class="adm-main">
   <header class="adm-top">
-    <h1 class="adm-top__title">${esc(title)}</h1>
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <button class="adm-burger" id="admBurger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="admSide">${icon("menu")}</button>
+      <h1 class="adm-top__title">${esc(title)}</h1>
+    </div>
     <div class="adm-top__user">
       <span class="adm-top__role">${esc(user.name)} · ${esc(roleLabel(user.role))}</span>
       <span class="adm-top__avatar">${esc(user.name.slice(0, 1).toUpperCase())}</span>

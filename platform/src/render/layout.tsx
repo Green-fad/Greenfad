@@ -115,6 +115,7 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11243E">
 <title>${esc(seo.title)}</title>
 ${seo.description ? `<meta name="description" content="${esc(seo.description)}">` : ""}
 ${seo.noindex ? `<meta name="robots" content="noindex,nofollow">` : `<meta name="robots" content="index,follow">`}
@@ -131,7 +132,7 @@ ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=2">
+<link rel="stylesheet" href="/css/main.css?v=3">
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
@@ -152,7 +153,13 @@ ${body}
   <div class="container site-foot__grid">
     <div class="site-foot__brand">
       <img src="${esc(logoFooter.startsWith("/") ? logoFooter : "/media/" + logoFooter)}" alt="${esc(siteName)}" class="site-foot__logo">
-      <p>${esc(tagline)}</p>
+      ${(() => {
+        const ent = site.footerSections.find((sec) => String(sec.section_key) === "entreprise");
+        if (!ent) return `<p>${esc(tagline)}</p>`;
+        const rawEnt = typeof ent.content === "string" ? ent.content : JSON.stringify(ent.content || "{}");
+        const entData = parseJSON<{ text?: string }>(rawEnt || "{}", {});
+        return `<p>${esc(entData.text || tagline)}</p>`;
+      })()}
       ${address ? `<p><span class="i i--inline">${icon("map-pin")}</span>${esc(address)}</p>` : ""}
       ${phone ? `<p><a href="tel:${esc(phone.replace(/\s/g, ""))}">${esc(phone)}</a></p>` : ""}
       ${email ? `<p><a href="mailto:${esc(email)}">${esc(email)}</a></p>` : ""}
@@ -160,8 +167,11 @@ ${body}
     </div>
     ${site.footerNav.length ? `<nav class="site-foot__nav" aria-label="Pied de page"><h4>Navigation</h4><ul>${footerMenu(site.footerNav)}</ul></nav>` : ""}
     ${site.footerSections
+      .filter((sec) => !["entreprise", "contact"].includes(String(sec.section_key || "")))
       .map((sec) => {
-        const content = parseJSON<{ text?: string; email?: string; items?: { label: string; url: string }[] }>(JSON.stringify(sec.content || "{}"), {});
+        // Le contenu peut arriver en objet D1 (colonne JSON) ou en string JSON — normaliser ici
+        const raw = typeof sec.content === "string" ? sec.content : JSON.stringify(sec.content || "{}");
+        const content = parseJSON<{ text?: string; email?: string; items?: { label: string; url: string }[] }>(raw || "{}", {});
         return `<div class="site-foot__sec"><h4>${esc(sec.title)}</h4>${content.text ? `<p>${esc(content.text)}</p>` : ""}${content.email ? `<p><a href="mailto:${esc(content.email)}">${esc(content.email)}</a></p>` : ""}${content.items?.length ? `<ul>${content.items.map((i) => `<li><a href="${esc(i.url)}">${esc(i.label)}</a></li>`).join("")}</ul>` : ""}</div>`;
       })
       .join("")}

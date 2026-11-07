@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="GREEN FAD — Future, Authentique, Dynamique">
+  <!-- Badge circulaire officiel GREEN FAD — fidèle au logo original -->
+  <circle cx="100" cy="100" r="95.5" fill="#FFFFFF" stroke="#11243E" stroke-width="4.5"/>
+  <g transform="translate(50,16) scale(0.877)">
+    <rect x="0" y="2" width="41.5" height="96" fill="#46929B"/>
+    <g fill="none" stroke="#11243E" stroke-width="2">
+      <path d="M 14.6 3 H 112.5 V 98"/>
+      <path d="M 23.1 11.6 H 104.1 V 98"/>
+      <path d="M 31.2 19.5 H 95.4 V 98"/>
+      <path d="M 39.7 28.1 H 86.8 V 98"/>
+      <path d="M 14.6 3 V 57.7"/>
+      <path d="M 23.1 11.6 V 57.7"/>
+      <path d="M 31.2 19.5 V 57.7"/>
+      <path d="M 39.7 28.1 V 57.7"/>
+      <path d="M 48.9 57.7 V 36.5 H 78.7 V 98"/>
+      <path d="M 14.6 57.7 H 78.7"/>
+      <path d="M 14.6 66.6 H 78.7"/>
+      <path d="M 14.6 74.6 H 78.7"/>
+      <path d="M 14.6 83 H 78.7"/>
+      <path d="M 14.6 91.6 H 78.7"/>
+    </g>
+  </g>
+  <text x="96" y="134" text-anchor="end" font-family="'Archivo Black','Arial Black',Arial,sans-serif" font-size="21" font-weight="800" letter-spacing="0.8" fill="#11243E">GREEN</text>
+  <text x="104" y="134" text-anchor="start" font-family="'Archivo Black','Arial Black',Arial,sans-serif" font-size="21" font-weight="800" letter-spacing="0.8" fill="#46929B">FAD</text>
+  <rect x="47" y="140" width="20" height="3.4" rx="1" fill="#D9A927"/>
+  <rect x="71" y="140" width="82" height="3.4" rx="1" fill="#11243E"/>
+  <text x="100" y="158" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="10" font-weight="700" letter-spacing="0.4" fill="#D9A927">Future, Authentique, Dynamique</text>
+</svg>

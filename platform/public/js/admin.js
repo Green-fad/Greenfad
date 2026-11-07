@@ -2,6 +2,24 @@
 (function () {
   "use strict";
 
+  // ---------- Menu latéral mobile ----------
+  var side = document.getElementById("admSide");
+  var backdrop = document.getElementById("admBackdrop");
+  var burger = document.getElementById("admBurger");
+  function toggleSide(open) {
+    if (!side) return;
+    side.classList.toggle("is-open", open);
+    if (backdrop) backdrop.classList.toggle("is-open", open);
+    if (burger) burger.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  if (burger) burger.addEventListener("click", function () { toggleSide(!side.classList.contains("is-open")); });
+  if (backdrop) backdrop.addEventListener("click", function () { toggleSide(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") toggleSide(false); });
+  // Fermer le menu après navigation (mobile)
+  side && side.addEventListener("click", function (e) {
+    if (e.target.closest("a") && window.innerWidth <= 860) toggleSide(false);
+  });
+
   // Confirmations
   document.addEventListener("click", function (e) {
     var f = e.target.closest("[data-confirm]");

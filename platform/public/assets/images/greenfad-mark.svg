@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 114 96" role="img" aria-label="Marque GREEN FAD">
+  <!-- Marque officielle GREEN FAD — labyrinthe concentrique + bandeau teal + filets de fondation
+       Recréation vectorielle fidèle du logo original (spirale 4 hooks, carré interne, 5 filets) -->
+  <g>
+    <rect x="0" y="0" width="41.5" height="96" fill="#46929B"/>
+    <g fill="none" stroke="#11243E" stroke-width="2">
+      <!-- Hook 1 : traverse haute pleine largeur + descente droite externe -->
+      <path d="M 14.6 1 H 112.5 V 96"/>
+      <!-- Hook 2 -->
+      <path d="M 23.1 9.6 H 104.1 V 96"/>
+      <!-- Hook 3 -->
+      <path d="M 31.2 17.5 H 95.4 V 96"/>
+      <!-- Hook 4 -->
+      <path d="M 39.7 26.1 H 86.8 V 96"/>
+      <!-- Descendes gauches vers le socle -->
+      <path d="M 14.6 1 V 55.7"/>
+      <path d="M 23.1 9.6 V 55.7"/>
+      <path d="M 31.2 17.5 V 55.7"/>
+      <path d="M 39.7 26.1 V 55.7"/>
+      <!-- Carré interne (côté droit prolongé jusqu'en bas) -->
+      <path d="M 48.9 55.7 V 34.5 H 78.7 V 96"/>
+      <!-- Filets de fondation -->
+      <path d="M 14.6 55.7 H 78.7"/>
+      <path d="M 14.6 64.6 H 78.7"/>
+      <path d="M 14.6 72.6 H 78.7"/>
+      <path d="M 14.6 81 H 78.7"/>
+      <path d="M 14.6 89.6 H 78.7"/>
+    </g>
+  </g>
+</svg>

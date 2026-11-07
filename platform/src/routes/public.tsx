@@ -29,11 +29,13 @@ function mediaSrc(key: string | null | undefined): string {
 }
 
 function cardHTML(item: { url: string; title: string; text?: string; image?: string; tag?: string; icon?: string; iconBadge?: boolean }): string {
+  const media = item.image
+    ? `<a class="card__media" href="${esc(item.url)}"><img src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy"></a>`
+    : `<a class="card__media card__media--empty" href="${esc(item.url)}" aria-hidden="true" tabindex="-1">${icon(item.icon && !/^[A-Z]{2}$/.test(item.icon) ? item.icon : "layers")}</a>`;
   return `<article class="card reveal">
-    ${item.image ? `<a class="card__media" href="${esc(item.url)}"><img src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy"></a>` : ""}
+    ${media}
     <div class="card__body">
       ${item.tag ? `<span class="tag">${esc(item.tag)}</span>` : ""}
-      ${!item.image && item.icon ? `<span class="card__icon">${icon(item.icon)}</span>` : ""}
       <h3><a href="${esc(item.url)}">${esc(item.title)}</a></h3>
       ${item.text ? `<p>${esc(item.text)}</p>` : ""}
       <span class="card__more">Découvrir ${icon("arrow-right")}</span>
@@ -176,7 +178,7 @@ publicRoutes.get("/produits", async (c) => {
     <p class="page-hero__text">Solutions propriétaires développées par nos équipes, pensées pour les marchés africains et ouverts à l'international.</p></div></section>
   <section class="container"><div class="cards cards--3 reveal">${rows
     .map((p) => `<article class="card">
-      <a class="card__media" href="/produits/${esc(String(p.slug))}">${p.image_key ? `<img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}" loading="lazy">` : `<span class="card__icon card__icon--navy" style="margin:0;height:100%;width:100%;border-radius:0">${icon("package")}</span>`}</a>
+      ${p.image_key ? `<a class="card__media" href="/produits/${esc(String(p.slug))}"><img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}" loading="lazy"></a>` : `<a class="card__media card__media--empty" href="/produits/${esc(String(p.slug))}" aria-hidden="true" tabindex="-1">${icon("package")}</a>`}
       <div class="card__body">
         <div class="card__foot">${p.category ? `<span class="tag">${esc(String(p.category))}</span>` : ""}${statePill(String(p.state || "developpement"))}</div>
         <h3><a href="/produits/${esc(String(p.slug))}">${esc(String(p.name))}</a></h3>

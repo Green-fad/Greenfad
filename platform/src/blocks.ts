@@ -249,6 +249,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
         <span>${icon("shield")} Solutions sécurisées</span>
       </div>`;
       return `<section class="hero hero--${esc(p.variant)}" ${style ? `style="${style}"` : ""}>
+        <span class="hero__mark" aria-hidden="true"><svg viewBox="0 0 114 96" fill="none"><rect x="0" y="0" width="41.5" height="96" fill="currentColor" opacity=".55"/><g stroke="currentColor" stroke-width="2"><path d="M 14.6 1 H 112.5 V 96"/><path d="M 23.1 9.6 H 104.1 V 96"/><path d="M 31.2 17.5 H 95.4 V 96"/><path d="M 39.7 26.1 H 86.8 V 96"/><path d="M 14.6 1 V 55.7"/><path d="M 23.1 9.6 V 55.7"/><path d="M 31.2 17.5 V 55.7"/><path d="M 39.7 26.1 V 55.7"/><path d="M 48.9 55.7 V 34.5 H 78.7 V 96"/><path d="M 14.6 55.7 H 78.7"/><path d="M 14.6 64.6 H 78.7"/><path d="M 14.6 72.6 H 78.7"/><path d="M 14.6 81 H 78.7"/><path d="M 14.6 89.6 H 78.7"/></g></svg></span>
         <div class="container hero__inner reveal">
           ${p.eyebrow ? `<p class="eyebrow">${esc(p.eyebrow)}</p>` : ""}
           <h1>${esc(p.title)}</h1>
@@ -314,16 +315,25 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
           : await dynamicCards(ctx.env.DB, p.source, p.limit);
       if (!cards.length) return ""; // aucune donnée réelle publiée → la section ne s'affiche pas (aucune carte fictive)
       return `<section class="container"><div class="cards cards--${p.columns} reveal">${cards
-        .map(
-          (it) => `<article class="card">
-            ${it.image_key ? `<a class="card__media" href="${esc(it.url || "#")}">${img(it.image_key, it.title)}</a>` : it.icon ? iconBadge(it.icon) : ""}
+        .map((it) => {
+          const hasIso = /^[A-Z]{2}$/.test(it.icon || "");
+          const media = it.image_key
+            ? `<a class="card__media" href="${esc(it.url || "#")}">${img(it.image_key, it.title)}</a>`
+            : !it.icon
+              ? `<a class="card__media card__media--empty" href="${esc(it.url || "#")}" aria-hidden="true" tabindex="-1">${icon("layers")}</a>`
+              : "";
+          const iconTile = !it.image_key && it.icon && !hasIso ? `<span class="card__icon">${icon(it.icon)}</span>` : "";
+          const isoTile = !it.image_key && hasIso ? iconBadge(it.icon) : "";
+          return `<article class="card">
+            ${media}
             <div class="card__body">
               ${it.tag ? `<span class="tag">${esc(it.tag)}</span>` : ""}
+              ${iconTile}${isoTile}
               <h3>${it.url ? `<a href="${esc(it.url)}">${esc(it.title)}</a>` : esc(it.title)}</h3>
               ${it.text ? `<p>${esc(it.text)}</p>` : ""}
               ${it.url ? `<span class="card__more">Découvrir ${icon("arrow-right")}</span>` : ""}
-            </div></article>`
-        )
+            </div></article>`;
+        })
         .join("")}</div>${p.view_all_label && p.view_all_url ? `<p class="center" style="margin-top:2.2rem"><a class="btn btn--outline" href="${esc(p.view_all_url)}">${esc(p.view_all_label)} ${icon("arrow-right")}</a></p>` : ""}</section>`;
     }
     case "stats": {
