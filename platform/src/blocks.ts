@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { Env, ContentStatus } from "./types";
 import { q, getSetting } from "./db";
-import { md, esc, parseJSON } from "./utils";
+import { md, esc, parseJSON, fmtDate } from "./utils";
 import { icon } from "./icons";
 
 const urlish = z.string().max(500).optional().or(z.literal(""));
@@ -45,6 +45,7 @@ export const blockSchemas = {
   gallery_album: z.object({
     album_slug: z.string().min(1).max(120),
     limit: z.number().int().min(1).max(24).default(12),
+    layout: z.enum(["grid", "featured"]).default("grid"),
   }),
   split: z.object({
     title: z.string().max(200),
@@ -97,6 +98,14 @@ export const blockSchemas = {
   team: z.object({
     limit: z.number().int().min(1).max(24).default(8),
   }),
+  posts: z.object({
+    limit: z.number().int().min(1).max(6).default(3),
+    category: z.string().max(80).optional().or(z.literal("")),
+  }),
+  logo_marquee: z.object({
+    source: z.enum(["products", "partners"]).default("products"),
+    label: z.string().max(120).optional().or(z.literal("")),
+  }),
   partners: z.object({
     limit: z.number().int().min(1).max(24).default(12),
   }),
@@ -138,7 +147,7 @@ export const BLOCK_LABELS: Record<BlockType, { label: string; group: string; des
   richtext: { label: "Texte enrichi", group: "Contenu", desc: "Paragraphe libre en markdown (titres, listes, liens)" },
   image: { label: "Image", group: "Média", desc: "Image pleine largeur ou contenue, avec légende" },
   gallery: { label: "Galerie manuelle", group: "Média", desc: "Grille d'images choisies avec légendes" },
-  gallery_album: { label: "Galerie d'album", group: "Média", desc: "Affiche les images d'un album du Media Center" },
+  gallery_album: { label: "Galerie d'album", group: "Média", desc: "Affiche les images d'un album du Media Center (grille ou mise en avant)" },
   video: { label: "Vidéo (URL)", group: "Média", desc: "Intégration YouTube ou Vimeo centrée" },
   video_playlist: { label: "Vidéos du Media Center", group: "Média", desc: "Grille des vidéos publiées dans le Media Center" },
   split: { label: "Image + Texte", group: "Structure", desc: "Deux colonnes : image d'un côté, texte de l'autre" },
@@ -149,6 +158,8 @@ export const BLOCK_LABELS: Record<BlockType, { label: string; group: string; des
   contact_form: { label: "Formulaire", group: "Conversion", desc: "Contact, demande de devis ou de démonstration produit" },
   faq: { label: "FAQ", group: "Contenu", desc: "Questions-réponses publiées depuis le module FAQ" },
   team: { label: "Équipe", group: "Écosystème", desc: "Membres publiés du module Équipe" },
+  posts: { label: "Aperçus du blog", group: "Contenu", desc: "Dernières publications réelles : couverture, type, date, résumé, lien vers l'article" },
+  logo_marquee: { label: "Bandeau de logos animé", group: "Écosystème", desc: "Défilement continu des logos produits ou partenaires" },
   partners: { label: "Partenaires", group: "Écosystème", desc: "Logos et liens des partenaires publiés" },
   testimonials: { label: "Témoignages clients", group: "Écosystème", desc: "Témoignages réels validés par l'administration" },
   countries_map: { label: "Implantation internationale", group: "Écosystème", desc: "Carte des pays actifs et leurs bureaux" },
@@ -158,8 +169,39 @@ export const BLOCK_LABELS: Record<BlockType, { label: string; group: string; des
 };
 
 // ---------- Validation serveur ----------
+/** Libellés des types de publication (blog) — utilisés par le bloc « posts » */
+const KIND_LABELS: Record<string, { label: string; icon: string; cls?: string }> = {
+  article: { label: "Actualité", icon: "newspaper" },
+  analyse: { label: "Analyse", icon: "bar-chart" },
+  recherche: { label: "Recherche & développement", icon: "flask", cls: "kind-badge--or" },
+  prototype: { label: "Prototype", icon: "rocket", cls: "kind-badge--or" },
+  veille: { label: "Veille technologique", icon: "globe" },
+  publication: { label: "Publication institutionnelle", icon: "file-text" },
+  guide: { label: "Guide & ressources", icon: "book-open" },
+  opinion: { label: "Opinion", icon: "quote" },
+  recit: { label: "Retour d'expérience", icon: "route" },
+};
+
+/**
+ * Normalise une valeur « blocks » potentiellement mal formée saisie dans l'admin :
+ * - {"blocks":[…]} (objet englobant) → déballe
+ * - un objet bloc unique {type:…} → enveloppe dans un tableau
+ * - chaîne JSON déjà parsée par le caller → laissé tel quel
+ * Rend le save non bloquant pour les parcours Dashboard.
+ */
+export function normalizeBlocksInput(v: unknown): unknown {
+  if (v && typeof v === "object" && !Array.isArray(v)) {
+    const obj = v as Record<string, unknown>;
+    if (Array.isArray(obj.blocks)) return obj.blocks;
+    if (typeof obj.type === "string") return [v];
+    // Objet sans type ni blocks (ex. {} collé par l'admin) → liste vide, pas d'erreur bloquante
+    return [];
+  }
+  return v;
+}
+
 export function validateBlocks(blocks: unknown): { ok: true; blocks: Block[] } | { ok: false; error: string } {
-  if (!Array.isArray(blocks)) return { ok: false, error: "blocks doit être un tableau" };
+  if (!Array.isArray(blocks)) return { ok: false, error: "les sections doivent être une liste de blocs (ex. : [{\"type\":\"hero\",\"title\":\"…\"}]) — ou vide pour désactiver" };
   if (blocks.length > 60) return { ok: false, error: "maximum 60 blocs par page" };
   const out: Block[] = [];
   for (let i = 0; i < blocks.length; i++) {
@@ -186,10 +228,10 @@ async function dynamicCards(db: D1Database, source: string, limit: number): Prom
     rows.map((r) => ({ title: String(r[titleF] || ""), text: String(r[textF] || ""), image_key: String(r[imgF] || ""), url: `${base}/${r.slug}`, icon: iconF ? String(r[iconF] || "") : "" }));
   try {
     if (source === "products")
-      return (await q(db, "SELECT slug, name, tagline, image_key, category, state FROM products WHERE status=? ORDER BY sort_order LIMIT ?", pub, limit)).map((r) => ({
+      return (await q(db, "SELECT slug, name, tagline, image_key, logo_key, category, state FROM products WHERE status=? ORDER BY sort_order LIMIT ?", pub, limit)).map((r) => ({
         title: String(r.name || ""),
         text: String(r.tagline || ""),
-        image_key: String(r.image_key || ""),
+        image_key: String(r.logo_key || r.image_key || ""),
         url: `/produits/${r.slug}`,
         icon: "",
         tag: String(r.category || ""),
@@ -225,6 +267,20 @@ function iconBadge(name: string): string {
   // Nom ISO2 (2 lettres majuscules) → badge pays ; sinon icône de la bibliothèque
   if (/^[A-Z]{2}$/.test(name)) return `<span class="country__code country__code--teal">${esc(name)}</span>`;
   return `<span class="card__icon">${icon(name)}</span>`;
+}
+
+/** Image logo → tuile douce (object-fit contain) ; photo → cadre plein (cover) */
+function isLogoKey(key: string): boolean {
+  return /-?logo[\w-]*\.(png|svg|jpe?g)$/i.test(key || "") || /logo[-_]?(key|main)\.(png|svg|jpe?g)$/i.test(key || "");
+}
+
+function cardMediaHTML(src: string, alt: string, url: string): string {
+  if (!src) return "";
+  const href = url || "#";
+  if (isLogoKey(src)) {
+    return `<a class="card__media card__media--logo" href="${esc(href)}"><img src="${esc(src.startsWith("/") ? src : "/media/" + src)}" alt="${esc(alt)}" loading="lazy"></a>`;
+  }
+  return `<a class="card__media" href="${esc(href)}"><img src="${esc(src.startsWith("/") ? src : "/media/" + src)}" alt="${esc(alt)}" loading="lazy"></a>`;
 }
 
 /** Analyse une URL YouTube/Vimeo → URL d'intégration officielle + miniature */
@@ -286,7 +342,8 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "gallery_album": {
       const rows = await q(ctx.env.DB, "SELECT m.r2_key, m.alt, mi.title FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE mi.album_id = (SELECT id FROM media_albums WHERE slug = ?) AND mi.type='image' AND mi.status='publie' ORDER BY mi.sort_order LIMIT ?", p.album_slug, p.limit);
       if (!rows.length) return "";
-      return `<div class="container"><div class="gallery gallery--3 reveal" data-lightbox>${rows
+      const gcls = p.layout === "featured" ? "gallery gallery--featured" : "gallery gallery--3";
+      return `<div class="container"><div class="${gcls} reveal" data-lightbox>${rows
         .map((r) => {
           const src = String(r.r2_key || "").startsWith("/") ? String(r.r2_key) : `/media/${r.r2_key}`;
           return `<figure data-full="${esc(src)}">${img(src, String(r.title || r.alt || ""))}${r.title ? `<figcaption>${esc(r.title)}</figcaption>` : ""}</figure>`;
@@ -327,7 +384,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
         .map((it) => {
           const hasIso = /^[A-Z]{2}$/.test(it.icon || "");
           const media = it.image_key
-            ? `<a class="card__media" href="${esc(it.url || "#")}">${img(it.image_key, it.title)}</a>`
+            ? cardMediaHTML(it.image_key, it.title, it.url)
             : !it.icon
               ? `<a class="card__media card__media--empty" href="${esc(it.url || "#")}" aria-hidden="true" tabindex="-1">${icon("layers")}</a>`
               : "";
@@ -348,7 +405,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "stats": {
       const items = (p.items as { value: string; label: string }[]) || [];
       if (!items.length) return "";
-      return `<section class="stats stats--${esc(p.variant)}"><div class="stats__row" data-stagger>${items
+      return `<section class="stats stats--${esc(p.variant)}"><div class="stats__row reveal" data-stagger>${items
         .map((it) => `<div class="stat"><strong>${esc(it.value)}</strong><span>${esc(it.label)}</span></div>`)
         .join("")}</div></section>`;
     }
@@ -393,6 +450,43 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
       return `<section class="container"><div class="partners reveal" data-stagger>${rows
         .map((r) => `<div class="partner">${r.logo_key ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy">` : `<span>${esc(r.name)}</span>`}</div>`)
         .join("")}</div></section>`;
+    }
+    case "posts": {
+      const rows = await q(ctx.env.DB, "SELECT slug, title, excerpt, cover_key, kind, category, author, published_at FROM posts WHERE status='publie' AND (?1 = '' OR category = ?1) ORDER BY published_at DESC LIMIT ?2", p.category || "", p.limit);
+      if (!rows.length) return "";
+      return `<section class="container"><div class="posts-grid reveal" data-stagger>${rows
+        .map((r) => {
+          const dt = String(r.published_at || "");
+          const d = dt ? fmtDate(dt, "long") : "";
+          const k = KIND_LABELS[String(r.kind || "")] || KIND_LABELS.article;
+          return `<article class="post-card">
+            <a class="post-card__media" href="/blog/${esc(String(r.slug))}">${
+              r.cover_key ? img(String(r.cover_key), String(r.title)) : `<span class="post-card__noimg">${icon("newspaper")}</span>`
+            }<span class="kind-badge${k.cls ? " " + k.cls : ""}">${icon(k.icon)} ${k.label}</span></a>
+            <div class="post-card__body">
+              <p class="post-card__meta">${d ? `<time datetime="${esc(dt.slice(0, 10))}">${esc(d)}</time>` : ""}</p>
+              <h3><a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3>
+              ${r.excerpt ? `<p class="post-card__excerpt">${esc(String(r.excerpt).slice(0, 180))}</p>` : ""}
+              <span class="post-card__more">Lire l'article ${icon("arrow-right")}</span>
+            </div>
+          </article>`;
+        })
+        .join("")}</div><p class="center" style="margin-top:2.2rem"><a class="btn btn--outline" href="/blog">Tous les articles du blog ${icon("arrow-right")}</a></p></section>`;
+    }
+    case "logo_marquee": {
+      const src = p.source === "partners" ? "partners" : "products";
+      const rows =
+        src === "products"
+          ? await q(ctx.env.DB, "SELECT name, COALESCE(logo_key, image_key) AS logo FROM products WHERE status='publie' AND COALESCE(logo_key, image_key) != '' ORDER BY sort_order")
+          : await q(ctx.env.DB, "SELECT name, logo_key AS logo FROM partners WHERE status='publie' AND COALESCE(logo_key, '') != '' ORDER BY sort_order");
+      if (!rows.length) return "";
+      const tile = (name: string, logo: string) =>
+        `<span class="marquee__item" title="${esc(name)}"><img src="${esc(String(logo).startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(name)}" loading="lazy"></span>`;
+      const sequence = rows.map((r) => tile(String(r.name), String(r.logo))).join("");
+      return `<div class="marquee reveal" aria-label="${esc(p.label || "Produits Green FAD")}">
+        <p class="marquee__label">${esc(p.label || "Nos produits")}</p>
+        <div class="marquee__track"><div class="marquee__seq">${sequence}</div><div class="marquee__seq" aria-hidden="true">${sequence}</div></div>
+      </div>`;
     }
     case "testimonials": {
       const rows = await q(ctx.env.DB, "SELECT author_name, author_role, company, quote, photo_key FROM testimonials WHERE status='publie' ORDER BY sort_order LIMIT ?", p.limit);

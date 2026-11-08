@@ -118,6 +118,7 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>document.documentElement.classList.add("js")</script>
 <meta name="theme-color" content="#11243E">
 <title>${esc(seo.title)}</title>
 ${seo.description ? `<meta name="description" content="${esc(seo.description)}">` : ""}
@@ -135,7 +136,7 @@ ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=5">
+<link rel="stylesheet" href="/css/main.css?v=6">
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>

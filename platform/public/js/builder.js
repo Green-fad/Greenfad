@@ -77,6 +77,14 @@
       { k: "limit", label: "Nombre max", t: "number" },
     ],
     team: [{ k: "limit", label: "Nombre max", t: "number" }],
+    posts: [
+      { k: "limit", label: "Nombre d'articles", t: "number" },
+      { k: "category", label: "Catégorie (vide = toutes)" , t: "text" },
+    ],
+    logo_marquee: [
+      { k: "source", label: "Source des logos", t: "select", o: ["products", "partners"] },
+      { k: "label", label: "Petit libellé au-dessus du bandeau", t: "text" },
+    ],
     partners: [{ k: "limit", label: "Nombre max", t: "number" }],
     testimonials: [{ k: "limit", label: "Nombre max", t: "number" }],
     countries_map: [],
@@ -213,7 +221,7 @@
       if (readonly) return;
       var t = btn.getAttribute("data-add-block");
       var nb = { type: t, visible: true };
-      var defaults = { hero: { title: "Nouveau titre", variant: "gradient" }, section_header: { title: "Nouvelle section" }, cta: { title: "Prêt à démarrer ?", button_label: "Nous contacter", button_url: "/contact" }, split: { title: "Nouvelle section" }, stats: { items: [] }, timeline: { items: [] }, gallery: { items: [], columns: 3 }, cards: { source: "products", limit: 6, columns: 3, items: [] } };
+      var defaults = { hero: { title: "Nouveau titre", variant: "gradient" }, section_header: { title: "Nouvelle section" }, cta: { title: "Prêt à démarrer ?", button_label: "Nous contacter", button_url: "/contact" }, split: { title: "Nouvelle section" }, stats: { items: [] }, timeline: { items: [] }, gallery: { items: [], columns: 3 }, cards: { source: "products", limit: 6, columns: 3, items: [] }, posts: { limit: 3 }, logo_marquee: { source: "products" } };
       if (defaults[t]) Object.assign(nb, defaults[t]);
       blocks.push(nb);
       select(nb);
@@ -233,7 +241,7 @@
       .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         flash(res.ok ? (publish ? "Page publiée (version v" + res.j.version + ")" : "Brouillon enregistré (v" + res.j.version + ")") : "Erreur : " + (res.j.error || "Erreur d'enregistrement"), res.ok);
-        if (res.ok) frame.src = "/__preview/" + pageId + "&r=" + Date.now();
+        if (res.ok) frame.src = "/__preview/" + pageId + "?r=" + Date.now();
       })
       .catch(function () { flash("Erreur réseau", false); });
   }
@@ -261,21 +269,7 @@
     });
   });
 
-  // Chargement initial des blocs existants
-  var existing = [];
-  document.querySelectorAll(".bblock").forEach(function (el, i) {
-    var t = el.getAttribute("data-block-type");
-    if (t) existing.push({ type: t, visible: !el.classList.contains("is-hidden") });
-  });
-  if (existing.length) {
-    // Les blocs complets viennent du serveur : on les recharge via l'aperçu du DOM initial
-    fetch("/__preview/" + pageId, { headers: { accept: "text/html" } })
-      .then(function () { /* rendu serveur : reconstruire depuis les données */
-        var data = window.__GF_BLOCKS__;
-        if (data && data.length) { blocks = data; renderList(); }
-      });
-  }
-  // Les données sérialisées sont injectées par le serveur :
+  // Chargement initial des blocs existants — les données sérialisées sont injectées par le serveur :
   blocks = window.__GF_BLOCKS__ || blocks;
   renderList();
 })();

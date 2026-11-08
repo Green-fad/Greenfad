@@ -21,6 +21,9 @@
 
   // Reveal au scroll — threshold 0 : les très grands blocs (article complet) se révèlent dès leur entrée
   var revealEls = document.querySelectorAll(".reveal");
+  // Filet de sécurité : tout conteneur [data-stagger] sans .reveal est révélé immédiatement
+  // (sinon ses enfants resteraient à opacity:0 pour toujours — bug des bandeaux « stats »)
+  document.querySelectorAll("[data-stagger]:not(.reveal)").forEach(function (el) { el.classList.add("is-in"); });
   if ("IntersectionObserver" in window && revealEls.length) {
     var io = new IntersectionObserver(
       function (entries) {

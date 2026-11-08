@@ -1,6 +1,5 @@
-*.pptx
-.env
-.env*
-*.env
-.dev.vars
-secrets/
+.wrangler-persist/
+node_modules/
+dist/
+audits/
+*.log

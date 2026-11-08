@@ -10,9 +10,9 @@ import { audit } from "../audit";
 import { can } from "../rbac";
 import { saveToR2 } from "../media";
 import { icon } from "../icons";
-import { validateBlocks } from "../blocks";
+import { validateBlocks, normalizeBlocksInput } from "../blocks";
 
-type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "readonly" | "url" | "media_multi";
+type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "list" | "kvlist" | "readonly" | "url" | "media_multi";
 
 export type Field = {
   name: string;
@@ -81,13 +81,14 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "tagline", label: "Accroche", type: "textarea", form_span: true },
       { name: "category", label: "Secteur d'activité / catégorie", type: "text" },
       { name: "state", label: "État du produit", type: "select", options: PRODUCT_STATES },
-      { name: "image_key", label: "Image principale", type: "image" },
+      { name: "image_key", label: "Image principale (couverture, bannière)", type: "image" },
+      { name: "logo_key", label: "Logo du produit (affiché sur les cartes et l'accueil)", type: "image" },
       { name: "icon", label: "Icône (bibliothèque SVG)", type: "select", options: ICON_OPTIONS },
       { name: "description_md", label: "Présentation générale (markdown)", type: "markdown", form_span: true },
       { name: "problem_md", label: "Problème auquel le produit répond", type: "markdown", form_span: true },
       { name: "vision_md", label: "Vision et objectif", type: "markdown", form_span: true },
       { name: "origin_md", label: "Origine et contexte de création", type: "markdown", form_span: true },
-      { name: "features", label: "Fonctionnalités détaillées", type: "json", form_span: true, help: 'Liste : ["Fonctionnalité 1","Fonctionnalité 2"]' },
+      { name: "features", label: "Fonctionnalités détaillées", type: "list", form_span: true, help: "Une fonctionnalité par ligne — aucun JSON à écrire" },
       { name: "modules_md", label: "Modules et services intégrés", type: "markdown", form_span: true },
       { name: "architecture_md", label: "Architecture et technologies (si publication autorisée)", type: "markdown", form_span: true },
       { name: "ux_md", label: "Expérience utilisateur et interfaces", type: "markdown", form_span: true },
@@ -96,10 +97,10 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "differentiators_md", label: "Éléments différenciateurs", type: "markdown", form_span: true },
       { name: "use_cases_md", label: "Cas d'utilisation", type: "markdown", form_span: true },
       { name: "related_service_id", label: "Expertise mobilisée", type: "relation", relation: { table: "services", label: "name", value: "id" } },
-      { name: "links_json", label: "Liens officiels", type: "json", form_span: true, help: '[{"label":"Site du produit","url":"https://…"}]' },
-      { name: "versions_json", label: "Historique des versions publiables", type: "json", form_span: true, help: '[{"version":"1.0","date":"2025","note":"…"}]' },
+      { name: "links_json", label: "Liens officiels", type: "kvlist", form_span: true, help: "Un lien par ligne : Nom du lien | https://adresse — aucun JSON à écrire" },
+      { name: "versions_json", label: "Historique des versions publiables", type: "kvlist", form_span: true, help: "Une version par ligne : 1.0 | 2025 | Note des changements" },
       { name: "external_url", label: "URL de l'application / démo", type: "url" },
-      { name: "blocks", label: "Sections éditoriales supplémentaires (JSON blocs)", type: "json", form_span: true, help: "Optionnel — structure identique au Page Builder" },
+      { name: "blocks", label: "Sections éditoriales supplémentaires", type: "json", form_span: true, help: "Optionnel — laissez vide. Pour construire des sections, utilisez le Page Builder des pages : plus simple et visuel." },
       { name: "sort_order", label: "Ordre d'affichage", type: "number" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "published_at", label: "Date de publication", type: "datetime" },
@@ -123,9 +124,9 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "content_md", label: "Présentation commerciale complète (markdown)", type: "markdown", form_span: true },
       { name: "methodology_md", label: "Méthodologie d'intervention (markdown)", type: "markdown", form_span: true, help: "Étapes numérotées ou sous-titres — affichée en section « Comment nous procédons »" },
       { name: "process_md", label: "Déroulement d'un projet type (markdown)", type: "markdown", form_span: true },
-      { name: "includes_json", label: "Ce que le service inclut", type: "json", form_span: true, help: 'Liste : ["Audit et cadrage","Conception UX/UI","Développement","Formation"]' },
-      { name: "tech_json", label: "Technologies & outils maîtrisés", type: "json", form_span: true, help: 'Liste : ["React","Node.js","PostgreSQL","Cloudflare"]' },
-      { name: "industries_json", label: "Secteurs / industries adressés", type: "json", form_span: true, help: 'Liste : ["Banque & microfinance","Santé","Éducation","ONG & institutions"]' },
+      { name: "includes_json", label: "Ce que le service inclut", type: "list", form_span: true, help: "Un élément par ligne — aucun JSON à écrire" },
+      { name: "tech_json", label: "Technologies & outils maîtrisés", type: "list", form_span: true, help: "Une technologie par ligne" },
+      { name: "industries_json", label: "Secteurs / industries adressés", type: "list", form_span: true, help: "Un secteur par ligne" },
       { name: "benefits_md", label: "Bénéfices pour le client (markdown)", type: "markdown", form_span: true },
       { name: "deliverables_md", label: "Livrables types (markdown)", type: "markdown", form_span: true },
       { name: "_media", label: "Médias liés (galerie & vidéos du service)", type: "media_multi", form_span: true, help: "Médias du Media Center réutilisables sans duplication" },
@@ -186,7 +187,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "tech_stack", label: "Technologies utilisées (public)", type: "markdown", form_span: true },
       { name: "results_md", label: "Résultats vérifiés (jamais inventés)", type: "markdown", form_span: true },
       { name: "image_key", label: "Image principale", type: "image" },
-      { name: "gallery", label: "Galerie simple (clés R2)", type: "json", form_span: true, help: '["clé-image1","clé-image2"]' },
+      { name: "gallery", label: "Galerie simple (images)", type: "list", form_span: true, help: "Une image par ligne — téléversez puis copiez la clé, ou collez un chemin /assets/…" },
       { name: "completed_at", label: "Livré le", type: "date" },
       { name: "sort_order", label: "Ordre", type: "number" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
@@ -414,6 +415,17 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
         </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
     case "json":
       return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-json>${esc(typeof value === "string" ? v : JSON.stringify(value, null, 2))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
+    case "list": {
+      // Éditeur simple : un élément par ligne — converti en tableau JSON côté serveur
+      const lines = Array.isArray(value) ? (value as unknown[]).map(String) : parseJSON<string[]>(typeof value === "string" ? value : "[]", []);
+      return `<label class="adm-field${full}"><span>${esc(f.label)}${f.required ? " *" : ""}</span><textarea name="${f.name}" rows="6" data-list>${esc((lines || []).join("\n"))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
+    }
+    case "kvlist": {
+      // Éditeur clé-valeur : « Label | valeur1 | valeur2 » par ligne — converti en objets JSON côté serveur
+      const pairs = parseJSON<Record<string, string>[]>(typeof value === "string" ? value : "[]", []);
+      const lines2 = (pairs || []).map((o) => Object.values(o).join(" | "));
+      return `<label class="adm-field${full}"><span>${esc(f.label)}${f.required ? " *" : ""}</span><textarea name="${f.name}" rows="5" data-list>${esc(lines2.join("\n"))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
+    }
     case "date":
       return `<label class="adm-field"><span>${esc(f.label)}</span><input type="date" name="${f.name}" value="${esc(v.slice(0, 10))}"></label>`;
     case "datetime":
@@ -685,14 +697,33 @@ async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, fo
         data[f.name] = JSON.stringify(arr);
         break;
       }
+      case "list": {
+        // Une entrée par ligne — l'admin n'écrit jamais de JSON
+        const lines = s ? s.split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 40) : [];
+        data[f.name] = JSON.stringify(lines);
+        break;
+      }
+      case "kvlist": {
+        // « Label | v1 | v2 » par ligne → [{label,url}] (liens) ou [{version,date,note}] (versions)
+        const rows = s
+          ? s.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p.length >= 2 && p[0]).slice(0, 40)
+          : [];
+        const shaped = f.name === "versions_json"
+          ? rows.map((p) => ({ version: p[0], date: p[1] || "", note: p.slice(2).join(" | ") || "" }))
+          : rows.map((p) => ({ label: p[0], url: p[1] || "", ...(p.length > 2 ? { note: p.slice(2).join(" | ") } : {}) }));
+        data[f.name] = JSON.stringify(shaped);
+        break;
+      }
       case "json": {
         if (s === "") {
           data[f.name] = f.name === "features" || f.name === "gallery" || f.name === "links_json" || f.name === "versions_json" || f.name === "blocks" ? "[]" : "{}";
           break;
         }
         try {
-          const parsed = JSON.parse(s);
+          let parsed = JSON.parse(s);
           if (f.name === "blocks") {
+            // Tolérance : {"blocks":[…]} déballé, bloc unique enveloppé — l'admin n'est plus bloqué
+            parsed = normalizeBlocksInput(parsed);
             const v = validateBlocks(parsed);
             if (!v.ok) return { data, error: `Sections éditoriales : ${v.error}` };
             data[f.name] = JSON.stringify(v.blocks);
