@@ -102,7 +102,7 @@ INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, f
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/fadcard-logo3.png', 'fadcard-logo3.png', 'image/png', 0, NULL, NULL, 'Logo FAD CARD', '/', 'seed', datetime('now'));
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/qrfad.jpg', 'qrfad.jpg', 'image/jpeg', 0, NULL, NULL, 'QRFAD — menu digital par QR code', '/', 'seed', datetime('now'));
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/qrfad-logo.png', 'qrfad-logo.png', 'image/png', 0, NULL, NULL, 'Logo QRFAD', '/', 'seed', datetime('now'));
-INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/ferefad1.jpg', 'ferefad1.jpg', 'image/jpeg', 0, NULL, NULL, 'FEREFAD — marketplace de petites annonces', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/ferefad.jpg', 'ferefad.jpg', 'image/jpeg', 0, NULL, NULL, 'FEREFAD — marketplace de petites annonces', '/', 'seed', datetime('now'));
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/ferefad-logo.png', 'ferefad-logo.png', 'image/png', 0, NULL, NULL, 'Logo FEREFAD', '/', 'seed', datetime('now'));
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/amitiefad.jpg', 'amitiefad.jpg', 'image/jpeg', 0, NULL, NULL, 'L''Amitié Fad — assistant hôtelier digital', '/', 'seed', datetime('now'));
 INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/amitiefad-logo.png', 'amitiefad-logo.png', 'image/png', 0, NULL, NULL, 'Logo L''Amitié Fad', '/', 'seed', datetime('now'));
@@ -142,7 +142,7 @@ INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, st
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité FAD CARD', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 1, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/fadcard-logo3.png';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'QRFAD en établissement', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 2, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/qrfad.jpg';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité QRFAD', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 3, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/qrfad-logo.png';
-INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'FEREFAD — la marketplace', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 4, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/ferefad1.jpg';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'FEREFAD — la marketplace', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 4, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/ferefad.jpg';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité FEREFAD', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 5, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/ferefad-logo.png';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'L''''Amitié Fad en hôtel', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 6, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/amitiefad.jpg';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité L''''Amitié Fad', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 7, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/amitiefad-logo.png';
@@ -295,8 +295,8 @@ INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md
   '["Demandes de services par QR code depuis la chambre (ménage, taxi, restauration…)", "Interface simple pour le client : scan, choix, envoi", "Notification et suivi des demandes pour le personnel", "Tableau de bord de l''hôtellerie : volume de demandes, délais, historique", "Personnalisation des services proposés par l''établissement"]',
   '', '', '',
   'Des demandes traitées plus vite, moins d''erreurs de communication, une expérience client modernisée et un service valorisé.', 'Un assistant hôtelier conçu localement, déployable sans matériel lourd : un QR code par chambre et un smartphone pour le personnel.',
-  'Hospitalité', 'disponible', '/assets/images/portfolio/amitie-fad.jpg', 'package', 5, 'publie', datetime('now'),
-  'L''Amitié Fad — Produit technologique Green FAD', 'Votre assistant hôtelier digital — le confort connecté', '/assets/images/portfolio/amitie-fad.jpg',
+  'Hospitalité', 'disponible', '/assets/images/portfolio/amitiefad.jpg', 'package', 5, 'publie', datetime('now'),
+  'L''Amitié Fad — Produit technologique Green FAD', 'Votre assistant hôtelier digital — le confort connecté', '/assets/images/portfolio/amitiefad.jpg',
   '[]', '[]', '',
   (SELECT id FROM services WHERE slug = ''));
 INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
@@ -1994,3 +1994,57 @@ WHERE slug = 'accueil';
 
 -- 2) Version du contenu
 UPDATE settings SET value = '9' WHERE key = 'content_version';
+
+-- =====================================================================
+-- DELTA v10 — nettoyage : doublons d'images et médias morts
+-- =====================================================================
+-- 1) FEREFAD : une seule image (ferefad.jpg) — l'album référençait un
+--    doublon bit-à-bit nommé ferefad1.jpg ; on aligne la médiathèque.
+--    Cas A (rejeu) : le canonique existe déjà — ré-attacher les éléments
+--    d'album puis supprimer le doublon recréé par l'INSERT OR IGNORE.
+UPDATE media_items SET
+  media_id = (SELECT m2.id FROM media m2 WHERE m2.r2_key = '/assets/images/portfolio/ferefad.jpg')
+WHERE EXISTS (SELECT 1 FROM media m2 WHERE m2.r2_key = '/assets/images/portfolio/ferefad.jpg')
+  AND media_id IN (SELECT m1.id FROM media m1 WHERE m1.r2_key = '/assets/images/portfolio/ferefad1.jpg');
+DELETE FROM media
+WHERE r2_key = '/assets/images/portfolio/ferefad1.jpg'
+  AND EXISTS (SELECT 1 FROM media m2 WHERE m2.r2_key = '/assets/images/portfolio/ferefad.jpg');
+--    Cas B (première application) : le canonique n'existe pas — renommer.
+UPDATE media SET
+  r2_key = '/assets/images/portfolio/ferefad.jpg',
+  filename = 'ferefad.jpg'
+WHERE r2_key = '/assets/images/portfolio/ferefad1.jpg';
+
+-- 2) Amitié Fad : une seule image (amitiefad.jpg) — la fiche produit
+--    référençait un doublon bit-à-bit nommé amitie-fad.jpg.
+UPDATE products SET
+  image_key = '/assets/images/portfolio/amitiefad.jpg'
+WHERE image_key = '/assets/images/portfolio/amitie-fad.jpg';
+UPDATE products SET
+  og_image = '/assets/images/portfolio/amitiefad.jpg'
+WHERE og_image = '/assets/images/portfolio/amitie-fad.jpg';
+
+-- 3) Médias morts : entrées à 0 octet créées par les premiers seeds et
+--    pointant vers des fichiers inexistants (sauf print-communication,
+--    encore référencée), ainsi que les envois de test orphelins.
+DELETE FROM media WHERE r2_key IN (
+  '/assets/images/services/web-development.jpg',
+  '/assets/images/services/digital-solutions.jpg',
+  '/assets/images/services/innovations.jpg',
+  '/assets/images/services/communication.jpg',
+  '/assets/images/services/conseil.jpg',
+  'media/2026-11/1YN6TX3HW5EJ0ZMGVH0ABJE4CJ-img-2120.jpg',
+  'media/2026-11/3E6317T1XGHAXZK898D6VNGBBG-img-2120.jpg',
+  'media/2026-11/6ZHS0TN3VT6Q6DWVV9BMQZYYX2-img-2120.jpg',
+  'media/2026-11/7WP3K28D22654T21SAN184G0VE-img-2119.jpg',
+  'media/2026-11/K7JR2FN37D61NQG1WFWA43RX7Z-img-2119.jpg',
+  'media/2026-11/QZNVPQ5E4Y1N6H4HM6H2C25EXD-img-2119.jpg',
+  'media/2026-11/S3P8MVAZ9PK7V6T2N83XE6EW2W-img-2120.jpg',
+  'media/2026-11/TV26D3C87R3JK3EY10YGYSVKYS-img-2119.jpg',
+  'media/2026-11/XE329SDFZEPVYFT1QTHCKAYT9Z-b1b5b45d-93cb-407b-80d6-a1979059b6bd.png'
+);
+DELETE FROM media_items WHERE media_id NOT IN (SELECT id FROM media);
+DELETE FROM content_relations WHERE media_item_id NOT IN (SELECT id FROM media_items);
+
+-- 4) Version du contenu
+UPDATE settings SET value = '10' WHERE key = 'content_version';
