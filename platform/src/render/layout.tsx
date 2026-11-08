@@ -68,6 +68,9 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
   const logo = String(s.logo_key || "/assets/images/greenfad-logo.svg");
   const logoFooter = String(s.logo_footer_key || "/assets/images/greenfad-logo-white.svg");
   const socials = parseJSON<Record<string, string>>(JSON.stringify(s.socials || "{}"), {});
+  // Bouton CTA de l'entête : 100 % piloté par les paramètres (label + URL). Vide → masqué.
+  const headCtaLabel = String(s.header_cta_label || "");
+  const headCtaUrl = String(s.header_cta_url || "/contact");
   const url = new URL(c.req.url);
   const siteUrl = String(s.site_url || c.env.SITE_URL || "https://greenfad.tech");
   const canonical = `${siteUrl}${seo.canonicalPath || url.pathname}`;
@@ -132,7 +135,7 @@ ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=4">
+<link rel="stylesheet" href="/css/main.css?v=5">
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
@@ -142,7 +145,7 @@ ${jsonLdHTML}
       <img src="${esc(logo.startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(siteName)} — ${esc(tagline)}" class="brand__logo">
     </a>
     <nav class="nav" id="mainnav" aria-label="Navigation principale"><ul>${navHtml}</ul></nav>
-    <a class="btn btn--primary btn--sm site-head__cta" href="/contact">Nous contacter</a>
+    ${headCtaLabel ? `<a class="btn btn--primary btn--sm site-head__cta" href="${esc(headCtaUrl)}">${esc(headCtaLabel)}</a>` : ""}
     <button class="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainnav">${icon("menu")}</button>
   </div>
 </header>
@@ -178,7 +181,7 @@ ${body}
   </div>
   <div class="container site-foot__legal">
     <p>© ${new Date().getFullYear()} ${esc(siteName)} — Tous droits réservés.</p>
-    <p><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a></p>
+    <p><a href="/p/mentions-legales">Mentions légales</a> · <a href="/p/confidentialite">Confidentialité</a></p>
   </div>
 </footer>
 <script src="/js/site.js" defer></script>

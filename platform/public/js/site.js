@@ -38,6 +38,72 @@
     revealEls.forEach(function (el) { el.classList.add("is-in"); });
   }
 
+  // Cascade : décalage progressif des enfants des grilles [data-stagger]
+  document.querySelectorAll("[data-stagger]").forEach(function (grid) {
+    Array.prototype.forEach.call(grid.children, function (child, i) {
+      child.style.setProperty("--d", Math.min(i * 70, 560) + "ms");
+    });
+  });
+
+  // Chiffres clés : comptage animé (la valeur reste celle de la base — uniquement l'affichage s'anime)
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var statEls = document.querySelectorAll(".stats .stat strong");
+  if (statEls.length && !reduceMotion && "IntersectionObserver" in window) {
+    var statIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        statIo.unobserve(en.target);
+        var el = en.target;
+        var m = /^([\d\u00A0\s]+)(.*)$/.exec((el.textContent || "").trim());
+        if (!m) return;
+        var target = parseInt(m[1].replace(/[^\d]/g, ""), 10);
+        if (!target || target < 2 || target > 100000) return; // petites valeurs ou textes : pas d'animation
+        var suffix = m[2] || "";
+        var t0 = null;
+        var DUR = 900;
+        var step = function (ts) {
+          if (!t0) t0 = ts;
+          var k = Math.min((ts - t0) / DUR, 1);
+          k = 1 - Math.pow(1 - k, 3); // ease-out cubic
+          el.textContent = Math.round(target * k) + suffix;
+          if (k < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.4 });
+    statEls.forEach(function (el) { statIo.observe(el); });
+  }
+
+  // Héros : indicateur de scroll → avance vers la section suivante
+  var cue = document.querySelector(".hero__scroll");
+  if (cue) {
+    cue.addEventListener("click", function () {
+      var main = document.getElementById("main");
+      var hero = cue.closest(".hero");
+      var next = hero && hero.nextElementSibling;
+      while (next && next !== main && !next.offsetHeight) next = next.nextElementSibling;
+      if (next) next.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    });
+  }
+
+  // Bouton retour en haut
+  var top = document.createElement("button");
+  top.className = "to-top";
+  top.type = "button";
+  top.setAttribute("aria-label", "Revenir en haut de la page");
+  top.innerHTML = '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>';
+  document.body.appendChild(top);
+  var topShown = false;
+  var onScroll = function () {
+    var show = window.scrollY > 640;
+    if (show !== topShown) { topShown = show; top.classList.toggle("is-visible", show); }
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  top.addEventListener("click", function () {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
   // Lightbox galerie
   var galleries = document.querySelectorAll("[data-lightbox]");
   if (galleries.length) {

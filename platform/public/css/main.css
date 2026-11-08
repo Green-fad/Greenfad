@@ -551,3 +551,56 @@ section.flush{padding:0}
   .pager__num{padding:8px 12px}
   .filters__spacer{margin-left:0}
 }
+
+/* ============================================================
+   GREEN FAD — Améliorations v5 : accueil & pages (100 % données D1)
+   ============================================================ */
+
+/* ---------- Cascade (stagger) : conteneurs [data-stagger] ---------- */
+[data-stagger]>*{opacity:0;transform:translateY(16px);transition:opacity .55s cubic-bezier(.2,.6,.2,1) var(--d,0ms),transform .55s cubic-bezier(.2,.6,.2,1) var(--d,0ms)}
+[data-stagger].is-in>*{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){[data-stagger]>*{opacity:1;transform:none;transition:none}}
+
+/* ---------- Héros d'accueil : reflet animé + badges en cascade + indicateur de scroll ---------- */
+.hero::before{animation:heroSheen 9s ease-in-out infinite alternate}
+@keyframes heroSheen{from{mask-image:radial-gradient(ellipse 85% 75% at 32% 18%,#000 25%,transparent 74%)}to{mask-image:radial-gradient(ellipse 95% 85% at 48% 30%,#000 32%,transparent 80%)}}
+.hero__badges span{opacity:0;transform:translateY(8px);animation:badgeIn .55s cubic-bezier(.2,.6,.2,1) forwards;animation-delay:calc(.35s + var(--d,0ms))}
+@keyframes badgeIn{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.hero__badges span{opacity:1;transform:none;animation:none}}
+.hero__scroll{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:2;color:rgba(233,240,250,.55);background:none;border:0;cursor:pointer;padding:8px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+.hero__scroll:hover{color:var(--teal-400)}
+.hero__scroll .i{width:22px;height:22px;animation:scrollCue 2.1s ease-in-out infinite}
+@keyframes scrollCue{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+@media (prefers-reduced-motion:reduce){.hero__scroll .i{animation:none}}
+
+/* ---------- Statistiques : chiffres montants + séparateur doré plus fin ---------- */
+.stat strong{font-variant-numeric:tabular-nums}
+.stat strong .stat__suffix{font-size:.62em;font-weight:600;color:inherit;opacity:.85}
+
+/* ---------- Timeline : années en pastille, ligne plus expressive ---------- */
+.timeline__year{display:inline-block;background:var(--gold-soft);color:var(--gold-600);border:1px solid rgba(217,169,39,.35);border-radius:99px;padding:3px 12px;font-size:.8rem;margin-bottom:.45rem}
+.timeline li::before{box-shadow:0 0 0 4px rgba(70,146,155,.12);transition:.25s}
+.timeline li:hover::before{background:var(--teal-500);box-shadow:0 0 0 6px rgba(70,146,155,.18)}
+
+/* ---------- Bandeau CTA : halo animé discret ---------- */
+.cta-band::after{content:"";position:absolute;left:50%;top:-160px;width:640px;height:640px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(124,196,204,.14),transparent 62%);animation:ctaGlow 7s ease-in-out infinite alternate;pointer-events:none}
+@keyframes ctaGlow{from{opacity:.55;transform:translateX(-50%) scale(.94)}to{opacity:1;transform:translateX(-50%) scale(1.05)}}
+@media (prefers-reduced-motion:reduce){.cta-band::after{animation:none}}
+.cta-band .btn--invert .i{transition:transform .2s}
+.cta-band .btn--invert:hover .i{transform:translateX(4px)}
+
+/* ---------- Page-hero intérieur : anneau décoratif bas-droite (cohérence avec l'accueil) ---------- */
+.page-hero::after{content:"";position:absolute;right:-150px;bottom:-190px;width:430px;height:430px;border-radius:50%;border:1.5px solid rgba(124,196,204,.13);background:radial-gradient(circle at 32% 32%,rgba(124,196,204,.09),transparent 55%);pointer-events:none}
+
+/* ---------- Bouton retour en haut ---------- */
+.to-top{position:fixed;right:18px;bottom:18px;z-index:60;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--navy-850);box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(10px);transition:.28s}
+.to-top.is-visible{opacity:1;visibility:visible;transform:none}
+.to-top:hover{color:var(--teal-600);border-color:rgba(70,146,155,.4);box-shadow:var(--sh-teal)}
+.to-top .i{width:20px;height:20px}
+
+/* ---------- Partenaires : légère élévation ---------- */
+.partners{gap:16px}
+.partner:hover{transform:translateY(-2px)}
+
+/* ---------- Cartes : accent gold au survol du lien titre ---------- */
+.card__body h3 a{transition:color .18s}

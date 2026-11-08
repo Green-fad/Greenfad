@@ -13,34 +13,74 @@ import { audit } from "../audit";
 const PUBLIE = "publie";
 
 // ---------- Contenu éditable depuis l'admin (settings → « content_overrides » JSON) ----------
-// Rien d'essentiel n'est figé dans le code : les textes de héros et le parcours des
-// réalisations peuvent être remplacés depuis Admin → Paramètres, sans toucher au code.
-type HeroOverride = { title?: string; text?: string };
+// ZÉRO donnée codée en dur : tous les héros, bandeaux CTA, textes SEO et la frise
+// chronologique proviennent de la base (seed + Admin → Paramètres). Si une entrée
+// est absente de la base, la zone correspondante ne s'affiche simplement pas.
+type HeroOverride = { title?: string; html?: string; text?: string };
+type CtaOverride = { title?: string; text?: string; button_label?: string; button_url?: string };
+type SeoOverride = { title?: string; description?: string };
 type TimelineEntry = { year: string; title: string; text: string };
-type ContentOverrides = { heroes?: Record<string, HeroOverride>; timeline?: TimelineEntry[] };
-
-const DEFAULT_TIMELINE: TimelineEntry[] = [
-  { year: "2021", title: "Les fondations", text: "Lancement de QRFAD (mars) et FAD CARD (mai) à Bamako : le menu par QR code et la carte de visite numérique NFC." },
-  { year: "2022", title: "Des produits qui s'élargissent", text: "QRFAD passe au multi-établissements ; FadCard ouvre Market, sa vitrine marchande." },
-  { year: "2023", title: "Transactions & commandes", text: "Commandes depuis le menu puis WhatsApp sur QRFAD ; Tickets puis Fund sur FadCard." },
-  { year: "2024", title: "Plateformes complètes", text: "Hôtellerie et caisse POS côté QRFAD ; Vote et FadCard Pay clôturent la suite FadCard. PayGfad, la suite de gestion SaaS, est mise en ligne." },
-  { year: "2025", title: "Maturité", text: "153 designs et cartes NFC pour FadCard ; caisse consolidée et thèmes pour QRFAD." },
-  { year: "2026", title: "Tile, CloudAf & PayGfad", text: "Le réseau social du progrès, la plateforme no-code + IA et la suite de gestion SaaS rejoignent l'écosystème — cinq plateformes en ligne." },
-];
+type ContentOverrides = {
+  heroes?: Record<string, HeroOverride>;
+  ctas?: Record<string, CtaOverride>;
+  seo?: Record<string, SeoOverride>;
+  timeline?: TimelineEntry[];
+  product_demo_intro?: string;
+};
 
 function overridesOf(site: { settings: Record<string, unknown> }): ContentOverrides {
-  return parseJSON<ContentOverrides>(String(site.settings.content_overrides || ""), {});
+  const raw = site.settings.content_overrides;
+  // Deux formes selon la source : objet déjà parsé par loadSettings (seed SQL)
+  // ou chaîne JSON (enregistrement via l'admin → setSetting). Les deux sont valides.
+  if (raw && typeof raw === "object") return raw as ContentOverrides;
+  return parseJSON<ContentOverrides>(String(raw || ""), {});
 }
 
-function heroOf(site: { settings: Record<string, unknown> }, path: string, defTitle: string, defText: string): { title: string; text: string; raw: boolean } {
+/** Héros de page : uniquement la base. Rien en base → chaînes vides (la page reste fonctionnelle). */
+function heroOf(site: { settings: Record<string, unknown> }, path: string, fallbackTitle = ""): { title: string; html: string; text: string } {
   const h = overridesOf(site).heroes?.[path];
-  if (h && (h.title || h.text)) return { title: h.title || defTitle, text: h.text || defText, raw: false };
-  return { title: defTitle, text: defText, raw: true };
+  return { title: h?.title || fallbackTitle, html: h?.html || "", text: h?.text || "" };
+}
+
+/** Titre de héros : HTML éditorial (base) sinon texte échappé. */
+function heroTitleHTML(hero: { title: string; html: string }): string {
+  return hero.html || esc(hero.title);
+}
+
+/** Bandeau CTA de bas de page : uniquement la base → absent, pas de bandeau. */
+function ctaOf(site: { settings: Record<string, unknown> }, key: string): CtaOverride | null {
+  const ct = overridesOf(site).ctas?.[key];
+  return ct && (ct.title || ct.button_label) ? ct : null;
+}
+
+function ctaBandHTML(ct: CtaOverride): string {
+  return `<section class="cta-band"><div class="container cta-band__inner reveal"><h2>${esc(ct.title || "")}</h2>${ct.text ? `<p>${esc(ct.text)}</p>` : ""}${ct.button_label ? `<a class="btn btn--invert" href="${esc(ct.button_url || "/contact")}">${esc(ct.button_label)} ${icon("arrow-right")}</a>` : ""}</div></section>`;
+}
+
+/** SEO par page : base (content_overrides.seo) → repli : titre sobre + description par défaut du site. */
+async function seoOf(c: Context<{ Bindings: Env }>, site: { settings: Record<string, unknown> }, path: string, fallbackTitle: string): Promise<{ title: string; description?: string }> {
+  const o = overridesOf(site).seo?.[path];
+  const defaults = (await getSetting(c.env.DB, "seo_defaults", {})) as { default_description?: string };
+  return {
+    title: o?.title || fallbackTitle,
+    description: o?.description || defaults.default_description || undefined,
+  };
 }
 
 function timelineOf(site: { settings: Record<string, unknown> }): TimelineEntry[] {
   const t = overridesOf(site).timeline;
-  return Array.isArray(t) && t.length ? t : DEFAULT_TIMELINE;
+  return Array.isArray(t) ? t : [];
+}
+
+/** Nom d'organisation pour les données structurées JSON-LD : setting site_name. */
+function orgName(site: { settings: Record<string, unknown> }): string {
+  return String(site.settings.site_name || "GREEN FAD") + " SARL";
+}
+
+/** Zone géographique de service (JSON-LD Service) : setting service_area — absent → omis. */
+function serviceAreaOf(site: { settings: Record<string, unknown> }): string | undefined {
+  const v = String(site.settings.service_area || "").trim();
+  return v || undefined;
 }
 
 // ---------- Helpers ----------
@@ -172,16 +212,18 @@ publicRoutes.get("/__preview/:id", async (c) => {
 publicRoutes.get("/expertises", async (c) => {
   const rows = await q(c.env.DB, "SELECT slug, name, summary, image_key, icon FROM services WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
-  const hero = heroOf(site, "/expertises", "L'ingénierie numérique de bout en bout", "Conception, développement, déploiement et accompagnement : nos équipes couvrent l'ensemble de la chaîne de valeur technologique.");
+  const hero = heroOf(site, "/expertises", "Expertises");
+  const ct = ctaOf(site, "/expertises");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Expertises" }])}<p class="eyebrow">Expertises</p>
-    <h1>${esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
-  <section class="container"><div class="cards cards--3 reveal">${rows
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
+  <section class="container"><div class="cards cards--3 reveal" data-stagger>${rows
     .map((s) => `<article class="card"><a class="card__media" href="/expertises/${esc(s.slug)}"><img src="${esc(mediaSrc(s.image_key as string))}" alt="${esc(String(s.name))}" loading="lazy"></a>
       <div class="card__body"><h3><a href="/expertises/${esc(s.slug)}">${esc(String(s.name))}</a></h3><p>${esc(String(s.summary || ""))}</p><span class="card__more">En savoir plus ${icon("arrow-right")}</span></div></article>`)
     .join("")}</div></section>
-  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Un besoin précis ?</h2><p>Décrivez votre projet — nous vous répondons avec une proposition concrète.</p><a class="btn btn--invert" href="/devis">Demander un devis ${icon("arrow-right")}</a></div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Expertises & services technologiques", description: "Développement web, applications mobiles, SEO, communication et conseil : les expertises GREEN FAD.", canonicalPath: "/expertises" }), body));
+  ${ct ? ctaBandHTML(ct) : ""}`;
+  const seo = await seoOf(c, site, "/expertises", "Expertises & services technologiques");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/expertises" }), body));
 });
 
 publicRoutes.get("/expertises/:slug", async (c) => {
@@ -265,8 +307,8 @@ publicRoutes.get("/expertises/:slug", async (c) => {
     name: String(s.name),
     description: String(s.summary || excerptFromMd(s.content_md, 160)),
     serviceType: String(s.name),
-    provider: { "@type": "Organization", name: "GREEN FAD SARL", url: String(site.settings.site_url || "") },
-    areaServed: "Afrique & international",
+    provider: { "@type": "Organization", name: orgName(site), url: String(site.settings.site_url || "") },
+    areaServed: serviceAreaOf(site),
     image: s.image_key ? String(site.settings.site_url || "") + mediaSrc(String(s.image_key)) : undefined,
   }];
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(s.meta_title || `${s.name} — Expertise GREEN FAD`), description: String(s.meta_description || s.summary || "") || undefined, ogImage: String(s.og_image || mediaSrc(String(s.image_key)) || "") || undefined, canonicalPath: `/expertises/${String(s.slug)}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Expertises", url: "/expertises" }, { label: String(s.name) }] }), body));
@@ -277,11 +319,11 @@ publicRoutes.get("/produits", async (c) => {
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, name, tagline, image_key, category, state FROM products WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
   const stateLabels: Record<string, string> = { developpement: "En développement", beta: "Bêta", disponible: "Disponible", evolution: "En évolution", archive: "Archivé" };
-  const hero = heroOf(site, "/produits", "Des produits numériques conçus et portés par Green FAD", "Solutions propriétaires développées par nos équipes, pensées pour les marchés africains et ouverts à l'international.");
+  const hero = heroOf(site, "/produits", "Produits");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits" }])}<p class="eyebrow">Produits technologiques</p>
-    <h1>${hero.raw ? `Des produits numériques <em style="color:var(--teal-400);font-style:normal">conçus et portés</em> par Green FAD` : esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
-  <section class="container"><div class="cards cards--3 reveal">${rows
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
+  <section class="container"><div class="cards cards--3 reveal" data-stagger>${rows
     .map((p) => `<article class="card">
       ${p.image_key ? `<a class="card__media" href="/produits/${esc(String(p.slug))}"><img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}" loading="lazy"></a>` : `<a class="card__media card__media--empty" href="/produits/${esc(String(p.slug))}" aria-hidden="true" tabindex="-1">${icon("package")}</a>`}
       <div class="card__body">
@@ -291,7 +333,8 @@ publicRoutes.get("/produits", async (c) => {
         <span class="card__more">Voir la fiche produit ${icon("arrow-right")}</span></div></article>`)
     .join("")}</div></section>
   ${rows.length ? "" : `<section class="container center muted">Les fiches produits seront publiées prochainement.</section>`}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Produits technologiques GREEN FAD", description: "FAD CARD, QRFAD, FereFad : découvrez les produits technologiques développés par Green FAD.", canonicalPath: "/produits" }), body));
+  const seo = await seoOf(c, site, "/produits", "Produits technologiques");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/produits" }), body));
 });
 
 publicRoutes.get("/produits/:slug", async (c) => {
@@ -315,6 +358,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const specCard = (title: string, iconName: string, content: unknown) =>
     content ? `<div class="spec-card"><h3>${icon(iconName)} ${esc(title)}</h3><div class="prose" style="font-size:.95rem">${md(content)}</div></div>` : "";
 
+  const demoIntro = overridesOf(site).product_demo_intro || "";
   const body = `<section class="page-hero" style="padding-bottom:0"><div class="page-hero__inner">
     ${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }])}
     <p class="eyebrow">Produit technologique</p>
@@ -334,7 +378,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
           <a class="btn btn--outline" href="/contact">${icon("mail", "i--inline")} Partenariat & contact</a>
         </div>
       </div>
-      <div class="pdp__media">${p.image_key ? `<img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}">` : `<img src="/assets/images/hero-image-modern.jpg" alt="">`}</div>
+      <div class="pdp__media">${p.image_key ? `<img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}">` : ""}</div>
     </div>
   </section>
   ${(p.problem_md || p.vision_md || p.origin_md) ? `<section class="container"><div class="spec-grid reveal">
@@ -371,7 +415,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
     <div class="cards cards--${Math.min(relatedPosts.length, 3)} reveal">${relatedPosts.map((r) => `<article class="card"><div class="card__body"><span class="kind-badge">${icon((KIND_LABELS[String(r.kind)] || KIND_LABELS.article).icon)} ${(KIND_LABELS[String(r.kind)] || KIND_LABELS.article).label}</span><h3><a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
   <section class="container" id="demo"><div class="form-card reveal">
     <h2>Demander une démonstration de ${esc(String(p.name))}</h2>
-    <p class="muted">Présentation guidée par nos équipes, en présentiel à Bamako ou en visioconférence.</p>
+    ${demoIntro ? `<p class="muted">${esc(demoIntro)}</p>` : ""}
     <form method="post" action="/contact" class="form-grid">
       <input type="text" name="website" class="hp" tabindex="-1" aria-hidden="true">
       <input type="hidden" name="subject" value="Démonstration produit : ${esc(String(p.name))}">
@@ -388,11 +432,11 @@ publicRoutes.get("/produits/:slug", async (c) => {
     "@type": "Product",
     name: String(p.name),
     description: String(p.tagline || excerptFromMd(p.description_md, 200)),
-    brand: { "@type": "Brand", name: "GREEN FAD" },
-    manufacturer: { "@type": "Organization", name: "GREEN FAD SARL", url: String(site.settings.site_url || "") },
+    brand: { "@type": "Brand", name: String(site.settings.site_name || "GREEN FAD") },
+    manufacturer: { "@type": "Organization", name: orgName(site), url: String(site.settings.site_url || "") },
     image: p.image_key ? String(site.settings.site_url || "") + mediaSrc(String(p.image_key)) : undefined,
     category: p.category ? String(p.category) : undefined,
-    ...(p.external_url ? { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: "GREEN FAD SARL" } } } : {}),
+    ...(p.external_url ? { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: orgName(site) } } } : {}),
   }];
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || `${p.name} — Produit technologique`), description: String(p.meta_description || p.tagline || excerptFromMd(p.description_md, 160)), ogImage: String(p.og_image || mediaSrc(String(p.image_key))), canonicalPath: `/produits/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }] }), body));
 });
@@ -405,20 +449,22 @@ publicRoutes.get("/realisations", async (c) => {
   const others = rows.filter((r) => !String(r.category || "").includes("Produit propriétaire"));
   const projectCard = (r: Record<string, unknown>) => `<article class="card"><a class="card__media" href="/realisations/${esc(String(r.slug))}">${r.image_key ? `<img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy">` : ""}</a>
       <div class="card__body">${r.category ? `<span class="tag">${esc(String(r.category))}</span>` : ""}<h3><a href="/realisations/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><p>${esc(String(r.summary || ""))}</p><span class="card__more">Lire l'étude de cas ${icon("arrow-right")}</span></div></article>`;
-  const hero = heroOf(site, "/realisations", "Des produits qui vivent, des parcours documentés", "Nos études de cas racontent la vraie vie de nos plateformes : lancement, évolutions trimestrielles, usage sur le terrain. Cinq ans de produit, sans artifice.");
+  const hero = heroOf(site, "/realisations", "Réalisations");
+  const ct = ctaOf(site, "/realisations");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Réalisations" }])}<p class="eyebrow">Projets & réalisations</p>
-    <h1>${esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${prop.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Produits propriétaires</p><h2>Le parcours de nos plateformes</h2></header>
     <div class="cards cards--${Math.min(prop.length, 3)} reveal">${prop.map(projectCard).join("")}</div></section>` : ""}
   <section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Depuis 2021</p><h2>Le chemin parcouru</h2></header>
-    <ol class="timeline reveal">${timelineOf(site).map((t) => `<li><span class="timeline__year">${esc(t.year)}</span><div><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p></div></li>`).join("")}
+    <ol class="timeline reveal" data-stagger>${timelineOf(site).map((t) => `<li><span class="timeline__year">${esc(t.year)}</span><div><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p></div></li>`).join("")}
     </ol>
     <p class="center" style="margin-top:2rem"><a class="btn btn--outline" href="/blog">${icon("newspaper", "i--inline")} Lire le parcours complet dans le blog</a></p></section>
   ${others.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Projets & prestations</p><h2>Études de cas clients</h2></header>
-    <div class="cards cards--3 reveal">${others.map(projectCard).join("")}</div></section>` : ""}
-  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Et le prochain chapitre ?</h2><p>Nos plateformes avancent chaque trimestre — suivez le blog, ou construisez le vôtre avec nous.</p><a class="btn btn--invert" href="/blog">Suivre le parcours ${icon("arrow-right")}</a></div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Réalisations & études de cas — le parcours de nos plateformes", description: "Études de cas et parcours produits Green FAD : QRFAD, FadCard, Tile, CloudAf, PayGfad — lancement, évolutions trimestrielles et déploiements réels depuis 2021.", canonicalPath: "/realisations" }), body));
+    <div class="cards cards--3 reveal" data-stagger>${others.map(projectCard).join("")}</div></section>` : ""}
+  ${ct ? ctaBandHTML(ct) : ""}`;
+  const seo = await seoOf(c, site, "/realisations", "Réalisations & études de cas");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/realisations" }), body));
 });
 
 publicRoutes.get("/realisations/:slug", async (c) => {
@@ -456,10 +502,10 @@ publicRoutes.get("/galerie", async (c) => {
   ]);
   const site = await loadSiteData(c);
   const catLabels: Record<string, string> = { general: "Galerie générale", produits: "Produits", projets: "Projets & réalisations", evenements: "Événements", institution: "Institutionnel & équipes", bureaux: "Bureaux & implantations", demonstrations: "Démonstrations" };
-  const hero = heroOf(site, "/galerie", "La galerie multimédia de Green FAD", "Photographies et vidéos officielles : nos produits, nos équipes, nos événements et nos implantations.");
+  const hero = heroOf(site, "/galerie", "Galerie");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Galerie" }])}<p class="eyebrow">Media Center</p>
-    <h1>${esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${albums.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Albums photo</p><h2>Explorez par thématique</h2></header>
     <div class="album-grid reveal">${albums.map((a) => `<a class="album" href="/galerie/album/${esc(String(a.slug))}">
       ${a.cover_key ? `<img src="${esc(mediaSrc(String(a.cover_key)))}" alt="${esc(String(a.name))}" loading="lazy">` : ""}
@@ -469,7 +515,8 @@ publicRoutes.get("/galerie", async (c) => {
       <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : ""}<span class="video-card__play"><span>${icon("play")}</span></span></span>
       <span class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}</p>` : ""}</span></a>`; }).join("")}</div></section>` : ""}
   ${!albums.length && !videos.length ? `<section class="container center"><div class="form-card" style="max-width:560px">${icon("image-off")}<h2 style="margin-top:1rem">Galerie en préparation</h2><p class="muted">Aucun média publié pour le moment. Les premiers albums arrivent bientôt.</p></div></section>` : ""}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Galerie multimédia", description: "Photos et vidéos officielles de Green FAD : produits, projets, événements et implantations.", canonicalPath: "/galerie" }), body));
+  const seo = await seoOf(c, site, "/galerie", "Galerie multimédia");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/galerie" }), body));
 });
 
 publicRoutes.get("/galerie/album/:slug", async (c) => {
@@ -582,10 +629,10 @@ publicRoutes.get("/blog", async (c) => {
     <p>${esc(String(p.excerpt || excerptFromMd(p.content_md, 130)))}</p>
     <div class="post-meta"><span>${icon("calendar")} ${fmtDate(p.published_at, "short")}</span><span>${icon("clock")} ${readingTime(String(p.content_md))} min</span></div></div></article>`;
 
-  const hero = heroOf(site, "/blog", "Le média technologique de nos ingénieurs", "Actualités de l'entreprise, lancements produits, analyses, R&D, guides d'ingénierie et regards sur l'innovation africaine — écrits par les équipes qui construisent.");
+  const hero = heroOf(site, "/blog", "Blog");
   const body = `<section class="page-hero blog-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog" }])}<p class="eyebrow">Blog GREEN FAD</p>
-    <h1>${hero.raw ? `Le média technologique <em style="color:var(--teal-400);font-style:normal">de nos ingénieurs</em>` : esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p>
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}
     <form class="blog-search" action="/blog" method="get" role="search">
       ${kind ? `<input type="hidden" name="type" value="${esc(kind)}">` : ""}
       <input type="search" name="q" value="${esc(search)}" placeholder="Rechercher un article, un thème…" aria-label="Rechercher dans le blog" maxlength="80">
@@ -613,7 +660,8 @@ publicRoutes.get("/blog", async (c) => {
   ${popular.length && current === 1 && !search ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Les plus lus</p><h2>Articles populaires</h2></header>
     <div class="popular-list reveal">${popular.map((p, i) => `<a class="popular" href="/blog/${esc(String(p.slug))}"><span class="popular__rank">${i + 1}</span><span class="popular__body"><strong>${esc(String(p.title))}</strong><em>${fmtDate(p.published_at, "short")} · ${Number(p.views)} vue${Number(p.views) > 1 ? "s" : ""}</em></span>${icon("arrow-right", "popular__arrow")}</a>`).join("")}</div></section>` : ""}
   ${years.length ? `<section class="cta-band"><div class="container cta-band__inner reveal"><h2>Explorer par année</h2><p>Retrouvez tous nos articles dans les archives.</p><a class="btn btn--invert" href="/blog/archives">Archives ${years[0]} — ${years[years.length - 1]} ${icon("arrow-right")}</a></div></section>` : ""}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Blog — Actualités, ingénierie et innovation", description: "Le blog de Green FAD : actualités, lancements produits, analyses technologiques, R&D, guides d'ingénierie et innovation africaine, par nos équipes.", canonicalPath: "/blog" }), body));
+  const seo = await seoOf(c, site, "/blog", "Blog — Actualités, ingénierie et innovation");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/blog" }), body));
 });
 
 publicRoutes.get("/blog/archives", async (c) => {
@@ -628,14 +676,15 @@ publicRoutes.get("/blog/archives", async (c) => {
     groups.get(key)!.push(r);
   }
   const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
-  const hero = heroOf(site, "/blog/archives", "Tous nos articles, par mois", "");
+  const hero = heroOf(site, "/blog/archives", "Archives");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: "Archives" }])}<p class="eyebrow">Blog — archives</p>
     <h1>${esc(hero.title)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   <section class="container">${[...groups.entries()].map(([key, items]) => `<div class="archive-group reveal">
     <h2>${MONTHS[Number(key.slice(5, 7)) - 1] || key} ${key.slice(0, 4)} <span class="muted">(${items.length})</span></h2>
     <ul class="archive-list">${items.map((r) => `<li><span class="archive-list__date">${fmtDate(r.published_at, "short")}</span>${kindBadge(String(r.kind))}<a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></li>`).join("")}</ul></div>`).join("")}
   ${!rows.length ? `<p class="center muted">Aucun article publié pour le moment.</p>` : ""}</section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Archives du blog", description: "Tous les articles du blog GREEN FAD classés par mois.", canonicalPath: "/blog/archives", noindex: true }), body));
+  const seo = await seoOf(c, site, "/blog/archives", "Archives du blog");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/blog/archives", noindex: true }), body));
 });
 
 publicRoutes.get("/blog/:slug", async (c) => {
@@ -652,6 +701,7 @@ publicRoutes.get("/blog/:slug", async (c) => {
 
   const articleUrl = `${String(site.settings.site_url || c.env.SITE_URL || "https://greenfad.tech")}/blog/${p.slug}`;
   const tags = parseJSON<string[]>(p.tags, []);
+  const ctArticle = ctaOf(site, "article");
   const body = `<section class="page-hero article-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: String(p.title) }])}
     ${kindBadge(String(p.kind))}
     <h1>${esc(String(p.title))}</h1>
@@ -668,7 +718,7 @@ publicRoutes.get("/blog/:slug", async (c) => {
   </div></section>
   ${relatedFallback.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">À lire ensuite</p><h2>Articles liés</h2></header>
     <div class="cards cards--3 reveal">${relatedFallback.map((o) => `<article class="card">${o.cover_key ? `<a class="card__media" href="/blog/${esc(String(o.slug))}"><img src="${esc(mediaSrc(String(o.cover_key)))}" alt="" loading="lazy"></a>` : ""}<div class="card__body">${kindBadge(String(o.kind))}<h3><a href="/blog/${esc(String(o.slug))}">${esc(String(o.title))}</a></h3><p>${esc(String(o.excerpt || ""))}</p><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
-  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Un projet technologique en tête ?</h2><p>Nos équipes conçoivent des produits et des plateformes pour les organisations africaines et internationales.</p><a class="btn btn--invert" href="/contact">Discutons-en ${icon("arrow-right")}</a></div></section>`;
+  ${ctArticle ? ctaBandHTML(ctArticle) : ""}`;
   const jsonLd = [{
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -677,8 +727,8 @@ publicRoutes.get("/blog/:slug", async (c) => {
     datePublished: String(p.published_at || ""),
     dateModified: String(p.updated_at || p.published_at || ""),
     wordCount: String(p.content_md || "").split(/\s+/).filter(Boolean).length,
-    author: { "@type": "Organization", name: String(p.author || "GREEN FAD") },
-    publisher: { "@type": "Organization", name: "GREEN FAD", logo: { "@type": "ImageObject", url: String(site.settings.site_url || "") + "/assets/images/greenfad-logo.svg" } },
+    author: { "@type": "Organization", name: String(p.author || site.settings.site_name || "GREEN FAD") },
+    publisher: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), logo: { "@type": "ImageObject", url: String(site.settings.site_url || "") + "/assets/images/greenfad-logo.svg" } },
     image: p.cover_key ? String(site.settings.site_url || "") + mediaSrc(String(p.cover_key)) : undefined,
     mainEntityOfPage: articleUrl,
     inLanguage: "fr",
@@ -698,10 +748,10 @@ publicRoutes.get("/services/:slug", (c) => c.redirect(`/expertises/${c.req.param
 publicRoutes.get("/implantation", async (c) => {
   const countries = await q(c.env.DB, "SELECT c.slug, c.name, c.iso2, c.is_registered, c.presentation_md, COUNT(o.id) AS offices FROM countries c LEFT JOIN offices o ON o.country_id = c.id AND o.status='publie' WHERE c.status='publie' GROUP BY c.id ORDER BY c.sort_order");
   const site = await loadSiteData(c);
-  const hero = heroOf(site, "/implantation", "Enracinés en Afrique, tournés vers le monde", "Green FAD opère depuis le Mali et accompagne des organisations dans plusieurs pays africains, avec une ambition internationale assumée.");
+  const hero = heroOf(site, "/implantation", "Implantation");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Implantation" }])}<p class="eyebrow">Présence internationale</p>
-    <h1>${esc(hero.title)}</h1>
-    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   <section class="container"><div class="countries reveal">${countries
     .map((co) => `<a class="country" href="/implantation/${esc(String(co.slug))}">
       <span class="country__code${Number(co.is_registered) ? "" : " country__code--teal"}">${esc(String(co.iso2 || "AF"))}</span>
@@ -709,7 +759,8 @@ publicRoutes.get("/implantation", async (c) => {
       <p>${co.offices ? `${co.offices} bureau${Number(co.offices) > 1 ? "x" : ""} · ` : ""}${esc(String(co.presentation_md || "").replace(/[#*>`]/g, "").slice(0, 110))}</p>
       <span class="country__arrow">${icon("arrow-right")}</span></a>`)
     .join("")}</div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Implantation & présence internationale", description: "Les pays d'intervention et bureaux de Green FAD en Afrique.", canonicalPath: "/implantation" }), body));
+  const seo = await seoOf(c, site, "/implantation", "Implantation & présence internationale");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/implantation" }), body));
 });
 
 publicRoutes.get("/implantation/:slug", async (c) => {
@@ -739,12 +790,14 @@ publicRoutes.get("/implantation/:slug", async (c) => {
 publicRoutes.get("/ressources", async (c) => {
   const docs = await q(c.env.DB, "SELECT id, title, description, category, file_key, mime, size FROM documents WHERE status = 'publie' AND is_public = 1 ORDER BY id DESC LIMIT 40");
   const site = await loadSiteData(c);
+  const hero = heroOf(site, "/ressources", "Ressources");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Ressources" }])}<p class="eyebrow">Ressources</p>
-    <h1>Documents et supports publics</h1><p class="page-hero__text">Documentation institutionnelle et technique mise à disposition par Green FAD.</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${docs.length ? `<section class="container"><div class="doc-list reveal">${docs
     .map((d) => { const isPdf = /pdf$/.test(String(d.mime || "")); return `<a class="doc" href="/media/${esc(String(d.file_key))}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}</span><span class="doc__arrow">${icon("download")}</span></a>`; })
     .join("")}</div></section>` : `<section class="container center"><p class="muted">Les premiers documents seront publiés prochainement.</p></section>`}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Ressources & documentation", description: "Documents publics et supports de Green FAD.", canonicalPath: "/ressources" }), body));
+  const seo = await seoOf(c, site, "/ressources", "Ressources & documentation");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources" }), body));
 });
 
 // ---------- Presse ----------
@@ -762,8 +815,9 @@ publicRoutes.get("/presse/:slug", async (c) => {
 publicRoutes.get("/carrieres", async (c) => {
   const jobs = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, department, location, contract_type, deadline FROM jobs WHERE status = ? AND is_open = 1 ORDER BY id DESC", PUBLIE);
   const site = await loadSiteData(c);
+  const hero = heroOf(site, "/carrieres", "Carrières");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Carrières" }])}<p class="eyebrow">Carrières</p>
-    <h1>Construisez le futur technologique avec nous</h1><p class="page-hero__text">Rejoignez une équipe qui conçoit des produits numériques africains à ambition internationale.</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${jobs.length ? `<section class="container"><div class="cards cards--2 reveal">${jobs
     .map((j) => `<article class="card"><div class="card__body">
       <div class="card__foot">${j.department ? `<span class="tag">${esc(String(j.department))}</span>` : ""}${j.contract_type ? `<span class="tag tag--navy">${esc(String(j.contract_type))}</span>` : ""}</div>
@@ -771,7 +825,8 @@ publicRoutes.get("/carrieres", async (c) => {
       <div class="post-meta">${j.location ? `<span>${icon("map-pin")} ${esc(String(j.location))}</span>` : ""}${j.deadline ? `<span>${icon("clock")} Jusqu'au ${fmtDate(j.deadline, "short")}</span>` : ""}</div>
       <span class="card__more">Voir l'offre ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>`
     : `<section class="container center"><div class="form-card" style="max-width:600px"><h2>Aucun poste ouvert actuellement</h2><p class="muted">Les prochaines opportunités seront publiées ici. Vous pouvez aussi nous envoyer une candidature spontanée via le formulaire de contact.</p><a class="btn btn--primary" href="/contact">Candidature spontanée ${icon("arrow-right")}</a></div></section>`}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Carrières chez Green FAD", description: "Offres d'emploi et opportunités technologiques chez Green FAD.", canonicalPath: "/carrieres" }), body));
+  const seo = await seoOf(c, site, "/carrieres", "Carrières");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/carrieres" }), body));
 });
 
 publicRoutes.get("/carrieres/:slug", async (c) => {
@@ -804,6 +859,7 @@ publicRoutes.get("/faq", async (c) => {
   const cats = await q(c.env.DB, "SELECT DISTINCT category FROM faqs WHERE status = 'publie' AND category IS NOT NULL");
   const rows = await q(c.env.DB, "SELECT question, answer, category FROM faqs WHERE status = 'publie' ORDER BY category, sort_order");
   const site = await loadSiteData(c);
+  const hero = heroOf(site, "/faq", "FAQ");
   const grouped = new Map<string, { question: string; answer: string }[]>();
   for (const r of rows) {
     const key = String(r.category || "Général");
@@ -811,13 +867,14 @@ publicRoutes.get("/faq", async (c) => {
     grouped.get(key)!.push({ question: String(r.question), answer: String(r.answer) });
   }
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "FAQ" }])}<p class="eyebrow">Questions fréquentes</p>
-    <h1>Vos questions, nos réponses</h1></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   <section class="container">${[...grouped.entries()].map(([cat, items]) => `
     <header class="sec-head sec-head--left reveal"><p class="eyebrow">${esc(cat)}</p></header>
     <div class="faq reveal" style="margin-bottom:2rem">${items.map((f) => `<details><summary>${esc(f.question)}</summary><div class="prose">${md(f.answer)}</div></details>`).join("")}</div>`).join("")}
     ${!rows.length ? `<p class="center muted">Aucune question publiée pour le moment.</p>` : ""}</section>`;
   const jsonLd = [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: rows.map((r) => ({ "@type": "Question", name: String(r.question), acceptedAnswer: { "@type": "Answer", text: String(r.answer).replace(/[#*>`]/g, "") } })) }];
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "FAQ", description: "Questions fréquentes sur Green FAD et ses services.", canonicalPath: "/faq", jsonLd }), body));
+  const seo = await seoOf(c, site, "/faq", "FAQ");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/faq", jsonLd }), body));
 });
 
 // ---------- Contact / Devis (POST → base de données) ----------
@@ -849,8 +906,9 @@ publicRoutes.get("/contact", async (c) => {
   const site = await loadSiteData(c);
   const s = site.settings;
   const sent = c.req.query("sent") === "1";
+  const hero = heroOf(site, "/contact", "Contact");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Contact" }])}<p class="eyebrow">Contact</p>
-    <h1>Parlons de votre projet</h1><p class="page-hero__text">Démonstrations, devis, partenariats ou presse : nos équipes vous répondent dans les meilleurs délais.</p></div></section>
+    <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${sent ? `<section class="container"><div class="form-card" id="merci"><div class="form-ok">${icon("check-circle")}<span><strong>Message bien reçu.</strong> Notre équipe revient vers vous très vite.</span></div><a class="btn btn--outline" href="/">Retour à l'accueil</a></div></section>` : ""}
   <section class="container"><div class="split">
     <div class="form-card"><h2>Nous écrire</h2>
@@ -881,7 +939,8 @@ publicRoutes.get("/contact", async (c) => {
       </form></div>
     </div>
   </div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Contact", description: "Contactez Green FAD — Bamako, Mali. Démonstrations, devis, partenariats.", canonicalPath: "/contact", crumbs: [{ label: "Accueil", url: "/" }, { label: "Contact" }] }), body));
+  const seo = await seoOf(c, site, "/contact", "Contact");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/contact", crumbs: [{ label: "Accueil", url: "/" }, { label: "Contact" }] }), body));
 });
 
 publicRoutes.post("/contact", (c) => handleContact(c, "contact"));
@@ -967,9 +1026,11 @@ publicRoutes.get("/robots.txt", async (c) => {
 
 publicRoutes.get("/rss.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
+  const siteName = String((await getSetting(c.env.DB, "site_name", "GREEN FAD")) as string);
+  const seoDef = (await getSetting(c.env.DB, "seo_defaults", {})) as { default_description?: string };
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, excerpt, published_at FROM posts WHERE status = ? ORDER BY published_at DESC LIMIT 20", PUBLIE);
   const items = rows
     .map((p) => `<item><title>${esc(p.title)}</title><link>${base}/blog/${p.slug}</link><description>${esc(p.excerpt || "")}</description><pubDate>${new Date(String(p.published_at)).toUTCString()}</pubDate><guid>${base}/blog/${p.slug}</guid></item>`)
     .join("\n");
-  return c.body(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>GREEN FAD — Blog technologique</title><link>${base}/blog</link><description>Actualités, ingénierie, produits et innovation — le blog de Green FAD</description>${items}</channel></rss>`, 200, { "content-type": "application/rss+xml; charset=utf-8" });
+  return c.body(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>${esc(siteName)} — Blog technologique</title><link>${base}/blog</link><description>${esc(seoDef.default_description || "Actualités, ingénierie, produits et innovation")}</description>${items}</channel></rss>`, 200, { "content-type": "application/rss+xml; charset=utf-8" });
 });

@@ -4,7 +4,7 @@
 // Aucun emoji : toutes les icônes proviennent de la bibliothèque SVG (icons.ts).
 import { z } from "zod";
 import { Env, ContentStatus } from "./types";
-import { q } from "./db";
+import { q, getSetting } from "./db";
 import { md, esc, parseJSON } from "./utils";
 import { icon } from "./icons";
 
@@ -243,11 +243,18 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "hero": {
       const isImg = p.variant === "image" && p.image_key;
       const style = isImg ? `background-image:linear-gradient(rgba(10,19,43,.78),rgba(14,27,58,.9)),url('${esc(p.image_key.startsWith("/") ? p.image_key : "/media/" + p.image_key)}')` : "";
-      const badges = `<div class="hero__badges">
-        <span>${icon("globe")} Afrique de l'Ouest &amp; internationale</span>
-        <span>${icon("cpu")} Produits propriétaires</span>
-        <span>${icon("shield")} Solutions sécurisées</span>
-      </div>`;
+      // Badges du héros : 100 % pilotés par la base (settings → « hero_badges », JSON).
+      // Aucun texte figé dans le code : si le setting est vide, la rangée ne s'affiche pas.
+      // getSetting renvoie déjà la valeur parsée (tableau) — on accepte aussi une chaîne JSON.
+      const rawBadges = await getSetting(ctx.env.DB, "hero_badges", []);
+      const badgesList: { icon?: string; label: string }[] = Array.isArray(rawBadges)
+        ? (rawBadges as { icon?: string; label: string }[])
+        : parseJSON<{ icon?: string; label: string }[]>(String(rawBadges || "[]"), []);
+      const badges = badgesList.length
+        ? `<div class="hero__badges">${badgesList
+            .map((bd, i) => `<span style="--d:${i * 110}ms">${icon(bd.icon || "shield")} ${esc(bd.label)}</span>`)
+            .join("")}</div>`
+        : "";
       return `<section class="hero hero--${esc(p.variant)}" ${style ? `style="${style}"` : ""}>
         <span class="hero__mark" aria-hidden="true"><svg viewBox="0 0 114 96" fill="none"><rect x="0" y="0" width="41.5" height="96" fill="currentColor" opacity=".55"/><g stroke="currentColor" stroke-width="2"><path d="M 14.6 1 H 112.5 V 96"/><path d="M 23.1 9.6 H 104.1 V 96"/><path d="M 31.2 17.5 H 95.4 V 96"/><path d="M 39.7 26.1 H 86.8 V 96"/><path d="M 14.6 1 V 55.7"/><path d="M 23.1 9.6 V 55.7"/><path d="M 31.2 17.5 V 55.7"/><path d="M 39.7 26.1 V 55.7"/><path d="M 48.9 55.7 V 34.5 H 78.7 V 96"/><path d="M 14.6 55.7 H 78.7"/><path d="M 14.6 64.6 H 78.7"/><path d="M 14.6 72.6 H 78.7"/><path d="M 14.6 81 H 78.7"/><path d="M 14.6 89.6 H 78.7"/></g></svg></span>
         <div class="container hero__inner reveal">
@@ -256,7 +263,9 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
           ${p.subtitle ? `<p class="hero__sub">${esc(p.subtitle)}</p>` : ""}
           ${(p.cta_label || p.cta2_label) ? `<div class="hero__cta">${p.cta_label ? `<a class="btn btn--primary" href="${esc(p.cta_url || "/contact")}">${p.cta_label} ${icon("arrow-right")}</a>` : ""}${p.cta2_label ? `<a class="btn btn--ghost" href="${esc(p.cta2_url || "#")}">${esc(p.cta2_label)}</a>` : ""}</div>` : ""}
           ${badges}
-        </div></section>`;
+        </div>
+        <button class="hero__scroll" type="button" aria-label="Défiler vers le contenu">${icon("chevron-down")}</button>
+      </section>`;
     }
     case "section_header":
       return `<div class="container"><header class="sec-head sec-head--${esc(p.align)} reveal">
@@ -314,7 +323,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
               .map((it) => ({ title: it.title, text: it.text || "", image_key: it.image_key || "", url: it.url || "", icon: it.icon || "" }))
           : await dynamicCards(ctx.env.DB, p.source, p.limit);
       if (!cards.length) return ""; // aucune donnée réelle publiée → la section ne s'affiche pas (aucune carte fictive)
-      return `<section class="container"><div class="cards cards--${p.columns} reveal">${cards
+      return `<section class="container"><div class="cards cards--${p.columns} reveal" data-stagger>${cards
         .map((it) => {
           const hasIso = /^[A-Z]{2}$/.test(it.icon || "");
           const media = it.image_key
@@ -339,7 +348,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "stats": {
       const items = (p.items as { value: string; label: string }[]) || [];
       if (!items.length) return "";
-      return `<section class="stats stats--${esc(p.variant)}"><div class="stats__row">${items
+      return `<section class="stats stats--${esc(p.variant)}"><div class="stats__row" data-stagger>${items
         .map((it) => `<div class="stat"><strong>${esc(it.value)}</strong><span>${esc(it.label)}</span></div>`)
         .join("")}</div></section>`;
     }
@@ -381,7 +390,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "partners": {
       const rows = await q(ctx.env.DB, "SELECT name, logo_key, url FROM partners WHERE status='publie' ORDER BY sort_order LIMIT ?", p.limit);
       if (!rows.length) return "";
-      return `<section class="container"><div class="partners reveal">${rows
+      return `<section class="container"><div class="partners reveal" data-stagger>${rows
         .map((r) => `<div class="partner">${r.logo_key ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy">` : `<span>${esc(r.name)}</span>`}</div>`)
         .join("")}</div></section>`;
     }
@@ -395,14 +404,14 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "countries_map": {
       const rows = await q(ctx.env.DB, "SELECT c.slug, c.name, c.iso2, c.is_registered, COUNT(o.id) AS offices FROM countries c LEFT JOIN offices o ON o.country_id = c.id AND o.status='publie' WHERE c.status='publie' GROUP BY c.id ORDER BY c.sort_order");
       if (!rows.length) return "";
-      return `<section class="container"><div class="countries reveal">${rows
+      return `<section class="container"><div class="countries reveal" data-stagger>${rows
         .map((r) => `<a class="country" href="/implantation/${esc(r.slug)}"><span class="country__code${Number(r.is_registered) ? "" : " country__code--teal"}">${esc(String(r.iso2 || "AF"))}</span><h3>${esc(r.name)}</h3><p class="muted">${r.offices ? `${r.offices} bureau${Number(r.offices) > 1 ? "x" : ""}` : "Présence &amp; partenariats"}</p><span class="country__arrow">${icon("arrow-right")}</span></a>`)
         .join("")}</div></section>`;
     }
     case "timeline": {
       const items = (p.items as { year: string; title: string; text?: string }[]) || [];
       if (!items.length) return "";
-      return `<section class="container">${p.title ? `<header class="sec-head"><h2>${esc(p.title)}</h2></header>` : ""}<ol class="timeline reveal">${items
+      return `<section class="container">${p.title ? `<header class="sec-head"><h2>${esc(p.title)}</h2></header>` : ""}<ol class="timeline reveal" data-stagger>${items
         .map((it) => `<li><span class="timeline__year">${esc(it.year)}</span><div><h3>${esc(it.title)}</h3>${it.text ? `<p>${esc(it.text)}</p>` : ""}</div></li>`)
         .join("")}</ol></section>`;
     }
