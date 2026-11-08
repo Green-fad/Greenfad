@@ -276,7 +276,15 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       <label class="adm-field"><span>Slug (URL)</span><input name="slug" value="${v("slug")}" placeholder="généré automatiquement"></label>
       <label class="adm-field full"><span>Description</span><textarea name="description" rows="2" maxlength="400">${v("description")}</textarea></label>
       <label class="adm-field"><span>Catégorie</span><select name="category">${ALBUM_CATEGORIES.map((o) => `<option value="${o.value}" ${v("category") === o.value ? "selected" : ""}>${o.label}</option>`).join("")}</select></label>
-      <label class="adm-field"><span>Image de couverture (clé R2 ou /assets/…)</span><input name="cover_key" value="${v("cover_key")}" placeholder="media/2025/01/…jpg"></label>
+      <div class="adm-field adm-field--media" data-media-field>
+        <span>Image de couverture</span>
+        <div class="media-pick"><img src="${(() => { const ck = String(a?.cover_key ?? ""); return ck ? esc(ck.startsWith("/") ? ck : "/media/" + ck) : ""; })()}" alt="" class="media-pick__thumb ${a?.cover_key ? "" : "is-empty"}" data-media-thumb>
+        <div class="media-pick__main"><input name="cover_key" value="${v("cover_key")}" placeholder="Téléversez une image depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>
+        <div class="media-pick__btns">
+        <button type="button" class="btn btn--sm btn--primary" data-media-upload>${icon("upload")} Téléverser</button>
+        <button type="button" class="btn btn--sm" data-media-open>Choisir</button>
+        <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
+        </div></div></div></div>
       <label class="adm-field"><span>Ordre</span><input type="number" name="sort_order" value="${v("sort_order") || "0"}"></label>
       <label class="adm-field"><span>Statut</span><select name="status">${["brouillon", "publie", "depublie", "archive"].map((s) => `<option ${v("status") === s ? "selected" : ""}>${s}</option>`).join("")}</select></label>
       <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/media/albums">Retour</a></div></form>`;

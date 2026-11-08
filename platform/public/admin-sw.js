@@ -2,7 +2,7 @@
 // Stratégie volontairement prudente :
 //  - assets (css/js/svg/png/polices) : cache-first (contenus publics, jamais sensibles)
 //  - pages HTML /admin : network-only avec repli hors-ligne (aucune donnée métier cachée)
-const VERSION = "gf-admin-v1";
+const VERSION = "gf-admin-v2";
 const ASSET_CACHE = `${VERSION}-assets`;
 
 const OFFLINE_HTML = `<!doctype html><html lang="fr"><head><meta charset="utf-8">

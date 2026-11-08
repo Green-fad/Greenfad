@@ -20,7 +20,7 @@
       { k: "eyebrow", label: "Sur-titre", t: "text" },
       { k: "title", label: "Titre principal", t: "text", req: true },
       { k: "subtitle", label: "Sous-titre", t: "textarea" },
-      { k: "image_key", label: "Image de fond (clé média ou /assets/…)", t: "text" },
+      { k: "image_key", label: "Image de fond", t: "media" },
       { k: "cta_label", label: "Bouton 1 — texte", t: "text" },
       { k: "cta_url", label: "Bouton 1 — lien", t: "text" },
       { k: "cta2_label", label: "Bouton 2 — texte", t: "text" },
@@ -35,7 +35,7 @@
     ],
     richtext: [{ k: "content_md", label: "Contenu (markdown)", t: "textarea", big: true, req: true }],
     image: [
-      { k: "image_key", label: "Image (clé média ou /assets/…)", t: "text", req: true },
+      { k: "image_key", label: "Image", t: "media", req: true },
       { k: "alt", label: "Texte alternatif", t: "text" },
       { k: "caption", label: "Légende", t: "text" },
       { k: "width", label: "Largeur", t: "select", o: ["contained", "full"] },
@@ -47,7 +47,7 @@
     split: [
       { k: "title", label: "Titre", t: "text", req: true },
       { k: "text_md", label: "Texte (markdown)", t: "textarea", big: true },
-      { k: "image_key", label: "Image (clé média)", t: "text" },
+      { k: "image_key", label: "Image", t: "media" },
       { k: "image_side", label: "Côté image", t: "select", o: ["right", "left"] },
       { k: "cta_label", label: "Bouton — texte", t: "text" },
       { k: "cta_url", label: "Bouton — lien", t: "text" },
@@ -161,6 +161,7 @@
       var v = b[f.k];
       if (f.k === "__items_images") v = (b.items || []).map(function (it) { return it.image_key || ""; }).join("\n");
       if (f.k === "__items" || f.k === "__manual") v = v ? JSON.stringify(v, null, 2) : (f.k === "__manual" ? "[]" : "[]");
+      var closeLabel = true;
       html += '<label>' + esc(f.label) + (f.req ? " *" : "");
       if (f.t === "select") {
         html += '<select data-fk="' + f.k + '">' + (f.o || []).map(function (o) { return '<option ' + (b[f.k] === o || (!b[f.k] && o === (f.o[0])) ? "selected" : "") + ">" + o + "</option>"; }).join("") + "</select>";
@@ -168,10 +169,23 @@
         html += '<textarea data-fk="' + f.k + '" rows="' + (f.big ? 8 : 3) + '">' + esc(typeof v === "string" ? v : v == null ? "" : JSON.stringify(v)) + "</textarea>";
       } else if (f.t === "number") {
         html += '<input type="number" data-fk="' + f.k + '" value="' + esc(v == null ? "" : v) + '">';
+      } else if (f.t === "media") {
+        closeLabel = false;
+        var sv = String(v == null ? "" : v);
+        var msrc = sv ? (sv.indexOf("/") === 0 ? sv : "/media/" + sv) : "";
+        html += '</label><div class="adm-field adm-field--media" data-media-field>' +
+          '<div class="media-pick">' +
+          '<img src="' + esc(msrc) + '" alt="" class="media-pick__thumb' + (sv ? "" : " is-empty") + '" data-media-thumb>' +
+          '<div class="media-pick__main"><input data-fk="' + f.k + '" value="' + esc(sv) + '" placeholder="Téléversez une image depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>' +
+          '<div class="media-pick__btns">' +
+          '<button type="button" class="btn btn--sm btn--primary" data-media-upload>Téléverser</button>' +
+          '<button type="button" class="btn btn--sm" data-media-open>Choisir</button>' +
+          '<button type="button" class="btn btn--sm" data-media-clear>Retirer</button>' +
+          '</div></div></div>';
       } else {
         html += '<input data-fk="' + f.k + '" value="' + esc(v == null ? "" : v) + '">';
       }
-      html += "</label>";
+      if (closeLabel) html += "</label>";
     });
     if (!fields.length) html = '<p class="muted">Ce bloc n\'a pas d\'option.</p>';
     formZone.innerHTML = html;

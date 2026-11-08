@@ -397,13 +397,21 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
       return `<div class="adm-field adm-field--media${full}" data-media-field>
         <span>${esc(f.label)}</span>
         <div class="media-pick"><img src="${v ? esc(v.startsWith("/") ? v : "/media/" + v) : ""}" alt="" class="media-pick__thumb ${v ? "" : "is-empty"}" data-media-thumb>
-        <div><input name="${f.name}" value="${esc(v)}" placeholder="clé R2 ou /assets/…" data-media-input>
-        <button type="button" class="btn btn--sm" data-media-open>Choisir dans la bibliothèque</button></div></div></div>`;
+        <div class="media-pick__main"><input name="${f.name}" value="${esc(v)}" placeholder="Téléversez une image depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>
+        <div class="media-pick__btns">
+        <button type="button" class="btn btn--sm btn--primary" data-media-upload>${icon("upload")} Téléverser</button>
+        <button type="button" class="btn btn--sm" data-media-open>Choisir</button>
+        <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
+        </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
     case "file":
       return `<div class="adm-field adm-field--media${full}" data-media-field data-doc>
         <span>${esc(f.label)}</span>
-        <div class="media-pick"><div><input name="${f.name}" value="${esc(v)}" placeholder="clé R2" data-media-input>
-        <button type="button" class="btn btn--sm" data-media-open data-doc>Choisir un document</button></div></div></div>`;
+        <div class="media-pick"><div class="media-pick__main"><input name="${f.name}" value="${esc(v)}" placeholder="Téléversez un document depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>
+        <div class="media-pick__btns">
+        <button type="button" class="btn btn--sm btn--primary" data-media-upload data-doc>${icon("upload")} Téléverser</button>
+        <button type="button" class="btn btn--sm" data-media-open data-doc>Choisir</button>
+        <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
+        </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
     case "json":
       return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-json>${esc(typeof value === "string" ? v : JSON.stringify(value, null, 2))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
     case "date":

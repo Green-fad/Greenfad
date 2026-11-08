@@ -174,6 +174,11 @@ code{background:var(--teal-soft);padding:2px 7px;border-radius:6px;font-size:.82
 .media-pick{display:flex;gap:14px;align-items:center}
 .media-pick__thumb{width:76px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line);background:var(--sand)}
 .media-pick__thumb.is-empty{opacity:0;background:var(--sand)}
+.media-pick__main{flex:1;min-width:0}
+.media-pick__main input{margin-bottom:9px}
+.media-pick__btns{display:flex;gap:8px;flex-wrap:wrap}
+.media-pick.is-dragover{outline:2px dashed var(--teal-500);outline-offset:3px;border-radius:10px;background:var(--teal-fog)}
+.media-pick.is-dragover::after{content:"Déposez pour téléverser";font-size:.78rem;color:var(--teal-700);font-weight:600;margin-left:auto;white-space:nowrap}
 .md-hint{color:var(--teal-700);font-size:.77rem}
 
 /* ---------- Médias multiples ---------- */
@@ -251,6 +256,10 @@ code{background:var(--teal-soft);padding:2px 7px;border-radius:6px;font-size:.82
 .media-modal__head{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center}
 .media-modal__head input{flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:8px}
 .media-modal__grid{overflow:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.media-modal__wrap{position:relative}
+.media-modal__del{position:absolute;top:13px;right:13px;width:24px;height:24px;border-radius:7px;border:1px solid var(--line);background:rgba(255,255,255,.94);color:var(--danger);cursor:pointer;display:grid;place-items:center;padding:0;transition:.15s;z-index:2}
+.media-modal__del:hover{background:var(--danger-soft);border-color:var(--danger)}
+.media-modal__del:disabled{opacity:.4;cursor:wait}
 .media-modal__item{border:1.5px solid var(--line);border-radius:10px;padding:8px;cursor:pointer;text-align:center;font-size:.69rem;background:none;transition:.15s}
 .media-modal__item:hover{border-color:var(--teal-500);background:var(--teal-fog)}
 .media-modal__item.is-selected{border-color:var(--teal-600);background:var(--teal-soft)}
