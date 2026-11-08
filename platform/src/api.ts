@@ -11,6 +11,21 @@ export function apiRouter(): Hono<{ Bindings: Env }> {
 
   r.get("/health", (c) => c.json({ ok: true, service: "greenfad-platform", version: "1.0", time: new Date().toISOString() }));
 
+  // ---------- DIAGNOSTIC TEMPORAIRE (à retirer après résolution de l'incident) ----------
+  r.get("/diag", async (c) => {
+    const out: Record<string, string> = {};
+    const t = async (name: string, fn: () => Promise<string>) => {
+      try { out[name] = await fn(); } catch (e: any) { out[name] = "ERR: " + String(e?.message || e).slice(0, 300); }
+    };
+    await t("kv_get", async () => { const v = await c.env.KV.get("diag:probe"); return "ok:" + JSON.stringify(v); });
+    await t("kv_put", async () => { await c.env.KV.put("diag:probe", String(Date.now())); return "ok"; });
+    await t("d1_select_settings", async () => { const r = await c.env.DB.prepare("SELECT value FROM settings WHERE key='content_version'").first<{ value: string }>(); return "ok:" + JSON.stringify(r); });
+    await t("d1_insert_newsletter", async () => { await c.env.DB.prepare("INSERT INTO newsletter_subscribers (email, status, created_at) VALUES (?1,'actif',datetime('now')) ON CONFLICT(email) DO NOTHING").bind("diag-probe@greenfad.tech").run(); return "ok"; });
+    await t("d1_insert_audit", async () => { await c.env.DB.prepare("INSERT INTO audit_log (user_email, action, entity, created_at) VALUES ('diag@greenfad.tech','diag','diag',datetime('now'))").run(); return "ok"; });
+    await t("r2_put", async () => { await c.env.MEDIA.put("diag/probe.txt", "probe"); return "ok"; });
+    return c.json({ time: new Date().toISOString(), probes: out });
+  });
+
   // ---------- MÉDIAS ----------
   r.get("/media/search", async (c) => {
     const user = c.get("user");
