@@ -51,7 +51,7 @@ jobs:
         run: |
           USERS=$(npx wrangler d1 execute greenfad-production --remote \
             --command "SELECT COUNT(*) AS n FROM users" --json \
-            | jq '.[0].results[0].n')
+            | jq -r 'if type=="array" then (.[0].results[0].n // 0) elif (.results?) then (.results[0].n // 0) else 0 end' 2>/dev/null || echo 0)
           if [ "$USERS" = "0" ]; then
             echo "Première installation : chargement du contenu réel…"
             npx wrangler d1 execute greenfad-production --remote --file=seed/seed.sql
@@ -65,8 +65,9 @@ jobs:
       - name: Mise à jour du contenu éditorial (si version changée)
         run: |
           VERSION=$(npx wrangler d1 execute greenfad-production --remote \
-            --command "SELECT COALESCE((SELECT json_extract(value,'$.') FROM settings WHERE key='content_version'),'0') AS v" --json \
-            | jq -r '.[0].results[0].v')
+            --command "SELECT COALESCE((SELECT value FROM settings WHERE key='content_version'),'0') AS v" --json \
+            | jq -r 'if type=="array" then (.[0].results[0].v // "0") elif (.results?) then (.results[0].v // "0") else "0" end' 2>/dev/null || echo 0)
+          VERSION=$(echo "$VERSION" | tr -d '"')
           if [ "$VERSION" != "4" ]; then
             echo "Contenu v4 détecté dans le dépôt (base en v$VERSION) — synchronisation du contenu réel…"
             npx wrangler d1 execute greenfad-production --remote --file=seed/content-update.sql
