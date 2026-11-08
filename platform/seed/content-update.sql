@@ -1627,3 +1627,223 @@ INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at
 
 -- Version du contenu éditorial (la CI ré-applique ce fichier quand la valeur change)
 INSERT INTO settings (key, value) VALUES ('content_version', '4');
+-- =====================================================================
+-- DELTA v5 — visuels blog, fiches services enrichies, FAQ ciblées,
+--          accès administrateur (mot de passe réinitialisé), version 5
+-- =====================================================================
+
+-- 1) Couvertures des articles du blog (images réelles livrées avec la plateforme)
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-lancement-menu-qr.jpg' WHERE slug = 'qrfad-lancement-menu-qr';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-multi-etablissements.jpg' WHERE slug = 'qrfad-multi-etablissements';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-commandes-depuis-menu.jpg' WHERE slug = 'qrfad-commandes-depuis-menu';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-whatsapp-commandes.jpg' WHERE slug = 'qrfad-whatsapp-commandes';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-hotels-reservations.jpg' WHERE slug = 'qrfad-hotels-reservations';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-caisse-pos.jpg' WHERE slug = 'qrfad-caisse-pos';
+UPDATE posts SET cover_key = '/assets/images/blog/qrfad-portail-public-9-etablissements.jpg' WHERE slug = 'qrfad-portail-public-9-etablissements';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-lancement-vcard.jpg' WHERE slug = 'fadcard-lancement-vcard';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-market.jpg' WHERE slug = 'fadcard-market';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-tickets.jpg' WHERE slug = 'fadcard-tickets';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-fund.jpg' WHERE slug = 'fadcard-fund';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-vote.jpg' WHERE slug = 'fadcard-vote';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-pay-six-applications.jpg' WHERE slug = 'fadcard-pay-six-applications';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-designs-nfc.jpg' WHERE slug = 'fadcard-designs-nfc';
+UPDATE posts SET cover_key = '/assets/images/blog/fadcard-analytics-66-pays.jpg' WHERE slug = 'fadcard-analytics-66-pays';
+UPDATE posts SET cover_key = '/assets/images/blog/tile-lancement-reseau-progres.jpg' WHERE slug = 'tile-lancement-reseau-progres';
+UPDATE posts SET cover_key = '/assets/images/blog/tile-android-ios-trois-flux.jpg' WHERE slug = 'tile-android-ios-trois-flux';
+UPDATE posts SET cover_key = '/assets/images/blog/cloudaf-lancement.jpg' WHERE slug = 'cloudaf-lancement';
+UPDATE posts SET cover_key = '/assets/images/blog/cloudaf-agent-ia.jpg' WHERE slug = 'cloudaf-agent-ia';
+UPDATE posts SET cover_key = '/assets/images/blog/tendances-developpement-web-2025.jpg' WHERE slug = 'tendances-developpement-web-2025';
+UPDATE posts SET cover_key = '/assets/images/blog/guide-seo-pour-sites-africains.jpg' WHERE slug = 'guide-seo-pour-sites-africains';
+UPDATE posts SET cover_key = '/assets/images/blog/bienvenue-sur-le-blog-greenfad.jpg' WHERE slug = 'bienvenue-sur-le-blog-greenfad';
+
+-- 2) Fiches services enrichies (méthodologie, inclusions, technologies, secteurs, bénéfices, livrables)
+UPDATE services SET image_key = '/assets/images/services/web-development.jpg', og_image = '/assets/images/services/web-development.jpg',
+  methodology_md = '### 1. Audit et cadrage
+Nous commençons par comprendre votre activité, vos usages réels et vos contraintes de connectivité. L''audit fixe le périmètre, les priorités et le budget — sans jargon inutile.
+
+### 2. Conception UX/UI
+Maquettes cliquables, parcours utilisateurs et arborescence validés avec vous avant la première ligne de code : vous voyez le produit avant qu''il existe.
+
+### 3. Développement itératif
+Des livraisons régulières sur un environnement de prévisualisation. Vous testez à chaque étape, sur votre propre téléphone, avec une connexion du terrain.
+
+### 4. Tests et sécurité
+Tests sur appareils d''entrée de gamme et réseaux 3G, protection CSRF/XSS, sauvegardes automatiques : la qualité se vérifie dans les conditions réelles du Mali et de la sous-région.
+
+### 5. Mise en production et accompagnement
+Déploiement sur infrastructure mondiale (Cloudflare), nom de domaine, formation de vos équipes et documentation en français. Nous restons disponibles après la livraison.',
+  process_md = '**Projet type — plateforme web :**
+
+- **Semaine 1-2** — audit, cadrage fonctionnel, devis détaillé
+- **Semaine 3-4** — maquettes UX/UI et validation des parcours
+- **Semaines 5-9** — développement itératif avec prévisualisation en continu
+- **Semaine 10** — tests sur appareils réels, relecture sécurité, contenu
+- **Semaine 11** — mise en production, nom de domaine, formation
+- **Après livraison** — garantie de correction, maintenance optionnelle et évolutions par tranches',
+  includes_json = '["Audit technique et cadrage fonctionnel", "Conception UX/UI avec maquettes cliquables", "Développement front-end et back-end", "Interface d''administration pour gérer vos contenus", "Intégration de paiements et de services tiers (WhatsApp, e-mail)", "Optimisation mobile, performances et connectivité faible", "Sécurité : protection CSRF/XSS, sauvegardes, HTTPS", "Mise en production, nom de domaine et formation des équipes", "Documentation en français et support après livraison"]',
+  tech_json = '["Hono / TypeScript (SSR)", "Cloudflare Pages, Workers, D1, R2 et KV", "HTML5, CSS3, JavaScript moderne", "Progressive Web Apps (PWA) installables", "Node.js", "SQLite / PostgreSQL", "WordPress pour les sites éditoriaux", "PHP / MySQL (maintenance de parcs existants)", "JSON-LD, sitemap et SEO technique"]',
+  industries_json = '["PME et commerces", "Institutions et ONG", "Éducation et formation", "Santé", "Agro-business", "Services professionnels", "Événementiel et culture"]',
+  benefits_md = '- **Un site qui fonctionne partout** : conçu pour le mobile d''abord et testé sur connexion 3G faible.
+- **Une administration simple** : vous modifiez vos contenus vous-même, sans passer par un développeur.
+- **Un budget maîtrisé** : hébergement mondial à coût optimal, pas de serveur à acheter, facturation claire en XOF.
+- **La qualité internationale** : les mêmes standards d''ingénierie que nos propres plateformes (FAD CARD, QRFAD, CloudAf).
+- **Un partenaire local** : équipe joignable à Bamako, service client en français, réunion en présentiel possible.',
+  deliverables_md = '- Site ou plateforme web livré(e), en ligne sur votre nom de domaine
+- Interface d''administration documentée pour gérer vos contenus
+- Maquettes et fichiers de conception validés
+- Documentation technique et guide d''utilisation en français
+- Formation de vos équipes à la prise en main
+- Certificat SSL, sauvegardes automatiques et suivi de disponibilité'
+WHERE slug = 'developpement-web';
+
+UPDATE services SET image_key = '/assets/images/services/mobile-development.jpg', og_image = '/assets/images/services/mobile-development.jpg',
+  methodology_md = '### 1. Choix du bon format
+Application progressive (PWA) installable, application native Android/iOS ou hybride : nous recommandons le format adapté à vos usages, votre budget et vos publics — pas le plus cher.
+
+### 2. Conception mobile-first
+Parcours simplifiés, taille des écrans, poids des données : chaque écran est pensé pour un téléphone d''entrée de gamme et une connexion instable.
+
+### 3. Développement et tests terrain
+Livraisons fréquentes, tests sur appareils réels du marché local, mode hors-ligne quand le métier l''exige.
+
+### 4. Publication et distribution
+Google Play, APK direct ou PWA installable depuis le navigateur : nous choisissons le canal de distribution le plus efficace pour vos utilisateurs.
+
+### 5. Suivi et évolutions
+Analytique d''usage, corrections rapides, mises à jour régulières — comme pour nos propres produits, qui évoluent chaque trimestre.',
+  process_md = '**Projet type — application mobile :**
+
+- **Semaine 1** — cadrage des usages, choix du format (PWA / native / hybride)
+- **Semaines 2-3** — design des écrans clés et prototype cliquable
+- **Semaines 4-10** — développement par fonctionnalités testables
+- **Semaines 11-12** — tests terrain, corrections, préparation des stores
+- **Semaine 12+** — publication, formation, plan d''évolution trimestriel',
+  includes_json = '["Cadrage des usages et choix du format (PWA, Android, iOS)", "Design mobile-first et prototype cliquable", "Développement de l''application et de son back-end", "Mode hors-ligne et économie de données", "Notifications push et SMS ciblés", "Intégration paiements (Wave, Orange Money, cartes, fournisseurs internationaux)", "Publication sur Google Play ou distribution directe (APK/PWA)", "Tableau de bord d''administration et analytique d''usage", "Formation, documentation et maintenance"]',
+  tech_json = '["Progressive Web Apps (PWA) installables", "Flutter (Dart) pour Android et iOS", "Firebase : Firestore, Cloud Functions, Storage, FCM", "API REST sécurisées", "SQLite / IndexedDB pour le mode hors-ligne", "Paiements : Stripe, CinetPay, FedaPay, PayPal, Mobile Money", "Notifications push (FCM) et e-mails transactionnels", "Google Play Console et distribution APK signée"]',
+  industries_json = '["Commerce et vente", "Restauration et hôtellerie", "Transport et logistique", "Éducation", "Santé", "Finance et microfinance", "Associations et événementiel"]',
+  benefits_md = '- **Vos clients vous ont dans la poche** : icône sur l''écran d''accueil, notifications directes, pas de concurrence avec d''autres sites.
+- **Fonctionne avec une connexion faible** : mode hors-ligne, données compressées, reprise automatique.
+- **Un seul investissement bien placé** : nous recommandons le format réellement utile — parfois une PWA suffit, et nous le disons.
+- **L''expérience de nos propres produits** : FAD CARD, Tile et QRFAD sont exploités par nos équipes au quotidien avec ces mêmes technologies.
+- **Évolutions planifiées** : mise à jour trimestrielle, comme nos plateformes.',
+  deliverables_md = '- Application publiée (Google Play, APK signé ou PWA installable)
+- Back-end et tableau de bord d''administration
+- Comptes développeur configurés et transférés à votre propriété
+- Documentation d''exploitation et guide utilisateur en français
+- Formation de vos équipes
+- Plan de maintenance et d''évolution trimestriel'
+WHERE slug = 'applications-mobiles';
+
+UPDATE services SET image_key = '/assets/images/services/seo-marketing.jpg', og_image = '/assets/images/services/seo-marketing.jpg',
+  methodology_md = '### 1. Audit de visibilité
+État des lieux complet : technique, contenu, concurrence locale, recherche mobile. Vous savez où vous êtes et ce qui rapporte.
+
+### 2. Fondations techniques
+Vitesse, adaptation mobile, données structurées (JSON-LD), sitemap, indexation : le socle qui rend votre site lisible par Google — le même socle que nos plateformes.
+
+### 3. Contenu qui répond aux vraies questions
+Nous rédigeons ou retravaillons vos pages et articles autour de ce que vos clients cherchent réellement, en français et dans les formulations du terrain.
+
+### 4. Notoriété locale et réseaux
+Fiche Google Business, annuaires locaux, cohérence Facebook / YouTube / TikTok : la visibilité se construit aussi hors du site.
+
+### 5. Mesure et amélioration continue
+Rapports clairs (trafic, positions, demandes reçues), décisions par les chiffres, ajustements mensuels.',
+  process_md = '**Accompagnement type :**
+
+- **Mois 1** — audit complet, corrections techniques prioritaires, mots-clés
+- **Mois 2** — optimisation des pages clés, données structurées, contenus
+- **Mois 3** — contenus récurrents, Google Business, netlinking local
+- **En continu** — rapport mensuel, ajustements, nouveaux contenus',
+  includes_json = '["Audit SEO technique et éditorial complet", "Recherche de mots-clés par marché et par langue", "Optimisation des pages (titres, descriptions, structure)", "Données structurées JSON-LD et sitemap", "Vitesse de chargement et Core Web Vitals", "Google Business Profile et référencement local", "Stratégie et rédaction de contenus (articles, pages)", "Cohérence et habillage des réseaux sociaux", "Rapport mensuel de positions et de trafic"]',
+  tech_json = '["Google Search Console", "Google Analytics", "Lighthouse et PageSpeed Insights", "Données structurées schema.org (JSON-LD)", "Sitemap XML et flux RSS", "Google Business Profile", "Meta (Facebook), YouTube, TikTok", "Outils d''analyse de mots-clés"]',
+  industries_json = '["PME et commerces", "Hôtellerie et restauration", "Immobilier", "Éducation et formation", "Santé", "Services professionnels", "Artisans et créateurs"]',
+  benefits_md = '- **Des clients qui vous trouvent** : apparaître quand on cherche votre activité à Bamako, Abidjan ou Dakar.
+- **Un trafic durable** : le référencement naturel continue de travailler après la campagne, contrairement à la publicité.
+- **Des décisions par les chiffres** : rapport mensuel clair, sans jargon — positions, visites, demandes reçues.
+- **La méthode de nos propres marques** : les fiches produits et articles de Green FAD appliquent exactement ce socle (JSON-LD, sitemap, Core Web Vitals).
+- **Budget en XOF, engagements claires** : pas de promesse miracle, un plan et des livrables.',
+  deliverables_md = '- Rapport d''audit initial avec priorités chiffrées
+- Pages optimisées et données structurées en place
+- Calendrier éditorial et contenus publiés
+- Fiches locales (Google Business) créées ou corrigées
+- Rapport mensuel : positions, trafic, actions du mois suivant'
+WHERE slug = 'seo-marketing-digital';
+
+UPDATE services SET image_key = '/assets/images/services/print-communication.jpg', og_image = '/assets/images/services/print-communication.jpg',
+  methodology_md = '### 1. Écoute et positionnement
+Votre activité, vos clients, votre différence : nous formulons un message clair avant de dessiner quoi que ce soit.
+
+### 2. Identité visuelle
+Logo, palette, typographies et règles d''usage réunis dans une charte simple à appliquer partout — du panneau au profil TikTok.
+
+### 3. Conception des supports
+Maquettes réelles (pas de modèles génériques), relectures avec vous, bon à tirer signé avant impression.
+
+### 4. Production et livraison
+Impression chez nos partenaires, contrôle qualité des épreuves, livraison à Bamako ou expédition.
+
+### 5. Déclinaison numérique
+Les mêmes visuels adaptés aux réseaux sociaux, aux e-mails et à vos documents — une image cohérente partout.',
+  process_md = '**Projet type — identité + supports :**
+
+- **Semaine 1** — brief, positionnement, propositions de direction artistique
+- **Semaine 2** — conception du logo et de la charte, allers-retours
+- **Semaines 3-4** — supports print et déclinaisons numériques
+- **Semaine 5** — bon à tirer, impression, livraison',
+  includes_json = '["Création ou refonte de logo", "Charte graphique complète (couleurs, typographies, usages)", "Cartes de visite, flyers, dépliants", "Affiches, bâches et panneaux", "Brochures, catalogues et dossiers de présentation", "Cartes NFC physiques personnalisées (technologie FAD CARD)", "Habillage réseaux sociaux (profils, bannières, modèles de publications)", "Signalétique et supports événementiels", "Suivi d''impression et contrôle qualité"]',
+  tech_json = '["Adobe Photoshop, Illustrator, InDesign", "Création vectorielle et mise en page professionnelle", "Gestion des couleurs pour l''impression (CMJN)", "Impression numérique et grand format", "Technologie NFC / RFID pour cartes physiques", "Mockups et prototypage de supports"]',
+  industries_json = '["PME et commerces", "Restaurants et hôtels", "Événementiel", "Associations et ONG", "Écoles et centres de formation", "Artisans et créateurs", "Églises et communautés"]',
+  benefits_md = '- **Une image professionnelle partout** : du carton d''invitation au profil Facebook, la même qualité.
+- **Un seul interlocuteur** : design, impression et déclinaisons numériques chez la même équipe.
+- **Le lien avec votre outil digital** : vos cartes imprimées peuvent embarquer la technologie NFC de FAD CARD — la carte papier qui se met à jour.
+- **Des fichiers à vous** : vous recevez les sources et les formats d''impression, réutilisables par n''importe quel prestataire.
+- **Délais et budget clairs** : devis fixe, bon à tirer avant impression.',
+  deliverables_md = '- Logo dans tous les formats (vectoriel, web, impression) 
+- Charte graphique PDF
+- Supports imprimés livrés (quantité convenue au devis)
+- Fichiers sources et prêts à imprimer (PDF HD, CMJN)
+- Kit réseaux sociaux (avatars, bannières, modèles)
+- Bon à tirer signé et archivé pour les réimpressions'
+WHERE slug = 'impression-communication';
+
+-- 3) FAQ ciblées : catégorie « service:<slug> » (fiche expertise) et « produit:<slug> » (fiche produit)
+INSERT INTO faqs (question, answer, category, sort_order, status) VALUES
+('Combien coûte un site web chez GREEN FAD ?', 'Chaque projet fait l''objet d''un devis détaillé en XOF, fixe et sans surprise. Un site vitrine professionnel démarre à quelques centaines de milliers de FCFA ; une plateforme métier est chiffrée après l''audit. Le devis liste exactement ce qui est inclus.', 'service:developpement-web', 0, 'publie'),
+('Combien de temps pour mettre mon site en ligne ?', 'Un site vitrine : 3 à 5 semaines. Une plateforme métier avec administration : 8 à 12 semaines. Nous livrons par étapes avec prévisualisation en continu — vous suivez l''avancement chaque semaine.', 'service:developpement-web', 1, 'publie'),
+('Pourrai-je modifier moi-même le contenu de mon site ?', 'Oui. Chaque site est livré avec une interface d''administration en français : textes, images, articles et menus se modifient sans compétence technique, avec une formation incluse à la livraison.', 'service:developpement-web', 2, 'publie'),
+('Que se passe-t-il après la mise en ligne ?', 'Une garantie de correction est incluse. Ensuite, la maintenance (mises à jour, sauvegardes, petites évolutions) est proposée par abonnement mensuel — et vous restez propriétaire de votre site et de vos données.', 'service:developpement-web', 3, 'publie'),
+('Faut-il forcément une application native ?', 'Non. Pour beaucoup d''usages, une application progressive (PWA) installable suffit : elle s''installe depuis le navigateur, sans store, et coûte moins cher. Nous recommandons le format adapté à votre besoin — pas le plus coûteux.', 'service:applications-mobiles', 0, 'publie'),
+('L''application fonctionnera-t-elle avec une connexion faible ?', 'C''est notre priorité de conception : données compressées, mode hors-ligne pour les fonctions essentielles, reprise automatique. Nos tests incluent des téléphones d''entrée de gamme et des réseaux 3G du terrain.', 'service:applications-mobiles', 1, 'publie'),
+('Peut-on payer dans l''application avec Orange Money ou Wave ?', 'Oui. Nous intégrons les solutions locales (Mobile Money) et internationales (Stripe, CinetPay, FedaPay, PayPal) — la même infrastructure de paiement que nos propres produits.', 'service:applications-mobiles', 2, 'publie'),
+('Qui publie l''application sur Google Play ?', 'Nous nous chargeons de la publication avec votre compte développeur (que nous créons avec vous et qui reste votre propriété), ou nous vous remettons un APK signé pour une distribution directe.', 'service:applications-mobiles', 3, 'publie'),
+('En combien de temps verrai-je des résultats SEO ?', 'Les corrections techniques agissent en quelques semaines ; les positions significatives demandent généralement 3 à 6 mois selon la concurrence locale. Nous fixons des objectifs mesurables dès le départ et rendons compte chaque mois.', 'service:seo-marketing-digital', 0, 'publie'),
+('Que comprend le rapport mensuel ?', 'Positions des mots-clés suivis, trafic du site, requêtes qui amènent des visiteurs, actions réalisées le mois écoulé et plan du mois suivant — en français, lisible sans connaissances techniques.', 'service:seo-marketing-digital', 1, 'publie'),
+('Travaillez-vous aussi les réseaux sociaux ?', 'Oui : cohérence de l''image de marque, habillage des profils, modèles de publications et stratégie de contenu pour Facebook, YouTube et TikTok — les plateformes réellement utilisées par vos clients.', 'service:seo-marketing-digital', 2, 'publie'),
+('Mon site actuel peut-il être optimisé, ou faut-il le refaire ?', 'Dans la plupart des cas, un site existant peut être optimisé : vitesse, structure, contenus. L''audit initial tranche honnêtement — si une refonte est plus rentable, nous le démontrons chiffres à l''appui.', 'service:seo-marketing-digital', 3, 'publie'),
+('Faites-vous l''impression ou seulement le design ?', 'Les deux : nous concevons les supports et assurons l''impression chez nos partenaires à Bamako, avec contrôle qualité et livraison. Vous pouvez aussi ne prendre que les fichiers prêts à imprimer.', 'service:impression-communication', 0, 'publie'),
+('Combien de propositions de logo recevons-nous ?', 'Deux à trois directions artistiques distinctes au premier tour, puis autant d''allers-retours que nécessaire jusqu''au choix final — défini contractuellement dans le devis.', 'service:impression-communication', 1, 'publie'),
+('Qu''est-ce qu''une carte NFC personnalisée ?', 'Une carte physique qui, au contact d''un téléphone, ouvre votre profil professionnel en ligne (coordonnées, liens, boutique). C''est la technologie de FAD CARD : la carte ne se périme pas et son contenu se met à jour en ligne.', 'service:impression-communication', 2, 'publie'),
+('Livrez-vous en dehors de Bamako ?', 'Oui : livraison à Bamako, expédition vers les autres villes du Mali et vers nos marchés (Burkina Faso, Niger, RD Congo, Côte d''Ivoire) selon le devis.', 'service:impression-communication', 3, 'publie'),
+('Que contient exactement l''offre gratuite de FAD CARD ?', 'Le plan Starter est gratuit : votre carte de visite numérique avec QR code et lien public, la prise de rendez-vous et l''accès de base aux applications. Les plans Pro (15 000 XOF/mois) et Business (45 000 XOF/mois) débloquent les designs premium, l''analytique avancée et les fonctions d''encaissement.', 'produit:fad-card', 0, 'publie'),
+('Comment obtenir une carte NFC physique ?', 'Depuis votre tableau de bord FAD CARD, commandez votre carte NFC personnalisée : elle est imprimée avec votre design, programmée sur votre profil et expédiée. Au contact d''un téléphone, votre profil s''ouvre — vos informations restent à jour même si elles changent.', 'produit:fad-card', 1, 'publie'),
+('FAD CARD fonctionne-t-il en dehors du Mali ?', 'Oui. La plateforme est une application web progressive accessible partout, avec validation de numéros dans 66 pays et plus de 40 devises pour les paiements — pensée pour la diaspora comme pour le marché local.', 'produit:fad-card', 2, 'publie'),
+('Les six applications partagent-elles mes données ?', 'Votre identité est unique et vous n''entrez vos informations qu''une fois, mais chaque application (Market, Tickets, Fund, Vote, Pay, vCard) dispose de son propre tableau de bord avec des données strictement isolées.', 'produit:fad-card', 3, 'publie'),
+('Comment fonctionne le menu QR de QRFAD ?', 'Un QR code est imprimé et posé sur les tables. Le client le scanne avec son téléphone : le menu à jour s''ouvre dans le navigateur, sans application à installer. Vous modifiez prix et plats depuis votre tableau de bord — le menu est immédiatement à jour partout.', 'produit:qrfad', 0, 'publie'),
+('Peut-on recevoir les commandes sur WhatsApp ?', 'Oui : le client commande depuis le menu numérique et la commande arrive directement sur le WhatsApp de l''établissement — un canal que votre personnel utilise déjà, sans matériel supplémentaire.', 'produit:qrfad', 1, 'publie'),
+('QRFAD convient-il aux hôtels ?', 'Oui : au-delà des menus, QRFAD gère les services en chambre, les réservations et la caisse (POS) des restaurants d''hôtel, multi-établissements. Le portail public permet aussi d''explorer les établissements partenaires en ligne.', 'produit:qrfad', 2, 'publie'),
+('Que se passe-t-il si Internet tombe pendant le service ?', 'Les QR codes continuent d''afficher le menu (page légère, rechargement automatique). La prise de commande hors-ligne et la caisse sont conçues pour les réalités de connectivité du terrain.', 'produit:qrfad', 3, 'publie'),
+('Qu''est-ce que Tile, le Réseau du Progrès ?', 'Tile est le réseau social panafricain de Green FAD : flux vidéo courts (Pour toi, Réseau, Certifié), Explorer, chat, stories et un portefeuille créateur — la communauté africaine qui progresse ensemble, depuis Bamako.', 'produit:tile', 0, 'publie'),
+('Sur quels appareils Tile est-il disponible ?', 'Tile est disponible sur Android (Google Play et APK signé) et sur iOS, avec une version web installable. L''application est développée avec Flutter pour une expérience fluide sur tous les téléphones.', 'produit:tile', 1, 'publie'),
+('Comment les créateurs gagnent-ils sur Tile ?', 'Chaque créateur dispose d''un portefeuille : gains d''engagement, cadeaux de la communauté, abonnements d''abonnés et retraits encadrés. Les paiements passent par des fournisseurs vérifiés (Stripe, CinetPay, FedaPay, PayPal) selon votre pays.', 'produit:tile', 2, 'publie'),
+('Qu''est-ce que CloudAf ?', 'CloudAf est la plateforme cloud africaine de Green FAD : créez, déployez et faites évoluer vos applications sans vous soucier de l''infrastructure — serveurs, sécurité et mise à l''échelle sont gérés, vous restez concentré sur votre produit.', 'produit:cloudaf', 0, 'publie'),
+('Qu''est-ce que l''Agent CloudAf ?', 'L''Agent CloudAf est l''assistant intégré à l''IA qui construit votre projet avec vous : il comprend votre besoin, génère l''application et vous accompagne du premier écran au déploiement — en français, sans être développeur.', 'produit:cloudaf', 1, 'publie'),
+('CloudAf convient-il à une petite entreprise ?', 'Oui : c''est précisément sa raison d''être. Une PME lance un outil interne ou un site client sans acheter de serveur ni recruter d''administrateur système, et paie ce qu''elle utilise — avec un support en français basé à Bamako.', 'produit:cloudaf', 2, 'publie');
+
+-- 4) Accès administrateur : mot de passe réinitialisé (hash PBKDF2-SHA-256, 100 000 itérations)
+UPDATE users SET password_hash = '8ThKwzz8erem99M2w7QIDCz/Y4lttqptefx8HwEyv/I=',
+  password_salt = 'Ue6HK+/Xb3LSptDurRCfDw==', must_change_password = 0, is_active = 1
+WHERE email = 'contact@greenfad.tech';
+
+-- 5) Version du contenu
+UPDATE settings SET value = '5' WHERE key = 'content_version';
