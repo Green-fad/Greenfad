@@ -28,10 +28,19 @@ jobs:
         run: npm ci
 
       - name: 1) Comptage global
-        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT 'pages' t, COUNT(*) n FROM pages UNION ALL SELECT 'posts', COUNT(*) FROM posts UNION ALL SELECT 'products', COUNT(*) FROM products UNION ALL SELECT 'services', COUNT(*) FROM services UNION ALL SELECT 'faqs', COUNT(*) FROM faqs UNION ALL SELECT 'media', COUNT(*) FROM media UNION ALL SELECT 'media_albums', COUNT(*) FROM media_albums UNION ALL SELECT 'media_items', COUNT(*) FROM media_items UNION ALL SELECT 'page_versions', COUNT(*) FROM page_versions UNION ALL SELECT 'audit_log', COUNT(*) FROM audit_log UNION ALL SELECT 'projects', COUNT(*) FROM projects UNION ALL SELECT 'partners', COUNT(*) FROM partners UNION ALL SELECT 'menus', COUNT(*) FROM menus UNION ALL SELECT 'footer_sections', COUNT(*) FROM footer_sections UNION ALL SELECT 'settings', COUNT(*) FROM settings UNION ALL SELECT 'redirects', COUNT(*) FROM redirects UNION ALL SELECT 'newsletter_subscribers', COUNT(*) FROM newsletter_subscribers"
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT (SELECT COUNT(*) FROM pages) pages, (SELECT COUNT(*) FROM posts) posts, (SELECT COUNT(*) FROM products) products, (SELECT COUNT(*) FROM services) services, (SELECT COUNT(*) FROM faqs) faqs, (SELECT COUNT(*) FROM media) media, (SELECT COUNT(*) FROM media_albums) media_albums, (SELECT COUNT(*) FROM media_items) media_items, (SELECT COUNT(*) FROM page_versions) page_versions, (SELECT COUNT(*) FROM audit_log) audit_log, (SELECT COUNT(*) FROM projects) projects, (SELECT COUNT(*) FROM partners) partners, (SELECT COUNT(*) FROM menus) menus, (SELECT COUNT(*) FROM footer_sections) footer_sections, (SELECT COUNT(*) FROM settings) settings, (SELECT COUNT(*) FROM redirects) redirects, (SELECT COUNT(*) FROM newsletter_subscribers) newsletter"
 
-      - name: 2) Slugs en doublon
-        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT 'page' typ, slug v, COUNT(*) n FROM pages GROUP BY slug HAVING n>1 UNION ALL SELECT 'post', slug, COUNT(*) FROM posts GROUP BY slug HAVING n>1 UNION ALL SELECT 'product', slug, COUNT(*) FROM products GROUP BY slug HAVING n>1 UNION ALL SELECT 'service', slug, COUNT(*) FROM services GROUP BY slug HAVING n>1"
+      - name: 2a) Slugs pages en doublon
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, COUNT(*) n, GROUP_CONCAT(id) ids FROM pages GROUP BY slug HAVING n>1"
+
+      - name: 2b) Slugs articles en doublon
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, COUNT(*) n, GROUP_CONCAT(id) ids FROM posts GROUP BY slug HAVING n>1"
+
+      - name: 2c) Slugs produits en doublon
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, COUNT(*) n, GROUP_CONCAT(id) ids FROM products GROUP BY slug HAVING n>1"
+
+      - name: 2d) Slugs services en doublon
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, COUNT(*) n, GROUP_CONCAT(id) ids FROM services GROUP BY slug HAVING n>1"
 
       - name: 3) Questions FAQ en doublon
         run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT question, COUNT(*) n, GROUP_CONCAT(id) ids FROM faqs GROUP BY question HAVING n>1 ORDER BY n DESC LIMIT 40"
