@@ -29,6 +29,25 @@ app.on(["GET", "HEAD"], "*", async (c, next) => {
 // Sessions sur toutes les routes (public + admin + api)
 app.use("*", authMiddleware);
 
+// ---------- PWA Admin : service worker servi avec l'autorisation de scope /admin/ ----------
+app.get("/admin/sw.js", async (c) => {
+  const url = new URL("/admin-sw.js", c.req.url);
+  const res = await c.env.ASSETS.fetch(new Request(url.toString(), { method: "GET", headers: c.req.raw.headers }));
+  if (res.status === 404) return c.body("not found", 404, { "content-type": "text/plain" });
+  const headers = new Headers(res.headers);
+  headers.set("Service-Worker-Allowed", "/admin/");
+  headers.set("Cache-Control", "public, max-age=0, must-revalidate");
+  return new Response(res.body, { status: res.status, headers });
+});
+
+// ---------- Accès admin par alias /greenfad (mémoire de marque) ----------
+app.get("/greenfad", (c) => c.redirect("/admin", 302));
+app.get("/greenfad/*", (c) => {
+  const rest = c.req.path.slice("/greenfad".length) || "";
+  const qs = c.req.query("q") ? `?q=${encodeURIComponent(c.req.query("q")!)}` : "";
+  return c.redirect(`/admin${rest}${qs}`, 302);
+});
+
 // ---------- Médias R2 ----------
 app.get("/media/*", async (c) => {
   const key = c.req.path.replace("/media/", "");

@@ -29,17 +29,41 @@
     }
   }, true);
 
-  // Copier l'URL média
+  // Copier l'URL média (ou une URL complète pour les partages)
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-copy]");
     if (!b) return;
-    var url = location.origin + b.getAttribute("data-copy");
-    navigator.clipboard.writeText(url).then(function () {
-      var old = b.textContent;
+    var raw = b.getAttribute("data-copy") || "";
+    var url = raw.indexOf("http") === 0 ? raw : location.origin + raw;
+    var done = function () {
+      var old = b.getAttribute("data-label") || b.textContent;
+      b.setAttribute("data-label", old);
       b.textContent = "Copié";
       setTimeout(function () { b.textContent = old; }, 1600);
-    });
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, done);
+    else { var t = document.createElement("textarea"); t.value = url; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch (err) {} t.remove(); done(); }
   });
+
+  // ---------- PWA Admin : service worker + bouton d'installation ----------
+  var installEvt = null;
+  window.addEventListener("beforeinstallprompt", function (e) {
+    e.preventDefault();
+    installEvt = e;
+    var btn = document.getElementById("admInstall");
+    if (btn) btn.hidden = false;
+  });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("#admInstall");
+    if (!b || !installEvt) return;
+    installEvt.prompt();
+    installEvt.userChoice.finally(function () { installEvt = null; b.hidden = true; });
+  });
+  if ("serviceWorker" in navigator && location.hostname !== "localhost") {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/admin/sw.js", { scope: "/admin/" }).catch(function () {});
+    });
+  }
 
   // Avertissement modifications non enregistrées
   document.querySelectorAll("[data-confirm-leave]").forEach(function (form) {

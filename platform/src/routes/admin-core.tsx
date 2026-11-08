@@ -37,13 +37,13 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     if (!email || !password) return c.html(adminLoginHTML("Email et mot de passe requis.", email), 400);
     const user = await q1<{ id: number; email: string; name: string; role: string; password_hash: string; password_salt: string; is_active: number }>(c.env.DB, "SELECT * FROM users WHERE email = ? AND is_active = 1", email);
     if (!user || !(await verifyPassword(password, user.password_hash, user.password_salt))) {
-      await audit(c, "login_echec", "users", null, { email, ip });
+      await audit(c, "login_echec", "users", null, { email, ip, note: "identifiants invalides" });
       return c.html(adminLoginHTML("Identifiants invalides.", email), 401);
     }
     await resetRateLimit(c, `login:${ip}`);
     await createSession(c, { userId: user.id, email: user.email, name: user.name, role: user.role as Role });
     await c.env.DB.prepare("UPDATE users SET last_login_at = datetime('now') WHERE id = ?").bind(user.id).run();
-    await audit(c, "login_succes", "users", user.id);
+    await audit(c, "login_succes", "users", user.id, { email: user.email });
     return c.redirect("/admin");
   });
 
@@ -58,43 +58,83 @@ export function adminCore(): Hono<{ Bindings: Env }> {
   r.get("/", async (c) => {
     const user = c.get("user")!;
     const db = c.env.DB;
-    const [pagesP, pagesD, posts, postsDraft, products, services, projects, countries, mediaCount, msgsNew, leadsNew, subs, jobsOpen] = await Promise.all([
-      count(db, "pages", "status='publie'"), count(db, "pages", "status='brouillon'"),
-      count(db, "posts", "status='publie'"), count(db, "posts", "status='brouillon'"),
-      count(db, "products", "status='publie'"), count(db, "services", "status='publie'"),
+    const [pagesP, pagesD, posts, postsDraft, postsPending, products, productsDraft, services, servicesDraft, projects, countries, mediaCount, msgsNew, leadsNew, subs, jobsOpen, albums] = await Promise.all([
+      count(db, "pages", "status='publie'"), count(db, "pages", "status='brouillon' OR status='en_attente'"),
+      count(db, "posts", "status='publie'"), count(db, "posts", "status='brouillon'"), count(db, "posts", "status='en_attente'"),
+      count(db, "products", "status='publie'"), count(db, "products", "status!='publie'"),
+      count(db, "services", "status='publie'"), count(db, "services", "status!='publie'"),
       count(db, "projects", "status='publie'"), count(db, "countries", "status='publie'"),
       count(db, "media"), count(db, "contact_messages", "status='nouveau'"), count(db, "leads", "status='nouveau'"),
       count(db, "newsletter_subscribers", "status='actif'"), count(db, "jobs", "is_open=1 AND status='publie'"),
+      count(db, "media_albums"),
     ]);
-    const recentAudit = await q(db, "SELECT * FROM audit_log ORDER BY id DESC LIMIT 8");
-    const recentMsgs = await q(db, "SELECT * FROM contact_messages ORDER BY id DESC LIMIT 5");
-    const recentPosts = await q(db, "SELECT id, title, status, published_at FROM posts ORDER BY id DESC LIMIT 5");
+    const [recentAudit, recentMsgs, recentPosts] = await Promise.all([
+      q(db, "SELECT * FROM audit_log ORDER BY id DESC LIMIT 8"),
+      q(db, "SELECT * FROM contact_messages ORDER BY id DESC LIMIT 5"),
+      q(db, "SELECT id, title, status, published_at, views FROM posts ORDER BY id DESC LIMIT 5"),
+    ]);
+
+    // Qualité éditoriale (données réelles) : contenus publiés dont le SEO est incomplet
+    const [prodNoSEO, postNoSEO, servNoSEO, prodNoImg] = await Promise.all([
+      q1<{ n: number }>(db, "SELECT COUNT(*) AS n FROM products WHERE status='publie' AND (meta_description IS NULL OR meta_description = '')"),
+      q1<{ n: number }>(db, "SELECT COUNT(*) AS n FROM posts WHERE status='publie' AND (meta_description IS NULL OR meta_description = '')"),
+      q1<{ n: number }>(db, "SELECT COUNT(*) AS n FROM services WHERE status='publie' AND (meta_description IS NULL OR meta_description = '')"),
+      q1<{ n: number }>(db, "SELECT COUNT(*) AS n FROM products WHERE status='publie' AND (image_key IS NULL OR image_key = '')"),
+    ]);
+    const qcTotal = Number(prodNoSEO?.n ?? 0) + Number(postNoSEO?.n ?? 0) + Number(servNoSEO?.n ?? 0);
 
     const stat = (v: number | string, label: string, url: string, accent = "") =>
       `<a class="adm-stat ${accent}" href="${url}"><strong>${v}</strong><span>${esc(label)}</span></a>`;
 
+    const quickActions = [
+      { icon: "package", label: "Nouveau produit", url: "/admin/products/new" },
+      { icon: "book-open", label: "Écrire un article", url: "/admin/posts/new" },
+      { icon: "briefcase", label: "Nouveau service", url: "/admin/services/new" },
+      { icon: "award", label: "Nouvelle réalisation", url: "/admin/projects/new" },
+      { icon: "layers", label: "Créer une page", url: "/admin/pages" },
+      { icon: "upload", label: "Téléverser un média", url: "/admin/media" },
+    ];
+
     const body = `
-    <p class="adm-intro">Bonjour ${esc(user.name)} — voici l'état réel de la plateforme. Toutes les données proviennent de la base D1 de production.</p>
+    <div class="adm-hero">
+      <div><h2>Bonjour ${esc(user.name)} — pilotage de la plateforme</h2>
+      <p class="muted">Toutes les données proviennent de la base D1 de production, en temps réel.</p></div>
+      <div class="adm-hero__actions">${quickActions.map((a) => `<a class="adm-quick" href="${a.url}">${icon(a.icon)} ${a.label}</a>`).join("")}</div>
+    </div>
+    <p class="adm-section-label">Publication</p>
     <div class="adm-stats">
-      ${stat(`${pagesP}/${pagesD}`, "Pages publiées / brouillons", "/admin/pages")}
-      ${stat(`${posts}/${postsDraft}`, "Articles publiés / brouillons", "/admin/posts")}
-      ${stat(products, "Produits publiés", "/admin/products")}
-      ${stat(services, "Services publiés", "/admin/services")}
+      ${stat(`${pagesP}`, "Pages publiées", "/admin/pages")}${stat(pagesD, "Pages en préparation", "/admin/pages")}
+      ${stat(`${posts}/${postsDraft}`, "Articles publiés / brouillons", "/admin/posts")}${stat(postsPending, "Articles en validation", "/admin/posts", postsPending ? "warn" : "")}
+      ${stat(products, "Produits publiés", "/admin/products")}${stat(productsDraft, "Produits en préparation", "/admin/products", productsDraft ? "warn" : "")}
+      ${stat(services, "Services publiés", "/admin/services")}${stat(servicesDraft, "Services en préparation", "/admin/services", servicesDraft ? "warn" : "")}
+    </div>
+    <p class="adm-section-label">Réseau & média</p>
+    <div class="adm-stats">
       ${stat(projects, "Réalisations", "/admin/projects")}
       ${stat(countries, "Pays actifs", "/admin/countries")}
+      ${stat(albums, "Albums galerie", "/admin/media/albums")}
       ${stat(mediaCount, "Médias dans R2", "/admin/media")}
       ${stat(jobsOpen, "Offres d'emploi ouvertes", "/admin/jobs")}
     </div>
+    <p class="adm-section-label">Entrées à traiter</p>
     <div class="adm-stats">
-      ${stat(msgsNew, "Nouveaux messages", "/admin/messages", "warn")}
-      ${stat(leadsNew, "Nouveaux prospects", "/admin/leads", "warn")}
+      ${stat(msgsNew, "Nouveaux messages", "/admin/messages", msgsNew ? "warn" : "")}
+      ${stat(leadsNew, "Nouveaux prospects", "/admin/leads", leadsNew ? "warn" : "")}
       ${stat(subs, "Abonnés newsletter", "/admin/newsletter")}
+      ${stat(qcTotal, "Fiches publiées sans description SEO", "/admin/seo", qcTotal ? "warn" : "")}
     </div>
+    ${qcTotal ? `<section class="adm-panel adm-panel--warn"><h3>${icon("alert-circle")} Qualité éditoriale — actions recommandées</h3>
+      <ul class="adm-list">
+        ${Number(prodNoSEO?.n ?? 0) ? `<li><a href="/admin/products">Produits publiés sans description SEO : <strong>${Number(prodNoSEO?.n ?? 0)}</strong></a></li>` : ""}
+        ${Number(postNoSEO?.n ?? 0) ? `<li><a href="/admin/posts">Articles publiés sans description SEO : <strong>${Number(postNoSEO?.n ?? 0)}</strong></a></li>` : ""}
+        ${Number(servNoSEO?.n ?? 0) ? `<li><a href="/admin/services">Services publiés sans description SEO : <strong>${Number(servNoSEO?.n ?? 0)}</strong></a></li>` : ""}
+        ${Number(prodNoImg?.n ?? 0) ? `<li><a href="/admin/products">Produits publiés sans image principale : <strong>${Number(prodNoImg?.n ?? 0)}</strong></a></li>` : ""}
+      </ul></section>` : ""}
     <div class="adm-two">
       <section class="adm-panel"><h3>Derniers messages</h3>${recentMsgs.length
         ? `<ul class="adm-list">${recentMsgs.map((m) => `<li><a href="/admin/messages/${m.id}"><strong>${esc(m.name)}</strong> <span class="muted">${esc(String(m.subject || ""))}</span> <em>${fmtDate(String(m.created_at), "short")}</em></a></li>`).join("")}</ul>` : `<p class="muted">Aucun message.</p>`}</section>
       <section class="adm-panel"><h3>Derniers articles</h3>${recentPosts.length
-        ? `<ul class="adm-list">${recentPosts.map((p) => `<li><a href="/admin/posts/${p.id}"><strong>${esc(p.title)}</strong> <em>${esc(String(p.status))}</em></a></li>`).join("")}</ul>` : `<p class="muted">Aucun article.</p>`}</section>
+        ? `<ul class="adm-list">${recentPosts.map((p) => `<li><a href="/admin/posts/${p.id}"><strong>${esc(p.title)}</strong> <em>${esc(String(p.status))}</em> <span class="muted">${Number(p.views || 0)} vue${Number(p.views || 0) > 1 ? "s" : ""}</span></a></li>`).join("")}</ul>` : `<p class="muted">Aucun article.</p>`}</section>
     </div>
     <section class="adm-panel"><h3>Journal d'audit — dernières opérations</h3>
       ${recentAudit.length ? `<table class="adm-table"><thead><tr><th>Quand</th><th>Qui</th><th>Action</th><th>Objet</th></tr></thead><tbody>${recentAudit
@@ -807,8 +847,10 @@ export function adminCore(): Hono<{ Bindings: Env }> {
 function adminLoginHTML(error = "", email = ""): string {
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>Connexion — GREEN FAD Admin</title>
+<meta name="theme-color" content="#11243E"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/images/admin-icon-180.png"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/admin.css?v=2"></head>
+<link rel="stylesheet" href="/css/admin.css?v=4"></head>
 <body class="adm-login-bg"><div class="adm-login">
 <div class="adm-login__brand"><img src="/assets/images/greenfad-logo.svg" alt="GREEN FAD — Future, Authentique, Dynamique" style="height:56px;width:auto"></div>
 ${error ? `<div class="adm-alert adm-alert--error">${esc(error)}</div>` : ""}

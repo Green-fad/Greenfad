@@ -16,7 +16,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
       { label: "Produits technologiques", url: "/admin/products", icon: "package" },
       { label: "Services & Expertises", url: "/admin/services", icon: "briefcase" },
       { label: "Projets & Réalisations", url: "/admin/projects", icon: "award" },
-      { label: "Innovation & publications", url: "/admin/posts", icon: "book-open" },
+      { label: "Blog & Publications", url: "/admin/posts", icon: "book-open" },
       { label: "Archives historiques", url: "/admin/archives", icon: "history" },
       { label: "Presse", url: "/admin/press", icon: "newspaper" },
       { label: "FAQ", url: "/admin/faqs", icon: "message-square" },
@@ -78,11 +78,17 @@ export function adminLayout(c: Context<{ Bindings: Env }>, user: SessionUser, ti
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>${esc(title)} — GREEN FAD Admin</title>
+<meta name="theme-color" content="#11243E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/assets/images/admin-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GF Admin">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/admin.css?v=3">
+<link rel="stylesheet" href="/css/admin.css?v=4">
 </head>
 <body class="adm">
 <div class="adm-backdrop" id="admBackdrop"></div>
@@ -90,6 +96,7 @@ export function adminLayout(c: Context<{ Bindings: Env }>, user: SessionUser, ti
   <a class="adm-side__brand" href="/admin"><img src="/assets/images/greenfad-logo-white.svg" alt="GREEN FAD" class="adm-side__logoimg"></a>
   <nav class="adm-nav" aria-label="Modules">${nav}</nav>
   <div class="adm-side__foot">
+    <button type="button" class="adm-side__link" id="admInstall" hidden>${icon("monitor", "i--inline")} Installer l'application</button>
     <a href="/" target="_blank" class="adm-side__link">${icon("external-link", "i--inline")} Voir le site</a>
     <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="${user.csrf}"><button type="submit" class="adm-side__link adm-side__link--danger">${icon("log-out", "i--inline")} Déconnexion</button></form>
   </div>

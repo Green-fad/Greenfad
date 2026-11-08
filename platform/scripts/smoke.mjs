@@ -42,6 +42,8 @@ ok("canonical défini", html.includes('rel="canonical"'));
 r = await get("/expertises/developpement-web");
 html = await r.text();
 ok("page service rend le contenu migré", r.status === 200 && html.includes("Développement Web"));
+ok("fiche service : formulaire de devis", html.includes("Demander un devis"));
+ok("fiche service : JSON-LD Service", html.includes('"@type":"Service"'));
 
 r = await get("/produits/fad-card");
 html = await r.text();
@@ -51,15 +53,30 @@ r = await get("/galerie");
 html = await r.text();
 ok("galerie multimédia (albums)", r.status === 200 && html.includes("Produits Green FAD"));
 
-r = await get("/innovation");
+r = await get("/blog");
 html = await r.text();
-ok("liste innovation", r.status === 200);
+ok("liste blog (média éditorial)", r.status === 200);
 ok("article 'Tendances du Développement Web 2025' présent", html.includes("Tendances du Développement Web"));
+ok("blog : section articles populaires", html.includes("Articles populaires"));
+ok("blog : recherche présente", html.includes("blog-search"));
 
-r = await get("/innovation/tendances-developpement-web-2025");
+r = await get("/blog/tendances-developpement-web-2025");
 html = await r.text();
 ok("article rendu avec date éditoriale originale (8 nov 2025)", r.status === 200 && html.includes("8 novembre 2025"));
-ok("JSON-LD Article", html.includes('"@type":"Article"'));
+ok("JSON-LD BlogPosting", html.includes('"@type":"BlogPosting"'));
+ok("temps de lecture affiché", html.includes("min de lecture"));
+ok("boutons de partage présents", html.includes("Partager"));
+
+r = await get("/blog/archives");
+ok("archives blog mensuelles", r.status === 200);
+
+r = await get("/blog?q=referencement");
+html = await r.text();
+ok("recherche insensible aux accents", r.status === 200 && html.includes("résultat"));
+
+r = await get("/blog?type=analyse");
+html = await r.text();
+ok("filtre par type", r.status === 200);
 
 r = await get("/implantation/mali");
 html = await r.text();
@@ -71,18 +88,28 @@ ok("FAQ réelle rendue", r.status === 200 && html.includes("Qui est GREEN FAD ?"
 
 r = await get("/sitemap.xml");
 html = await r.text();
-ok("sitemap contient produits+pays+articles+albums", r.status === 200 && html.includes("/produits/fad-card") && html.includes("/implantation/mali") && html.includes("/innovation/tendances-developpement-web-2025") && html.includes("/galerie/album/produits-green-fad"));
+ok("sitemap contient produits+pays+articles+albums", r.status === 200 && html.includes("/produits/fad-card") && html.includes("/implantation/mali") && html.includes("/blog/tendances-developpement-web-2025") && html.includes("/galerie/album/produits-green-fad"));
 
 // ---------- 2. Redirections SEO ----------
 console.log("\n— Redirections anciennes URL —");
 r = await get("/services/web-development.html");
 ok("301 /services/web-development.html → /expertises/developpement-web", r.status === 301 && r.headers.get("location") === "/expertises/developpement-web");
 r = await get("/blog.html");
-ok("301 /blog.html → /innovation", r.status === 301 && r.headers.get("location") === "/innovation");
+ok("301 /blog.html → /blog", r.status === 301 && r.headers.get("location") === "/blog");
+r = await get("/innovation");
+ok("301 /innovation → /blog", r.status === 301 && r.headers.get("location")?.includes("/blog"));
 r = await get("/actualites/tendances-developpement-web-2025");
-ok("301 /actualites/[slug] → /innovation/[slug]", r.status === 301 && r.headers.get("location") === "/innovation/tendances-developpement-web-2025");
+ok("301 /actualites/[slug] → /blog/[slug]", r.status === 301 && r.headers.get("location")?.includes("/blog/tendances-developpement-web-2025"));
+r = await get("/services");
+ok("301 /services → /expertises", r.status === 301 && r.headers.get("location") === "/expertises");
 r = await get("/countries/mali.html");
 ok("301 /countries/mali.html → /implantation/mali", r.status === 301);
+r = await get("/greenfad");
+ok("302 /greenfad → /admin (alias PWA)", r.status === 302 && r.headers.get("location") === "/admin");
+r = await get("/manifest.webmanifest");
+ok("manifest PWA servi", r.status === 200 && (await r.text()).includes("GREEN FAD"));
+r = await get("/admin/sw.js");
+ok("service worker admin + header Service-Worker-Allowed", r.status === 200 && r.headers.get("service-worker-allowed") === "/admin/");
 
 // ---------- 3. Sécurité ----------
 console.log("\n— Sécurité (CSRF, sessions) —");

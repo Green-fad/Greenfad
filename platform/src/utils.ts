@@ -112,13 +112,23 @@ export function parseJSON<T>(s: unknown, fallback: T): T {
   }
 }
 
+/** Retire le premier titre H1 d'un markdown — le titre de page (h1 principal) ne doit jamais être dupliqué dans le corps. */
+export function stripFirstH1(src: unknown): string {
+  const text = String(src || "");
+  return text.replace(/^\s*#\s+[^\n]+\n+/, "");
+}
+
 export function excerptFromMd(src: unknown, len = 180): string {
   if (!src) return "";
   const text = String(src)
     .replace(/[#>*`!\[\]\(\)]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return text.length > len ? text.slice(0, len).trimEnd() + "…" : text;
+  if (text.length <= len) return text;
+  // Coupe sur la frontière du mot précédent : jamais de mot tronqué en plein milieu
+  const cut = text.slice(0, len);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > len * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…";
 }
 
 export function fmtDate(iso: unknown, style: "short" | "long" = "long"): string {

@@ -19,7 +19,7 @@
     });
   }
 
-  // Reveal au scroll
+  // Reveal au scroll — threshold 0 : les très grands blocs (article complet) se révèlent dès leur entrée
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window && revealEls.length) {
     var io = new IntersectionObserver(
@@ -31,7 +31,7 @@
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.01, rootMargin: "0px 0px -24px 0px" }
     );
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
@@ -59,6 +59,27 @@
       });
     });
   }
+
+  // Copier un lien (boutons de partage d'article)
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-copy]");
+    if (!b) return;
+    e.preventDefault();
+    var v = b.getAttribute("data-copy") || "";
+    var url = v.indexOf("http") === 0 ? v : location.origin + v;
+    var done = function () {
+      b.classList.add("is-copied");
+      setTimeout(function () { b.classList.remove("is-copied"); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, done);
+    } else {
+      var t = document.createElement("textarea");
+      t.value = url; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); } catch (err) {}
+      t.remove(); done();
+    }
+  });
 
   // Anti double-soumission des formulaires publics
   document.querySelectorAll("form[method=post]").forEach(function (f) {

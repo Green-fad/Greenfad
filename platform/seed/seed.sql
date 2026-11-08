@@ -20,8 +20,8 @@ INSERT INTO settings (key, value) VALUES ('socials', '{"facebook": "https://web.
 INSERT INTO settings (key, value) VALUES ('seo_defaults', '{"default_description": "GREEN FAD SARL — entreprise technologique africaine : conception de produits numériques propriétaires, ingénierie logicielle et transformation digitale des organisations, au Mali et à linternational."}');
 
 -- ---------- MENUS ----------
-INSERT INTO menus (location, items) VALUES ('header', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Innovation", "url": "/innovation"}, {"label": "Implantation", "url": "/implantation"}, {"label": "Contact", "url": "/contact"}]');
-INSERT INTO menus (location, items) VALUES ('footer', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Innovation", "url": "/innovation"}, {"label": "Ressources", "url": "/ressources"}, {"label": "Carrières", "url": "/carrieres"}, {"label": "FAQ", "url": "/faq"}]');
+INSERT INTO menus (location, items) VALUES ('header', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Blog", "url": "/blog"}, {"label": "Implantation", "url": "/implantation"}, {"label": "Contact", "url": "/contact"}]');
+INSERT INTO menus (location, items) VALUES ('footer', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Blog", "url": "/blog"}, {"label": "Ressources", "url": "/ressources"}, {"label": "Carrières", "url": "/carrieres"}, {"label": "FAQ", "url": "/faq"}]');
 
 -- ---------- PIED DE PAGE ----------
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('entreprise', 'Green FAD', '{"text": "Entreprise technologique africaine d''innovation : nous concevons, développons et portons nos propres produits numériques à l''échelle internationale."}', 1);
@@ -914,7 +914,7 @@ Le SEO est un marathon, pas un sprint. Les résultats prennent du temps, mais le
 
 **À propos de l''auteur**  
 L''équipe Greenfad accompagne les entreprises africaines dans leur transformation digitale depuis plus de 10 ans. Nous sommes spécialisés dans le développement web, le SEO et les stratégies de marketing digital adaptées au contexte africain.', '', 'seo', '["SEO", "référencement", "Afrique", "marketing digital"]', 'Green FAD', 'guide', 0, '2025-11-09 14:30:00', 'publie', 'Découvrez les meilleures pratiques SEO adaptées au contexte africain. Stratégies, outils et conseils pour améliorer votre référencement naturel.');
-INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description) VALUES ('bienvenue-sur-le-blog-greenfad', 'Bienvenue sur le Blog Greenfad', 'Découvrez notre nouveau blog dédié à la transformation numérique et écologique en Afrique. Articles, tutoriels et actualités sur le développement web, le SEO et les technologies ve', '# Bienvenue sur le Blog Greenfad
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description) VALUES ('bienvenue-sur-le-blog-greenfad', 'Bienvenue sur le Blog Greenfad', 'Découvrez notre nouveau blog dédié à la transformation numérique et écologique en Afrique. Articles, tutoriels et actualités sur le développement web, le SEO et les technologies vertes', '# Bienvenue sur le Blog Greenfad
 
 Nous sommes ravis de vous accueillir sur le nouveau blog de **GREEN FAD SARL**, votre partenaire de confiance pour la transformation numérique et écologique en Afrique.
 
@@ -985,10 +985,13 @@ INSERT INTO pages (slug, title, meta_title, meta_description, blocks, status, is
 
 -- ---------- REDIRECTIONS SEO ----------
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/index.html', '/', 301, 1, datetime('now'));
-INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/blog.html', '/innovation', 301, 1, datetime('now'));
-INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/blog', '/innovation', 301, 1, datetime('now'));
-INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/actualites', '/innovation', 301, 1, datetime('now'));
-INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/actualites/*', '/innovation/*', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/innovation', '/blog', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/innovation/*', '/blog/*', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/actualites', '/blog', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/actualites/*', '/blog/*', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/blog.html', '/blog', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/blog-article.html', '/blog', 301, 1, datetime('now'));
+INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/services', '/expertises', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/projets/portfolio.html', '/realisations', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/projets', '/realisations', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/services/web-development.html', '/expertises/developpement-web', 301, 1, datetime('now'));
@@ -1004,6 +1007,5 @@ INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/mentions-legales.html', '/p/mentions-legales', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/politique-de-confidentialite.html', '/p/confidentialite', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/cgv.html', '/p/cgv', 301, 1, datetime('now'));
-INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/blog-article.html', '/innovation', 301, 1, datetime('now'));
 
--- Fin du seed v2
+-- Fin du seed v3

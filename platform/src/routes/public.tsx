@@ -6,7 +6,7 @@ import { Env } from "../types";
 import { q, q1, count, getSetting } from "../db";
 import { layout, loadSiteData, PageSEO, crumbsHTML, Crumb } from "../render/layout";
 import { renderBlocks, renderBlock, Block, parseVideo } from "../blocks";
-import { md, esc, fmtDate, excerptFromMd, parseJSON } from "../utils";
+import { md, esc, fmtDate, excerptFromMd, stripFirstH1, parseJSON } from "../utils";
 import { icon } from "../icons";
 import { audit } from "../audit";
 
@@ -153,19 +153,91 @@ publicRoutes.get("/expertises", async (c) => {
 });
 
 publicRoutes.get("/expertises/:slug", async (c) => {
-  const s = await q1<{ id: number; slug: string; name: string; summary: string; content_md: string; image_key: string; icon: string; meta_title: string; meta_description: string; og_image: string }>(c.env.DB, "SELECT * FROM services WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
+  const s = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM services WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
   if (!s) return c.notFound();
   const site = await loadSiteData(c);
-  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Expertises", url: "/expertises" }, { label: s.name }])}<p class="eyebrow">Expertise</p><h1>${esc(s.name)}</h1>${s.summary ? `<p class="page-hero__text">${esc(s.summary)}</p>` : ""}</div></section>
-  <section class="container"><div class="split"><div class="split__body prose">${md(s.content_md)}</div>
-    ${s.image_key ? `<div class="split__media"><img src="${esc(mediaSrc(s.image_key))}" alt="${esc(s.name)}"></div>` : ""}</div></section>
-  <section class="container"><div class="form-card reveal"><h2>Discuter de cette expertise</h2><p class="muted">Nos ingénieurs vous répondent avec des références concrètes.</p>
-    <form method="post" action="/contact" class="form-grid"><input type="text" name="website" class="hp" tabindex="-1" aria-hidden="true">
-    <input type="hidden" name="subject" value="Expertise : ${esc(s.name)}">
-    <label>Nom complet<input name="name" required maxlength="120"></label><label>Email<input type="email" name="email" required maxlength="160"></label>
-    <label class="full">Votre message<textarea name="message" rows="4" required maxlength="4000"></textarea></label>
-    <button class="btn btn--primary" type="submit">${icon("send", "i--inline")} Envoyer</button></form></div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: s.meta_title || s.name, description: s.meta_description || s.summary || undefined, ogImage: s.og_image || mediaSrc(s.image_key), canonicalPath: `/expertises/${s.slug}` }), body));
+  const db = c.env.DB;
+
+  // Contenus liés : projets menés, produits mobilisés, galeries, FAQ métier
+  const [serviceFaqs, relatedProjects, relatedProducts, gallery, videos] = await Promise.all([
+    q(db, "SELECT question, answer FROM faqs WHERE status='publie' AND category = ? ORDER BY sort_order LIMIT 8", `service:${s.slug}`),
+    q(db, "SELECT slug, title, summary, image_key, category FROM projects WHERE status='publie' AND related_service_id = ? LIMIT 3", s.id),
+    q(db, "SELECT slug, name, tagline, image_key, state FROM products WHERE status='publie' AND related_service_id = ? LIMIT 3", s.id),
+    q(db, "SELECT mi.title, mi.caption, m.r2_key FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='image' AND mi.status='publie' JOIN media m ON m.id = mi.media_id WHERE cr.content_type='service' AND cr.content_id = ? ORDER BY cr.sort_order LIMIT 6", s.id),
+    q(db, "SELECT mi.id, mi.title, mi.description, mi.source_url FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='video' AND mi.status='publie' WHERE cr.content_type='service' AND cr.content_id = ? ORDER BY cr.sort_order LIMIT 3", s.id),
+  ]);
+  // Règle éditoriale : sans relation explicite, aucun projet n'est affiché au hasard.
+
+  const includes = parseJSON<string[]>(s.includes_json, []);
+  const techs = parseJSON<string[]>(s.tech_json, []);
+  const industries = parseJSON<string[]>(s.industries_json, []);
+
+  const specCard = (title: string, iconName: string, content: unknown) =>
+    content ? `<div class="spec-card"><h3>${icon(iconName)} ${esc(title)}</h3><div class="prose" style="font-size:.95rem">${md(content)}</div></div>` : "";
+
+  const body = `<section class="page-hero service-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Expertises", url: "/expertises" }, { label: String(s.name) }])}
+    ${s.icon ? `<span class="service-hero__icon">${icon(String(s.icon))}</span>` : ""}
+    <p class="eyebrow">Expertise & service</p>
+    <h1>${esc(String(s.name))}</h1>
+    ${s.summary ? `<p class="page-hero__text">${esc(String(s.summary))}</p>` : ""}
+    <div class="pdp__cta" style="margin-top:1.6rem;justify-content:flex-start">
+      <a class="btn btn--invert" href="#devis">${icon("send", "i--inline")} Demander un devis</a>
+      <a class="btn btn--ghost" href="/realisations">${icon("award", "i--inline")} Voir nos réalisations</a>
+    </div></div></section>
+  <section class="container flush" style="padding-top:0"><div class="pdp" style="padding-top:44px">
+    <div class="pdp__info"><h2 style="margin-bottom:1rem">Présentation du service</h2><div class="prose">${md(stripFirstH1(s.content_md))}</div></div>
+    ${s.image_key ? `<div class="pdp__media"><img src="${esc(mediaSrc(String(s.image_key)))}" alt="${esc(String(s.name))}"></div>` : ""}
+  </div></section>
+  ${includes.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Prestation</p><h2>Ce que ce service inclut</h2></header>
+    <div class="includes-grid reveal">${includes.map((i) => `<div class="includes-item">${icon("check-circle")} <span>${esc(i)}</span></div>`).join("")}</div></section>` : ""}
+  ${(s.methodology_md || s.process_md) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Méthodologie</p><h2>Comment nous procédons</h2></header>
+    <div class="spec-grid reveal">
+    ${specCard("Notre méthodologie", "workflow", s.methodology_md)}
+    ${specCard("Déroulement d'un projet type", "route", s.process_md)}
+  </div></section>` : ""}
+  ${techs.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Savoir-faire</p><h2>Technologies & outils maîtrisés</h2></header>
+    <div class="chips chips--lg reveal">${techs.map((t) => `<span class="chip chip--tech">${icon("cpu", "i--inline")} ${esc(t)}</span>`).join("")}</div></section>` : ""}
+  ${(s.benefits_md || s.deliverables_md) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Résultats</p><h2>Bénéfices & livrables</h2></header>
+    <div class="spec-grid reveal">
+    ${specCard("Bénéfices pour votre organisation", "trending-up", s.benefits_md)}
+    ${specCard("Livrables types", "clipboard", s.deliverables_md)}
+  </div></section>` : ""}
+  ${industries.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Secteurs</p><h2>Industries & organisations adressés</h2></header>
+    <div class="industries-grid reveal">${industries.map((i) => `<div class="industry-card">${icon("building")} <span>${esc(i)}</span></div>`).join("")}</div></section>` : ""}
+  ${gallery.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Galerie</p><h2>Ce service en images</h2></header>
+    <div class="gallery gallery--3 reveal" data-lightbox>${gallery.map((g) => { const src = mediaSrc(String(g.r2_key)); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(String(g.title || ""))}" loading="lazy">${g.caption ? `<figcaption>${esc(String(g.caption))}</figcaption>` : ""}</figure>`; }).join("")}</div></section>` : ""}
+  ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Démonstrations</p><h2>Vidéos</h2></header>
+    <div class="video-grid reveal">${videos.map((v) => { const pv = parseVideo(String(v.source_url || "")); return `<div class="video-card"><div class="video-embed"><iframe src="${esc(pv.embed)}" allowfullscreen loading="lazy" title="${esc(String(v.title))}"></iframe></div><div class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description))}</p>` : ""}</div></div>`; }).join("")}</div></section>` : ""}
+  ${relatedProjects.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Références</p><h2>Réalisations liées à cette expertise</h2></header>
+    <div class="cards cards--${Math.min(relatedProjects.length, 3)} reveal">${relatedProjects.map((r) => `<article class="card">${r.image_key ? `<a class="card__media" href="/realisations/${esc(String(r.slug))}"><img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy"></a>` : ""}<div class="card__body">${r.category ? `<span class="tag">${esc(String(r.category))}</span>` : ""}<h3><a href="/realisations/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><p>${esc(String(r.summary || ""))}</p><span class="card__more">Lire l'étude de cas ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+  ${relatedProducts.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Produits mobilisés</p><h2>Nos produits au service de cette expertise</h2></header>
+    <div class="cards cards--${Math.min(relatedProducts.length, 3)} reveal">${relatedProducts.map((pr) => `<article class="card">${pr.image_key ? `<a class="card__media" href="/produits/${esc(String(pr.slug))}"><img src="${esc(mediaSrc(String(pr.image_key)))}" alt="${esc(String(pr.name))}" loading="lazy"></a>` : `<a class="card__media card__media--empty" href="/produits/${esc(String(pr.slug))}" aria-hidden="true" tabindex="-1">${icon("package")}</a>`}<div class="card__body"><h3><a href="/produits/${esc(String(pr.slug))}">${esc(String(pr.name))}</a></h3><p>${esc(String(pr.tagline || ""))}</p><span class="card__more">Voir la fiche produit ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+  ${serviceFaqs.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">FAQ</p><h2>Questions fréquentes</h2></header>
+    <div class="faq reveal" style="margin:0">${serviceFaqs.map((f) => `<details><summary>${esc(String(f.question))}</summary><div class="prose">${md(f.answer)}</div></details>`).join("")}</div></section>` : ""}
+  <section class="container" id="devis"><div class="form-card reveal">
+    <h2>Demander un devis — ${esc(String(s.name))}</h2>
+    <p class="muted">Décrivez votre besoin : nos ingénieurs reviennent vers vous avec une proposition concrète, chiffrée et adaptée à votre contexte.</p>
+    <form method="post" action="/devis" class="form-grid">
+      <input type="text" name="website" class="hp" tabindex="-1" aria-hidden="true">
+      <input type="hidden" name="subject" value="Devis — ${esc(String(s.name))}">
+      <label>Nom complet<input name="name" required maxlength="120"></label>
+      <label>Email professionnel<input type="email" name="email" required maxlength="160"></label>
+      <label>Téléphone<input name="phone" maxlength="40"></label>
+      <label>Société / Organisation<input name="company" maxlength="160"></label>
+      <label class="full">Votre projet<textarea name="message" rows="4" required maxlength="4000" placeholder="Contexte, objectifs, délais envisagés…"></textarea></label>
+      <button class="btn btn--primary btn--full" type="submit">${icon("send", "i--inline")} Envoyer la demande de devis</button>
+    </form></div></section>`;
+  const jsonLd = [{
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: String(s.name),
+    description: String(s.summary || excerptFromMd(s.content_md, 160)),
+    serviceType: String(s.name),
+    provider: { "@type": "Organization", name: "GREEN FAD SARL", url: String(site.settings.site_url || "") },
+    areaServed: "Afrique & international",
+    image: s.image_key ? String(site.settings.site_url || "") + mediaSrc(String(s.image_key)) : undefined,
+  }];
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(s.meta_title || `${s.name} — Expertise GREEN FAD`), description: String(s.meta_description || s.summary || "") || undefined, ogImage: String(s.og_image || mediaSrc(String(s.image_key)) || "") || undefined, canonicalPath: `/expertises/${String(s.slug)}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Expertises", url: "/expertises" }, { label: String(s.name) }] }), body));
 });
 
 // ---------- Produits technologiques (portfolio professionnel) ----------
@@ -222,9 +294,10 @@ publicRoutes.get("/produits/:slug", async (c) => {
     <div class="pdp" style="padding-top:44px">
       <div class="pdp__info">
         <h2 style="margin-bottom:1rem">Présentation générale</h2>
-        <div class="prose">${md(p.description_md)}</div>
+        <div class="prose">${md(stripFirstH1(p.description_md))}</div>
         <div class="pdp__cta">
           <a class="btn btn--primary" href="#demo">${icon("rocket", "i--inline")} Demander une démonstration</a>
+          ${p.external_url ? `<a class="btn btn--accent" href="${esc(String(p.external_url))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} Accéder au produit</a>` : ""}
           <a class="btn btn--outline" href="/contact">${icon("mail", "i--inline")} Partenariat & contact</a>
         </div>
       </div>
@@ -245,6 +318,13 @@ publicRoutes.get("/produits/:slug", async (c) => {
     ${specCard("Publics cibles", "users", p.audience)}
     ${specCard("Secteur d'activité", "briefcase", p.sector)}
   </div></section>` : ""}
+  ${(p.benefits_md || p.differentiators_md) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Valeur ajoutée</p><h2>Pourquoi choisir ${esc(String(p.name))}</h2></header>
+    <div class="spec-grid reveal">
+    ${specCard("Bénéfices & valeur ajoutée", "trending-up", p.benefits_md)}
+    ${specCard("Ce qui le différencie", "award", p.differentiators_md)}
+  </div></section>` : ""}
+  ${p.use_cases_md ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Terrain</p><h2>Cas d'usage concrets</h2></header>
+    <div class="split"><div class="split__body prose reveal">${md(p.use_cases_md)}</div></div></section>` : ""}
   ${gallery.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Galerie</p><h2>Le produit en images</h2></header>
     <div class="gallery gallery--3 reveal" data-lightbox>${gallery.map((g) => { const src = mediaSrc(String(g.r2_key)); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(String(g.title || ""))}" loading="lazy">${g.caption ? `<figcaption>${esc(String(g.caption))}</figcaption>` : ""}</figure>`; }).join("")}</div></section>` : ""}
   ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Démonstrations</p><h2>Vidéos du produit</h2></header>
@@ -255,7 +335,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   ${productFaqs.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">FAQ</p><h2>Questions fréquentes sur ${esc(String(p.name))}</h2></header>
     <div class="faq reveal" style="margin:0">${productFaqs.map((f) => `<details><summary>${esc(String(f.question))}</summary><div class="prose">${md(f.answer)}</div></details>`).join("")}</div></section>` : ""}
   ${relatedPosts.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Actualités liées</p><h2>À lire sur ce produit</h2></header>
-    <div class="cards cards--${Math.min(relatedPosts.length, 3)} reveal">${relatedPosts.map((r) => `<article class="card"><div class="card__body"><span class="kind-badge">${icon((KIND_LABELS[String(r.kind)] || KIND_LABELS.article).icon)} ${(KIND_LABELS[String(r.kind)] || KIND_LABELS.article).label}</span><h3><a href="/innovation/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+    <div class="cards cards--${Math.min(relatedPosts.length, 3)} reveal">${relatedPosts.map((r) => `<article class="card"><div class="card__body"><span class="kind-badge">${icon((KIND_LABELS[String(r.kind)] || KIND_LABELS.article).icon)} ${(KIND_LABELS[String(r.kind)] || KIND_LABELS.article).label}</span><h3><a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
   <section class="container" id="demo"><div class="form-card reveal">
     <h2>Demander une démonstration de ${esc(String(p.name))}</h2>
     <p class="muted">Présentation guidée par nos équipes, en présentiel à Bamako ou en visioconférence.</p>
@@ -276,8 +356,10 @@ publicRoutes.get("/produits/:slug", async (c) => {
     name: String(p.name),
     description: String(p.tagline || excerptFromMd(p.description_md, 200)),
     brand: { "@type": "Brand", name: "GREEN FAD" },
+    manufacturer: { "@type": "Organization", name: "GREEN FAD SARL", url: String(site.settings.site_url || "") },
     image: p.image_key ? String(site.settings.site_url || "") + mediaSrc(String(p.image_key)) : undefined,
     category: p.category ? String(p.category) : undefined,
+    ...(p.external_url ? { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: "GREEN FAD SARL" } } } : {}),
   }];
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || `${p.name} — Produit technologique`), description: String(p.meta_description || p.tagline || excerptFromMd(p.description_md, 160)), ogImage: String(p.og_image || mediaSrc(String(p.image_key))), canonicalPath: `/produits/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }] }), body));
 });
@@ -373,58 +455,198 @@ publicRoutes.get("/galerie/video/:id", async (c) => {
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(v.title), description: String(v.description || "Vidéo Green FAD"), canonicalPath: `/galerie/video/${v.id}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Galerie", url: "/galerie" }, { label: String(v.title) }] }), body));
 });
 
-// ---------- Innovation & connaissance ----------
-publicRoutes.get("/innovation", async (c) => {
+// ---------- BLOG — média éditorial de l'entreprise ----------
+function readingTime(mdText: string | null | undefined): number {
+  const words = String(mdText || "").replace(/[#>*`\-\[\]()!]/g, " ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+function paginationHTML(base: string, page: number, totalPages: number, sep = "?"): string {
+  if (totalPages <= 1) return "";
+  const link = (n: number, label: string, cls: string, aria: string) =>
+    `<a class="${cls}" href="${base}${sep}page=${n}" aria-label="${aria}">${label}</a>`;
+  let links = "";
+  const window = 2;
+  for (let n = 1; n <= totalPages; n++) {
+    if (n === 1 || n === totalPages || Math.abs(n - page) <= window) {
+      links += n === page
+        ? `<span class="pager__num pager__num--current" aria-current="page">${n}</span>`
+        : link(n, String(n), "pager__num", `Page ${n}`);
+    } else if (Math.abs(n - page) === window + 1) links += `<span class="pager__dots">…</span>`;
+  }
+  const prev = page > 1 ? link(page - 1, `${icon("arrow-left", "i--inline")} Précédent`, "pager__nav", "Page précédente") : `<span class="pager__nav pager__nav--off">Précédent</span>`;
+  const next = page < totalPages ? link(page + 1, `Suivant ${icon("arrow-right", "i--inline")}`, "pager__nav", "Page suivante") : `<span class="pager__nav pager__nav--off">Suivant</span>`;
+  return `<nav class="pager" aria-label="Pagination">${prev}${links}${next}</nav>`;
+}
+
+function shareHTML(title: string, url: string): string {
+  const enc = encodeURIComponent;
+  return `<div class="share" aria-label="Partager cet article">
+    <span class="share__label">${icon("share", "i--inline")} Partager</span>
+    <a class="share__btn" href="https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}" target="_blank" rel="noopener" aria-label="Partager sur LinkedIn">${icon("briefcase")}</a>
+    <a class="share__btn" href="https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}" target="_blank" rel="noopener" aria-label="Partager sur X (Twitter)">${icon("x-social")}</a>
+    <a class="share__btn" href="https://api.whatsapp.com/send?text=${enc(title + " " + url)}" target="_blank" rel="noopener" aria-label="Partager sur WhatsApp">${icon("phone")}</a>
+    <a class="share__btn" href="https://www.facebook.com/sharer/sharer.php?u=${enc(url)}" target="_blank" rel="noopener" aria-label="Partager sur Facebook">${icon("globe")}</a>
+    <button class="share__btn share__btn--copy" type="button" data-copy="${esc(url)}" aria-label="Copier le lien">${icon("link")}</button>
+  </div>`;
+}
+
+function searchNormalize(s: string): string {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+}
+
+publicRoutes.get("/blog", async (c) => {
   const kind = c.req.query("type") || "";
+  const search = (c.req.query("q") || "").trim().slice(0, 80);
+  const page = Math.max(1, parseInt(c.req.query("page") || "1", 10) || 1);
+  const PER = 9;
   const kinds = Object.keys(KIND_LABELS);
-  const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, excerpt, cover_key, kind, published_at, author FROM posts WHERE status = ?2 AND (?1 = '' OR kind = ?1) ORDER BY published_at DESC LIMIT 30", kind, PUBLIE);
+
+  // Recherche : normalisation accents côté SQL impossible — LIKE sur 3 champs + filtre affiné en JS
+  const all = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, excerpt, content_md, cover_key, kind, category, tags, author, published_at, is_featured, views FROM posts WHERE status = ? ORDER BY published_at DESC", PUBLIE);
+
+  let filtered = all;
+  if (kind && kinds.includes(kind)) filtered = filtered.filter((r) => String(r.kind) === kind);
+  if (search) {
+    const nq = searchNormalize(search);
+    filtered = filtered.filter((r) => searchNormalize(`${r.title} ${r.excerpt || ""} ${r.category || ""} ${String(r.tags || "")} ${String(r.content_md || "").slice(0, 4000)}`).includes(nq));
+  }
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / PER));
+  const current = Math.min(page, totalPages);
+  const slice = filtered.slice((current - 1) * PER, current * PER);
+
+  const popular = all.filter((r) => Number(r.views || 0) > 0).sort((a, b) => Number(b.views) - Number(a.views)).slice(0, 5);
+  const years = [...new Set(all.map((r) => String(r.published_at || "").slice(0, 4)).filter(Boolean))].sort().reverse();
+
+  // À la une : dernier article marqué (uniquement page 1, sans filtre ni recherche)
+  const featured = current === 1 && !kind && !search ? filtered.find((r) => Number(r.is_featured) === 1) || filtered[0] : null;
+  const rest = featured ? slice.filter((r) => r.slug !== featured.slug) : slice;
+
   const site = await loadSiteData(c);
-  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Innovation" }])}<p class="eyebrow">Innovation & connaissance</p>
-    <h1>Nous réfléchissons, expérimentons et documentons</h1>
-    <p class="page-hero__text">Analyses, recherches, prototypes, veille technologique et retours d'expérience de nos équipes — au service de l'écosystème technologique africain.</p></div></section>
+  const pagerParams = new URLSearchParams();
+  if (kind) pagerParams.set("type", kind);
+  if (search) pagerParams.set("q", search);
+  const baseForPager = pagerParams.toString() ? `/blog?${pagerParams.toString()}` : "/blog";
+  const sep = baseForPager.includes("?") ? "&" : "?";
+
+  const card = (p: Record<string, unknown>) => `<article class="card post-card">
+    ${p.cover_key ? `<a class="card__media" href="/blog/${esc(String(p.slug))}"><img src="${esc(mediaSrc(String(p.cover_key)))}" alt="${esc(String(p.title))}" loading="lazy"></a>` : ""}
+    <div class="card__body">${kindBadge(String(p.kind))}
+    <h3><a href="/blog/${esc(String(p.slug))}">${esc(String(p.title))}</a></h3>
+    <p>${esc(String(p.excerpt || excerptFromMd(p.content_md, 130)))}</p>
+    <div class="post-meta"><span>${icon("calendar")} ${fmtDate(p.published_at, "short")}</span><span>${icon("clock")} ${readingTime(String(p.content_md))} min</span></div></div></article>`;
+
+  const body = `<section class="page-hero blog-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog" }])}<p class="eyebrow">Blog GREEN FAD</p>
+    <h1>Le média technologique <em style="color:var(--teal-400);font-style:normal">de nos ingénieurs</em></h1>
+    <p class="page-hero__text">Actualités de l'entreprise, lancements produits, analyses, R&D, guides d'ingénierie et regards sur l'innovation africaine — écrits par les équipes qui construisent.</p>
+    <form class="blog-search" action="/blog" method="get" role="search">
+      ${kind ? `<input type="hidden" name="type" value="${esc(kind)}">` : ""}
+      <input type="search" name="q" value="${esc(search)}" placeholder="Rechercher un article, un thème…" aria-label="Rechercher dans le blog" maxlength="80">
+      <button class="btn btn--primary" type="submit">${icon("search", "i--inline")} Rechercher</button>
+      ${search ? `<a class="btn btn--ghost" href="${esc(baseForPager)}">Réinitialiser</a>` : ""}
+    </form></div></section>
   <section class="container">
-    <div class="filters reveal"><a href="/innovation" class="${kind === "" ? "active" : ""}">${icon("grid")} Tout</a>
-    ${Object.entries(KIND_LABELS).map(([k, v]) => `<a href="/innovation?type=${k}" class="${kind === k ? "active" : ""}">${icon(v.icon)} ${v.label}</a>`).join("")}</div>
-    <div class="post-list reveal">${rows
-      .map((p) => `<article class="card">
-        ${p.cover_key ? `<a class="card__media" href="/innovation/${esc(String(p.slug))}"><img src="${esc(mediaSrc(String(p.cover_key)))}" alt="" loading="lazy"></a>` : ""}
-        <div class="card__body">${kindBadge(String(p.kind))}
-        <h3><a href="/innovation/${esc(String(p.slug))}">${esc(String(p.title))}</a></h3>
-        <p>${esc(String(p.excerpt || ""))}</p>
-        <div class="post-meta"><span>${icon("calendar")} ${fmtDate(p.published_at, "short")}</span><span>${icon("user")} ${esc(String(p.author || "Green FAD"))}</span></div></div></article>`)
-      .join("")}</div>
-    ${!rows.length ? `<p class="center muted">Aucune publication dans cette catégorie pour le moment.</p>` : ""}
-  </section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Innovation & connaissance", description: "Articles d'expertise, analyses technologiques, R&D et publications de Green FAD.", canonicalPath: "/innovation" }), body));
+    <div class="filters filters--scroll reveal"><a href="/blog" class="${kind === "" ? "active" : ""}">${icon("grid")} Tout</a>
+    ${Object.entries(KIND_LABELS).map(([k, v]) => `<a href="/blog?type=${k}" class="${kind === k ? "active" : ""}">${icon(v.icon)} ${v.label}</a>`).join("")}
+    <span class="filters__spacer"></span><a class="filters__aux" href="/blog/archives">${icon("history")} Archives</a><a class="filters__aux" href="/rss.xml" title="Flux RSS">${icon("rss")} RSS</a></div>
+  </section>
+  ${search ? `<section class="container"><p class="muted">${total} résultat${total > 1 ? "s" : ""} pour « <strong>${esc(search)}</strong> »</p></section>` : ""}
+  ${featured && current === 1 && !search ? `<section class="container"><a class="blog-featured reveal" href="/blog/${esc(String(featured.slug))}">
+    <div class="blog-featured__media${featured.cover_key ? "" : " blog-featured__media--empty"}">${featured.cover_key
+      ? `<img src="${esc(mediaSrc(String(featured.cover_key)))}" alt="${esc(String(featured.title))}">`
+      : `<span class="blog-featured__mark" aria-hidden="true"><img src="/assets/images/greenfad-mark.svg" alt=""></span>`}</div>
+    <div class="blog-featured__body"><span class="kind-badge">${icon("star")} À la une</span>${kindBadge(String(featured.kind))}
+      <h2>${esc(String(featured.title))}</h2>
+      <p>${esc(String(featured.excerpt || excerptFromMd(featured.content_md, 220)))}</p>
+      <div class="post-meta"><span>${icon("user")} ${esc(String(featured.author || "Green FAD"))}</span><span>${icon("calendar")} ${fmtDate(featured.published_at)}</span><span>${icon("clock")} ${readingTime(String(featured.content_md))} min de lecture</span></div>
+      <span class="card__more">Lire l'article ${icon("arrow-right")}</span></div></a></section>` : ""}
+  <section class="container"><div class="post-list post-list--blog reveal">${rest.map(card).join("")}</div>
+    ${!total ? `<p class="center muted">Aucun article ne correspond à votre recherche pour le moment.</p>` : ""}
+    ${paginationHTML(baseForPager, current, totalPages, sep)}</section>
+  ${popular.length && current === 1 && !search ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Les plus lus</p><h2>Articles populaires</h2></header>
+    <div class="popular-list reveal">${popular.map((p, i) => `<a class="popular" href="/blog/${esc(String(p.slug))}"><span class="popular__rank">${i + 1}</span><span class="popular__body"><strong>${esc(String(p.title))}</strong><em>${fmtDate(p.published_at, "short")} · ${Number(p.views)} vue${Number(p.views) > 1 ? "s" : ""}</em></span>${icon("arrow-right", "popular__arrow")}</a>`).join("")}</div></section>` : ""}
+  ${years.length ? `<section class="cta-band"><div class="container cta-band__inner reveal"><h2>Explorer par année</h2><p>Retrouvez tous nos articles dans les archives.</p><a class="btn btn--invert" href="/blog/archives">Archives ${years[0]} — ${years[years.length - 1]} ${icon("arrow-right")}</a></div></section>` : ""}`;
+  return c.html(await layout(c, site, await getPageSEO(c, { title: "Blog — Actualités, ingénierie et innovation", description: "Le blog de Green FAD : actualités, lancements produits, analyses technologiques, R&D, guides d'ingénierie et innovation africaine, par nos équipes.", canonicalPath: "/blog" }), body));
 });
 
-publicRoutes.get("/innovation/:slug", async (c) => {
+publicRoutes.get("/blog/archives", async (c) => {
+  const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, kind, published_at FROM posts WHERE status = ? ORDER BY published_at DESC", PUBLIE);
+  const site = await loadSiteData(c);
+  const groups = new Map<string, Record<string, unknown>[]>();
+  for (const r of rows) {
+    const d = String(r.published_at || "");
+    if (!d) continue;
+    const key = d.slice(0, 7); // YYYY-MM
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(r);
+  }
+  const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: "Archives" }])}<p class="eyebrow">Blog — archives</p>
+    <h1>Tous nos articles, par mois</h1></div></section>
+  <section class="container">${[...groups.entries()].map(([key, items]) => `<div class="archive-group reveal">
+    <h2>${MONTHS[Number(key.slice(5, 7)) - 1] || key} ${key.slice(0, 4)} <span class="muted">(${items.length})</span></h2>
+    <ul class="archive-list">${items.map((r) => `<li><span class="archive-list__date">${fmtDate(r.published_at, "short")}</span>${kindBadge(String(r.kind))}<a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></li>`).join("")}</ul></div>`).join("")}
+  ${!rows.length ? `<p class="center muted">Aucun article publié pour le moment.</p>` : ""}</section>`;
+  return c.html(await layout(c, site, await getPageSEO(c, { title: "Archives du blog", description: "Tous les articles du blog GREEN FAD classés par mois.", canonicalPath: "/blog/archives", noindex: true }), body));
+});
+
+publicRoutes.get("/blog/:slug", async (c) => {
   const p = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM posts WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
   if (!p) return c.notFound();
   const site = await loadSiteData(c);
-  const others = await q(c.env.DB, "SELECT slug, title, kind FROM posts WHERE status='publie' AND id != ? ORDER BY published_at DESC LIMIT 3", p.id);
-  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Innovation", url: "/innovation" }, { label: String(p.title) }])}
-    <p class="eyebrow">Publication</p><h1>${esc(String(p.title))}</h1>
-    <div class="post-meta" style="margin-top:1rem;color:rgba(255,255,255,.7)">${kindBadge(String(p.kind))}
-    <span style="display:inline-flex;align-items:center;gap:5px">${icon("calendar")} ${fmtDate(p.published_at)}</span>
-    <span style="display:inline-flex;align-items:center;gap:5px">${icon("user")} ${esc(String(p.author || "Green FAD"))}</span></div></div></section>
-  ${p.cover_key ? `<div class="container"><div class="article__cover"><img src="${esc(mediaSrc(String(p.cover_key)))}" alt="${esc(String(p.title))}"></div></div>` : ""}
-  <section class="container"><article class="article prose reveal">${md(p.content_md)}</article></section>
-  ${others.length ? `<section class="container"><header class="sec-head"><h2>Poursuivre la lecture</h2></header>
-    <div class="cards cards--${Math.min(others.length, 3)} reveal">${others.map((o) => `<article class="card"><div class="card__body">${kindBadge(String(o.kind))}<h3><a href="/innovation/${esc(String(o.slug))}">${esc(String(o.title))}</a></h3><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}`;
+  c.executionCtx.waitUntil(c.env.DB.prepare("UPDATE posts SET views = views + 1 WHERE id = ?").bind(p.id).run().catch(() => {}));
+
+  const related = await q(c.env.DB, `SELECT slug, title, kind, excerpt, cover_key, published_at FROM posts WHERE status='publie' AND id != ? AND (kind = ? OR category = ?) ORDER BY published_at DESC LIMIT 3`, p.id, String(p.kind || ""), String(p.category || ""));
+  const relatedFallback = related.length < 3
+    ? [...related, ...await q(c.env.DB, "SELECT slug, title, kind, excerpt, cover_key, published_at FROM posts WHERE status='publie' AND id != ? ORDER BY published_at DESC LIMIT ?", p.id, 3 - related.length)].filter((v, i, a) => a.findIndex((x) => x.slug === v.slug) === i).slice(0, 3)
+    : related;
+  const product = p.related_product_id ? await q1<{ slug: string; name: string }>(c.env.DB, "SELECT slug, name FROM products WHERE slug IS NOT NULL AND (id = ? OR slug = ?)", p.related_product_id, String(p.related_product_id || "")) : null;
+
+  const articleUrl = `${String(site.settings.site_url || c.env.SITE_URL || "https://greenfad.tech")}/blog/${p.slug}`;
+  const tags = parseJSON<string[]>(p.tags, []);
+  const body = `<section class="page-hero article-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: String(p.title) }])}
+    ${kindBadge(String(p.kind))}
+    <h1>${esc(String(p.title))}</h1>
+    <div class="post-meta post-meta--hero"><span>${icon("user")} ${esc(String(p.author || "Green FAD"))}</span><span>${icon("calendar")} ${fmtDate(p.published_at)}</span><span>${icon("clock")} ${readingTime(String(p.content_md))} min de lecture</span></div></div></section>
+  ${p.cover_key ? `<div class="container"><div class="article__cover reveal"><img src="${esc(mediaSrc(String(p.cover_key)))}" alt="${esc(String(p.title))}"></div></div>` : ""}
+  <section class="container"><div class="article-grid">
+    <article class="article prose reveal">${md(stripFirstH1(p.content_md))}</article>
+    <aside class="article-side">
+      ${tags.length ? `<div class="article-side__block"><h3>${icon("tag", "i--inline")} Sujets</h3><div class="chips">${tags.map((t) => `<a class="chip" href="/blog?q=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}</div></div>` : ""}
+      ${product ? `<div class="article-side__block"><h3>${icon("package", "i--inline")} Produit associé</h3><a class="mini-card" href="/produits/${esc(product.slug)}"><strong>${esc(product.name)}</strong><span class="card__more">Découvrir ${icon("arrow-right")}</span></a></div>` : ""}
+      <div class="article-side__block"><h3>${icon("newspaper", "i--inline")} Newsletter</h3><p class="muted">Recevez nos prochaines publications technologiques.</p><form method="post" action="/newsletter" class="nl-form"><input type="email" name="email" required placeholder="votre@email.com" aria-label="Email"><button class="btn btn--primary btn--sm" type="submit">${icon("send", "i--inline")}</button></form></div>
+      <div class="article-side__block">${shareHTML(String(p.title), articleUrl)}</div>
+    </aside>
+  </div></section>
+  ${relatedFallback.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">À lire ensuite</p><h2>Articles liés</h2></header>
+    <div class="cards cards--3 reveal">${relatedFallback.map((o) => `<article class="card">${o.cover_key ? `<a class="card__media" href="/blog/${esc(String(o.slug))}"><img src="${esc(mediaSrc(String(o.cover_key)))}" alt="" loading="lazy"></a>` : ""}<div class="card__body">${kindBadge(String(o.kind))}<h3><a href="/blog/${esc(String(o.slug))}">${esc(String(o.title))}</a></h3><p>${esc(String(o.excerpt || ""))}</p><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Un projet technologique en tête ?</h2><p>Nos équipes conçoivent des produits et des plateformes pour les organisations africaines et internationales.</p><a class="btn btn--invert" href="/contact">Discutons-en ${icon("arrow-right")}</a></div></section>`;
   const jsonLd = [{
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: String(p.title),
     description: String(p.excerpt || excerptFromMd(p.content_md, 160)),
     datePublished: String(p.published_at || ""),
+    dateModified: String(p.updated_at || p.published_at || ""),
+    wordCount: String(p.content_md || "").split(/\s+/).filter(Boolean).length,
     author: { "@type": "Organization", name: String(p.author || "GREEN FAD") },
-    publisher: { "@type": "Organization", name: "GREEN FAD" },
+    publisher: { "@type": "Organization", name: "GREEN FAD", logo: { "@type": "ImageObject", url: String(site.settings.site_url || "") + "/assets/images/greenfad-logo.svg" } },
     image: p.cover_key ? String(site.settings.site_url || "") + mediaSrc(String(p.cover_key)) : undefined,
+    mainEntityOfPage: articleUrl,
     inLanguage: "fr",
   }];
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || p.title), description: String(p.meta_description || p.excerpt || ""), ogImage: String(p.og_image || mediaSrc(String(p.cover_key))), canonicalPath: `/innovation/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Innovation", url: "/innovation" }, { label: String(p.title) }] }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || p.title), description: String(p.meta_description || p.excerpt || ""), ogImage: String(p.og_image || mediaSrc(String(p.cover_key))), canonicalPath: `/blog/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: String(p.title) }] }), body));
 });
+
+// ---------- Anciennes URL Innovation → Blog (301) ----------
+publicRoutes.get("/innovation", (c) => c.redirect(c.req.url.replace(/\/innovation(\?.*)?$/, "/blog$1"), 301));
+publicRoutes.get("/innovation/:slug", (c) => c.redirect(`/blog/${c.req.param("slug")}`, 301));
+
+// ---------- Alias /services → /expertises ----------
+publicRoutes.get("/services", (c) => c.redirect("/expertises", 301));
+publicRoutes.get("/services/:slug", (c) => c.redirect(`/expertises/${c.req.param("slug")}`, 301));
 
 // ---------- Implantation internationale ----------
 publicRoutes.get("/implantation", async (c) => {
@@ -674,8 +896,9 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     ...projects.map((p) => ({ loc: `/realisations/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.6" })),
     { loc: "/galerie", date: today, priority: "0.7" },
     ...albums.map((a) => ({ loc: `/galerie/album/${a.slug}`, date: String(a.updated_at).slice(0, 10), priority: "0.5" })),
-    { loc: "/innovation", date: today, priority: "0.8" },
-    ...posts.map((p) => ({ loc: `/innovation/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.6" })),
+    { loc: "/blog", date: today, priority: "0.9" },
+    { loc: "/blog/archives", date: today, priority: "0.4" },
+    ...posts.map((p) => ({ loc: `/blog/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.7" })),
     { loc: "/implantation", date: today, priority: "0.7" },
     ...countries.map((p) => ({ loc: `/implantation/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.6" })),
     { loc: "/contact", date: today, priority: "0.6" },
@@ -699,7 +922,7 @@ publicRoutes.get("/rss.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, excerpt, published_at FROM posts WHERE status = ? ORDER BY published_at DESC LIMIT 20", PUBLIE);
   const items = rows
-    .map((p) => `<item><title>${esc(p.title)}</title><link>${base}/innovation/${p.slug}</link><description>${esc(p.excerpt || "")}</description><pubDate>${new Date(String(p.published_at)).toUTCString()}</pubDate><guid>${base}/innovation/${p.slug}</guid></item>`)
+    .map((p) => `<item><title>${esc(p.title)}</title><link>${base}/blog/${p.slug}</link><description>${esc(p.excerpt || "")}</description><pubDate>${new Date(String(p.published_at)).toUTCString()}</pubDate><guid>${base}/blog/${p.slug}</guid></item>`)
     .join("\n");
-  return c.body(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>GREEN FAD — Innovation & actualités</title><link>${base}</link><description>Technologie, innovation et connaissance — Green FAD</description>${items}</channel></rss>`, 200, { "content-type": "application/rss+xml; charset=utf-8" });
+  return c.body(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>GREEN FAD — Blog technologique</title><link>${base}/blog</link><description>Actualités, ingénierie, produits et innovation — le blog de Green FAD</description>${items}</channel></rss>`, 200, { "content-type": "application/rss+xml; charset=utf-8" });
 });

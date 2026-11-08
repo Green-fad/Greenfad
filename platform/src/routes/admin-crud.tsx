@@ -37,7 +37,7 @@ export type ResourceDef = {
   slugFrom?: string;
   order?: string;
   searchable?: string[];
-  relationsKey?: "product" | "project"; // médias liés via content_relations
+  relationsKey?: "product" | "project" | "service"; // médias liés via content_relations
   columns: Field[];
   fields: Field[];
   intro?: string;
@@ -95,6 +95,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "benefits_md", label: "Bénéfices et valeur ajoutée", type: "markdown", form_span: true },
       { name: "differentiators_md", label: "Éléments différenciateurs", type: "markdown", form_span: true },
       { name: "use_cases_md", label: "Cas d'utilisation", type: "markdown", form_span: true },
+      { name: "related_service_id", label: "Expertise mobilisée", type: "relation", relation: { table: "services", label: "name", value: "id" } },
       { name: "links_json", label: "Liens officiels", type: "json", form_span: true, help: '[{"label":"Site du produit","url":"https://…"}]' },
       { name: "versions_json", label: "Historique des versions publiables", type: "json", form_span: true, help: '[{"version":"1.0","date":"2025","note":"…"}]' },
       { name: "external_url", label: "URL de l'application / démo", type: "url" },
@@ -111,26 +112,35 @@ export const RESOURCES: Record<string, ResourceDef> = {
   },
   services: {
     key: "services", table: "services", title: "Services & Expertises", single: "service", perm: "services", statusable: true,
-    slugFrom: "name", order: "sort_order ASC", searchable: ["name", "summary"],
-    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "summary", label: "Résumé", type: "textarea", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    slugFrom: "name", order: "sort_order ASC", searchable: ["name", "summary"], relationsKey: "service",
+    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "sort_order", label: "Ordre", type: "number", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "name", label: "Nom du service", type: "text", required: true },
       { name: "slug", label: "Slug", type: "text", help: "Laisser vide pour générer automatiquement" },
       { name: "summary", label: "Résumé (cartes & SEO)", type: "textarea", form_span: true },
       { name: "icon", label: "Icône (bibliothèque SVG)", type: "select", options: ICON_OPTIONS },
       { name: "image_key", label: "Image", type: "image" },
-      { name: "content_md", label: "Contenu commercial complet (markdown)", type: "markdown", form_span: true },
+      { name: "content_md", label: "Présentation commerciale complète (markdown)", type: "markdown", form_span: true },
+      { name: "methodology_md", label: "Méthodologie d'intervention (markdown)", type: "markdown", form_span: true, help: "Étapes numérotées ou sous-titres — affichée en section « Comment nous procédons »" },
+      { name: "process_md", label: "Déroulement d'un projet type (markdown)", type: "markdown", form_span: true },
+      { name: "includes_json", label: "Ce que le service inclut", type: "json", form_span: true, help: 'Liste : ["Audit et cadrage","Conception UX/UI","Développement","Formation"]' },
+      { name: "tech_json", label: "Technologies & outils maîtrisés", type: "json", form_span: true, help: 'Liste : ["React","Node.js","PostgreSQL","Cloudflare"]' },
+      { name: "industries_json", label: "Secteurs / industries adressés", type: "json", form_span: true, help: 'Liste : ["Banque & microfinance","Santé","Éducation","ONG & institutions"]' },
+      { name: "benefits_md", label: "Bénéfices pour le client (markdown)", type: "markdown", form_span: true },
+      { name: "deliverables_md", label: "Livrables types (markdown)", type: "markdown", form_span: true },
+      { name: "_media", label: "Médias liés (galerie & vidéos du service)", type: "media_multi", form_span: true, help: "Médias du Media Center réutilisables sans duplication" },
       { name: "sort_order", label: "Ordre", type: "number" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "published_at", label: "Date de publication", type: "datetime" },
       { name: "meta_title", label: "Titre SEO", type: "text" },
       { name: "meta_description", label: "Description SEO", type: "textarea" },
+      { name: "og_image", label: "Image de partage Open Graph", type: "image" },
     ],
   },
   posts: {
-    key: "posts", table: "posts", title: "Innovation & publications", single: "article", perm: "posts", statusable: true,
+    key: "posts", table: "posts", title: "Blog & Publications", single: "article", perm: "posts", statusable: true,
     slugFrom: "title", order: "published_at DESC", searchable: ["title", "excerpt"],
-    intro: "Espace Innovation & Connaissance : analyses, R&D, prototypes, veille, guides et retours d'expérience — reliés aux produits, projets et pays.",
+    intro: "Le blog GREEN FAD (public : /blog) : actualités, lancements produits, analyses, R&D, guides et retours d'expérience — reliés aux produits, projets et pays. Article le plus lu affiché automatiquement dans « Articles populaires ».",
     columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "kind", label: "Type", type: "select", options: POST_KINDS, list: true }, { name: "published_at", label: "Date éditoriale", type: "datetime", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "title", label: "Titre de l'article", type: "text", required: true },
@@ -166,6 +176,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "client", label: "Client (si autorisé)", type: "text" },
       { name: "client_type", label: "Type de relation", type: "select", options: [{ value: "client", label: "Client direct" }, { value: "partenaire", label: "Partenaire technologique" }, { value: "interne", label: "Projet interne / expérimentation" }, { value: "solution", label: "Solution personnalisée" }] },
       { name: "country_id", label: "Pays", type: "relation", relation: { table: "countries", label: "name", value: "id" } },
+      { name: "related_service_id", label: "Expertise mobilisée", type: "relation", relation: { table: "services", label: "name", value: "id" } },
       { name: "category", label: "Catégorie", type: "text" },
       { name: "summary", label: "Résumé", type: "textarea", form_span: true },
       { name: "content_md", label: "Étude de cas (markdown)", type: "markdown", form_span: true },
