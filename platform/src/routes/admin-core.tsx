@@ -785,9 +785,11 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     if (d) return d;
     const s = await loadSettings(c.env.DB);
     const v = (k: string) => esc(String((s[k] as string) || ""));
+    const jsonErr = c.req.query("error") === "json" ? `<div class="adm-alert adm-alert--error">JSON invalide — corrigez la syntaxe (guillemets, virgules) puis enregistrez à nouveau.</div>` : "";
     const socials = parseJSON<Record<string, string>>(JSON.stringify(s.socials || "{}"), {});
     const body = `<form method="post" action="/admin/settings" class="adm-form">
       <input type="hidden" name="_csrf" value="${user.csrf}">
+      ${jsonErr}
       <section class="adm-panel"><h3>Identité de l'entreprise</h3>
         <label class="adm-field"><span>Nom du site</span><input name="site_name" value="${v("site_name")}"></label>
         <label class="adm-field full"><span>Accroche (tagline)</span><input name="tagline" value="${v("tagline")}"></label>
@@ -804,6 +806,25 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       <section class="adm-panel"><h3>Réseaux sociaux</h3>
         ${["facebook", "youtube", "tiktok", "linkedin"].map((n) => `<label class="adm-field"><span>${esc(n)}</span><input name="social_${n}" value="${esc(socials[n] || "")}"></label>`).join("")}
       </section>
+      <section class="adm-panel full"><h3>Textes des pages publiques &amp; parcours produits (JSON)</h3>
+        <p class="muted" style="margin:0 0 .8rem">Ici vous remplacez, sans toucher au code, les grands titres des pages publiques et la frise « Le chemin parcouru » de la page Réalisations. Structure attendue :</p>
+        <pre style="background:#0d1b2a;color:#cde;padding:1rem;border-radius:10px;overflow:auto;font-size:.85rem">{
+  "heroes": {
+    "/expertises":  { "title": "…", "text": "…" },
+    "/produits":    { "title": "…", "text": "…" },
+    "/realisations":{ "title": "…", "text": "…" },
+    "/galerie":     { "title": "…", "text": "…" },
+    "/blog":        { "title": "…", "text": "…" },
+    "/blog/archives":{ "title": "…" },
+    "/implantation":{ "title": "…", "text": "…" }
+  },
+  "timeline": [
+    { "year": "2021", "title": "Les fondations", "text": "…" }
+  ]
+}</pre>
+        <label class="adm-field full"><span>Contenu éditable (JSON — laissez vide pour garder les textes actuels)</span><textarea name="content_overrides" rows="12" spellcheck="false" style="font-family:monospace">${esc(String(s.content_overrides || ""))}</textarea></label>
+        <p class="muted">Astuce : chaque image et chaque texte des produits, services, articles et de la page d'accueil s'édite dans leurs modules respectifs — ce champ ne concerne que les héros et la frise chronologique ci-dessus.</p>
+      </section>
       <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer les paramètres</button></div></form>`;
     return c.html(adminLayout(c, user, "Paramètres & identité", body, "/admin/settings"));
   });
@@ -819,6 +840,17 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const socials: Record<string, string> = {};
     for (const n of ["facebook", "youtube", "tiktok", "linkedin"]) if (form[`social_${n}`]) socials[n] = String(form[`social_${n}`]);
     await setSetting(c.env.DB, "socials", socials);
+    const coRaw = String(form.content_overrides || "").trim();
+    if (coRaw) {
+      try {
+        const parsed = JSON.parse(coRaw);
+        await setSetting(c.env.DB, "content_overrides", JSON.stringify(parsed));
+      } catch {
+        return c.redirect("/admin/settings?error=json");
+      }
+    } else {
+      await setSetting(c.env.DB, "content_overrides", "");
+    }
     await invalidateCache(c.env, ["settings"]);
     await audit(c, "modification_parametres", "settings");
     return c.redirect("/admin/settings");

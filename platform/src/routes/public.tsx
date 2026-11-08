@@ -12,6 +12,37 @@ import { audit } from "../audit";
 
 const PUBLIE = "publie";
 
+// ---------- Contenu éditable depuis l'admin (settings → « content_overrides » JSON) ----------
+// Rien d'essentiel n'est figé dans le code : les textes de héros et le parcours des
+// réalisations peuvent être remplacés depuis Admin → Paramètres, sans toucher au code.
+type HeroOverride = { title?: string; text?: string };
+type TimelineEntry = { year: string; title: string; text: string };
+type ContentOverrides = { heroes?: Record<string, HeroOverride>; timeline?: TimelineEntry[] };
+
+const DEFAULT_TIMELINE: TimelineEntry[] = [
+  { year: "2021", title: "Les fondations", text: "Lancement de QRFAD (mars) et FAD CARD (mai) à Bamako : le menu par QR code et la carte de visite numérique NFC." },
+  { year: "2022", title: "Des produits qui s'élargissent", text: "QRFAD passe au multi-établissements ; FadCard ouvre Market, sa vitrine marchande." },
+  { year: "2023", title: "Transactions & commandes", text: "Commandes depuis le menu puis WhatsApp sur QRFAD ; Tickets puis Fund sur FadCard." },
+  { year: "2024", title: "Plateformes complètes", text: "Hôtellerie et caisse POS côté QRFAD ; Vote et FadCard Pay clôturent la suite FadCard. PayGfad, la suite de gestion SaaS, est mise en ligne." },
+  { year: "2025", title: "Maturité", text: "153 designs et cartes NFC pour FadCard ; caisse consolidée et thèmes pour QRFAD." },
+  { year: "2026", title: "Tile, CloudAf & PayGfad", text: "Le réseau social du progrès, la plateforme no-code + IA et la suite de gestion SaaS rejoignent l'écosystème — cinq plateformes en ligne." },
+];
+
+function overridesOf(site: { settings: Record<string, unknown> }): ContentOverrides {
+  return parseJSON<ContentOverrides>(String(site.settings.content_overrides || ""), {});
+}
+
+function heroOf(site: { settings: Record<string, unknown> }, path: string, defTitle: string, defText: string): { title: string; text: string; raw: boolean } {
+  const h = overridesOf(site).heroes?.[path];
+  if (h && (h.title || h.text)) return { title: h.title || defTitle, text: h.text || defText, raw: false };
+  return { title: defTitle, text: defText, raw: true };
+}
+
+function timelineOf(site: { settings: Record<string, unknown> }): TimelineEntry[] {
+  const t = overridesOf(site).timeline;
+  return Array.isArray(t) && t.length ? t : DEFAULT_TIMELINE;
+}
+
 // ---------- Helpers ----------
 async function getPageSEO(c: Context<{ Bindings: Env }>, seo: PageSEO): Promise<PageSEO> {
   const siteName = (await getSetting(c.env.DB, "site_name", "GREEN FAD")) as string;
@@ -141,9 +172,10 @@ publicRoutes.get("/__preview/:id", async (c) => {
 publicRoutes.get("/expertises", async (c) => {
   const rows = await q(c.env.DB, "SELECT slug, name, summary, image_key, icon FROM services WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
+  const hero = heroOf(site, "/expertises", "L'ingénierie numérique de bout en bout", "Conception, développement, déploiement et accompagnement : nos équipes couvrent l'ensemble de la chaîne de valeur technologique.");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Expertises" }])}<p class="eyebrow">Expertises</p>
-    <h1>L'ingénierie numérique de bout en bout</h1>
-    <p class="page-hero__text">Conception, développement, déploiement et accompagnement : nos équipes couvrent l'ensemble de la chaîne de valeur technologique.</p></div></section>
+    <h1>${esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
   <section class="container"><div class="cards cards--3 reveal">${rows
     .map((s) => `<article class="card"><a class="card__media" href="/expertises/${esc(s.slug)}"><img src="${esc(mediaSrc(s.image_key as string))}" alt="${esc(String(s.name))}" loading="lazy"></a>
       <div class="card__body"><h3><a href="/expertises/${esc(s.slug)}">${esc(String(s.name))}</a></h3><p>${esc(String(s.summary || ""))}</p><span class="card__more">En savoir plus ${icon("arrow-right")}</span></div></article>`)
@@ -245,9 +277,10 @@ publicRoutes.get("/produits", async (c) => {
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, name, tagline, image_key, category, state FROM products WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
   const stateLabels: Record<string, string> = { developpement: "En développement", beta: "Bêta", disponible: "Disponible", evolution: "En évolution", archive: "Archivé" };
+  const hero = heroOf(site, "/produits", "Des produits numériques conçus et portés par Green FAD", "Solutions propriétaires développées par nos équipes, pensées pour les marchés africains et ouverts à l'international.");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits" }])}<p class="eyebrow">Produits technologiques</p>
-    <h1>Des produits numériques <em style="color:var(--teal-400);font-style:normal">conçus et portés</em> par Green FAD</h1>
-    <p class="page-hero__text">Solutions propriétaires développées par nos équipes, pensées pour les marchés africains et ouverts à l'international.</p></div></section>
+    <h1>${hero.raw ? `Des produits numériques <em style="color:var(--teal-400);font-style:normal">conçus et portés</em> par Green FAD` : esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
   <section class="container"><div class="cards cards--3 reveal">${rows
     .map((p) => `<article class="card">
       ${p.image_key ? `<a class="card__media" href="/produits/${esc(String(p.slug))}"><img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}" loading="lazy"></a>` : `<a class="card__media card__media--empty" href="/produits/${esc(String(p.slug))}" aria-hidden="true" tabindex="-1">${icon("package")}</a>`}
@@ -372,19 +405,14 @@ publicRoutes.get("/realisations", async (c) => {
   const others = rows.filter((r) => !String(r.category || "").includes("Produit propriétaire"));
   const projectCard = (r: Record<string, unknown>) => `<article class="card"><a class="card__media" href="/realisations/${esc(String(r.slug))}">${r.image_key ? `<img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy">` : ""}</a>
       <div class="card__body">${r.category ? `<span class="tag">${esc(String(r.category))}</span>` : ""}<h3><a href="/realisations/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><p>${esc(String(r.summary || ""))}</p><span class="card__more">Lire l'étude de cas ${icon("arrow-right")}</span></div></article>`;
+  const hero = heroOf(site, "/realisations", "Des produits qui vivent, des parcours documentés", "Nos études de cas racontent la vraie vie de nos plateformes : lancement, évolutions trimestrielles, usage sur le terrain. Cinq ans de produit, sans artifice.");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Réalisations" }])}<p class="eyebrow">Projets & réalisations</p>
-    <h1>Des produits qui vivent, des parcours documentés</h1>
-    <p class="page-hero__text">Nos études de cas racontent la vraie vie de nos plateformes : lancement, évolutions trimestrielles, usage sur le terrain. Cinq ans de produit, sans artifice.</p></div></section>
+    <h1>${esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
   ${prop.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Produits propriétaires</p><h2>Le parcours de nos plateformes</h2></header>
     <div class="cards cards--${Math.min(prop.length, 3)} reveal">${prop.map(projectCard).join("")}</div></section>` : ""}
   <section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Depuis 2021</p><h2>Le chemin parcouru</h2></header>
-    <ol class="timeline reveal">
-      <li><span class="timeline__year">2021</span><div><h3>Les fondations</h3><p>Lancement de QRFAD (mars) et FAD CARD (mai) à Bamako : le menu par QR code et la carte de visite numérique NFC.</p></div></li>
-      <li><span class="timeline__year">2022</span><div><h3>Des produits qui s'élargissent</h3><p>QRFAD passe au multi-établissements ; FadCard ouvre Market, sa vitrine marchande.</p></div></li>
-      <li><span class="timeline__year">2023</span><div><h3>Transactions & commandes</h3><p>Commandes depuis le menu puis WhatsApp sur QRFAD ; Tickets puis Fund sur FadCard.</p></div></li>
-      <li><span class="timeline__year">2024</span><div><h3>Plateformes complètes</h3><p>Hôtellerie et caisse POS côté QRFAD ; Vote et FadCard Pay clôturent la suite FadCard.</p></div></li>
-      <li><span class="timeline__year">2025</span><div><h3>Maturité</h3><p>153 designs et cartes NFC pour FadCard ; caisse consolidée et thèmes pour QRFAD.</p></div></li>
-      <li><span class="timeline__year">2026</span><div><h3>Tile, CloudAf & PayGfad</h3><p>Le réseau social du progrès, la plateforme no-code + IA et la suite de gestion SaaS rejoignent l'écosystème — cinq plateformes en ligne.</p></div></li>
+    <ol class="timeline reveal">${timelineOf(site).map((t) => `<li><span class="timeline__year">${esc(t.year)}</span><div><h3>${esc(t.title)}</h3><p>${esc(t.text)}</p></div></li>`).join("")}
     </ol>
     <p class="center" style="margin-top:2rem"><a class="btn btn--outline" href="/blog">${icon("newspaper", "i--inline")} Lire le parcours complet dans le blog</a></p></section>
   ${others.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Projets & prestations</p><h2>Études de cas clients</h2></header>
@@ -428,9 +456,10 @@ publicRoutes.get("/galerie", async (c) => {
   ]);
   const site = await loadSiteData(c);
   const catLabels: Record<string, string> = { general: "Galerie générale", produits: "Produits", projets: "Projets & réalisations", evenements: "Événements", institution: "Institutionnel & équipes", bureaux: "Bureaux & implantations", demonstrations: "Démonstrations" };
+  const hero = heroOf(site, "/galerie", "La galerie multimédia de Green FAD", "Photographies et vidéos officielles : nos produits, nos équipes, nos événements et nos implantations.");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Galerie" }])}<p class="eyebrow">Media Center</p>
-    <h1>La galerie multimédia de Green FAD</h1>
-    <p class="page-hero__text">Photographies et vidéos officielles : nos produits, nos équipes, nos événements et nos implantations.</p></div></section>
+    <h1>${esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
   ${albums.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Albums photo</p><h2>Explorez par thématique</h2></header>
     <div class="album-grid reveal">${albums.map((a) => `<a class="album" href="/galerie/album/${esc(String(a.slug))}">
       ${a.cover_key ? `<img src="${esc(mediaSrc(String(a.cover_key)))}" alt="${esc(String(a.name))}" loading="lazy">` : ""}
@@ -553,9 +582,10 @@ publicRoutes.get("/blog", async (c) => {
     <p>${esc(String(p.excerpt || excerptFromMd(p.content_md, 130)))}</p>
     <div class="post-meta"><span>${icon("calendar")} ${fmtDate(p.published_at, "short")}</span><span>${icon("clock")} ${readingTime(String(p.content_md))} min</span></div></div></article>`;
 
+  const hero = heroOf(site, "/blog", "Le média technologique de nos ingénieurs", "Actualités de l'entreprise, lancements produits, analyses, R&D, guides d'ingénierie et regards sur l'innovation africaine — écrits par les équipes qui construisent.");
   const body = `<section class="page-hero blog-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog" }])}<p class="eyebrow">Blog GREEN FAD</p>
-    <h1>Le média technologique <em style="color:var(--teal-400);font-style:normal">de nos ingénieurs</em></h1>
-    <p class="page-hero__text">Actualités de l'entreprise, lancements produits, analyses, R&D, guides d'ingénierie et regards sur l'innovation africaine — écrits par les équipes qui construisent.</p>
+    <h1>${hero.raw ? `Le média technologique <em style="color:var(--teal-400);font-style:normal">de nos ingénieurs</em>` : esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p>
     <form class="blog-search" action="/blog" method="get" role="search">
       ${kind ? `<input type="hidden" name="type" value="${esc(kind)}">` : ""}
       <input type="search" name="q" value="${esc(search)}" placeholder="Rechercher un article, un thème…" aria-label="Rechercher dans le blog" maxlength="80">
@@ -598,8 +628,9 @@ publicRoutes.get("/blog/archives", async (c) => {
     groups.get(key)!.push(r);
   }
   const MONTHS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+  const hero = heroOf(site, "/blog/archives", "Tous nos articles, par mois", "");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: "Archives" }])}<p class="eyebrow">Blog — archives</p>
-    <h1>Tous nos articles, par mois</h1></div></section>
+    <h1>${esc(hero.title)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   <section class="container">${[...groups.entries()].map(([key, items]) => `<div class="archive-group reveal">
     <h2>${MONTHS[Number(key.slice(5, 7)) - 1] || key} ${key.slice(0, 4)} <span class="muted">(${items.length})</span></h2>
     <ul class="archive-list">${items.map((r) => `<li><span class="archive-list__date">${fmtDate(r.published_at, "short")}</span>${kindBadge(String(r.kind))}<a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></li>`).join("")}</ul></div>`).join("")}
@@ -667,9 +698,10 @@ publicRoutes.get("/services/:slug", (c) => c.redirect(`/expertises/${c.req.param
 publicRoutes.get("/implantation", async (c) => {
   const countries = await q(c.env.DB, "SELECT c.slug, c.name, c.iso2, c.is_registered, c.presentation_md, COUNT(o.id) AS offices FROM countries c LEFT JOIN offices o ON o.country_id = c.id AND o.status='publie' WHERE c.status='publie' GROUP BY c.id ORDER BY c.sort_order");
   const site = await loadSiteData(c);
+  const hero = heroOf(site, "/implantation", "Enracinés en Afrique, tournés vers le monde", "Green FAD opère depuis le Mali et accompagne des organisations dans plusieurs pays africains, avec une ambition internationale assumée.");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Implantation" }])}<p class="eyebrow">Présence internationale</p>
-    <h1>Enracinés en Afrique, tournés vers le monde</h1>
-    <p class="page-hero__text">Green FAD opère depuis le Mali et accompagne des organisations dans plusieurs pays africains, avec une ambition internationale assumée.</p></div></section>
+    <h1>${esc(hero.title)}</h1>
+    <p class="page-hero__text">${esc(hero.text)}</p></div></section>
   <section class="container"><div class="countries reveal">${countries
     .map((co) => `<a class="country" href="/implantation/${esc(String(co.slug))}">
       <span class="country__code${Number(co.is_registered) ? "" : " country__code--teal"}">${esc(String(co.iso2 || "AF"))}</span>
