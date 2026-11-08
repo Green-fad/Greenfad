@@ -18,7 +18,7 @@ async function getPageSEO(c: Context<{ Bindings: Env }>, seo: PageSEO): Promise<
   const defaults = (await getSetting(c.env.DB, "seo_defaults", {})) as { default_description?: string };
   return {
     ...seo,
-    title: seo.title.includes("GREEN FAD") ? seo.title : `${seo.title} | ${String(siteName)}`,
+    title: /green\s*fad/i.test(seo.title) ? seo.title : `${seo.title} | ${String(siteName)}`,
     description: seo.description || defaults.default_description || undefined,
   };
 }
@@ -368,14 +368,29 @@ publicRoutes.get("/produits/:slug", async (c) => {
 publicRoutes.get("/realisations", async (c) => {
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, summary, image_key, category, client_type FROM projects WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
+  const prop = rows.filter((r) => String(r.category || "").includes("Produit propriétaire"));
+  const others = rows.filter((r) => !String(r.category || "").includes("Produit propriétaire"));
+  const projectCard = (r: Record<string, unknown>) => `<article class="card"><a class="card__media" href="/realisations/${esc(String(r.slug))}">${r.image_key ? `<img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy">` : ""}</a>
+      <div class="card__body">${r.category ? `<span class="tag">${esc(String(r.category))}</span>` : ""}<h3><a href="/realisations/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><p>${esc(String(r.summary || ""))}</p><span class="card__more">Lire l'étude de cas ${icon("arrow-right")}</span></div></article>`;
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Réalisations" }])}<p class="eyebrow">Projets & réalisations</p>
-    <h1>Des solutions livrées, des partenaires satisfaits</h1>
-    <p class="page-hero__text">Études de cas de nos prestations et collaborations — distinctes de nos produits propriétaires. Seules des informations autorisées et vérifiables sont publiées.</p></div></section>
-  <section class="container"><div class="cards cards--3 reveal">${rows
-    .map((r) => `<article class="card"><a class="card__media" href="/realisations/${esc(String(r.slug))}">${r.image_key ? `<img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy">` : ""}</a>
-      <div class="card__body">${r.category ? `<span class="tag">${esc(String(r.category))}</span>` : ""}<h3><a href="/realisations/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><p>${esc(String(r.summary || ""))}</p><span class="card__more">Lire l'étude de cas ${icon("arrow-right")}</span></div></article>`)
-    .join("")}</div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Réalisations & études de cas", description: "Projets technologiques livrés par Green FAD pour ses clients et partenaires.", canonicalPath: "/realisations" }), body));
+    <h1>Des produits qui vivent, des parcours documentés</h1>
+    <p class="page-hero__text">Nos études de cas racontent la vraie vie de nos plateformes : lancement, évolutions trimestrielles, usage sur le terrain. Cinq ans de produit, sans artifice.</p></div></section>
+  ${prop.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Produits propriétaires</p><h2>Le parcours de nos plateformes</h2></header>
+    <div class="cards cards--${Math.min(prop.length, 3)} reveal">${prop.map(projectCard).join("")}</div></section>` : ""}
+  <section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Depuis 2021</p><h2>Le chemin parcouru</h2></header>
+    <ol class="timeline reveal">
+      <li><span class="timeline__year">2021</span><div><h3>Les fondations</h3><p>Lancement de QRFAD (mars) et FAD CARD (mai) à Bamako : le menu par QR code et la carte de visite numérique NFC.</p></div></li>
+      <li><span class="timeline__year">2022</span><div><h3>Des produits qui s'élargissent</h3><p>QRFAD passe au multi-établissements ; FadCard ouvre Market, sa vitrine marchande.</p></div></li>
+      <li><span class="timeline__year">2023</span><div><h3>Transactions & commandes</h3><p>Commandes depuis le menu puis WhatsApp sur QRFAD ; Tickets puis Fund sur FadCard.</p></div></li>
+      <li><span class="timeline__year">2024</span><div><h3>Plateformes complètes</h3><p>Hôtellerie et caisse POS côté QRFAD ; Vote et FadCard Pay clôturent la suite FadCard.</p></div></li>
+      <li><span class="timeline__year">2025</span><div><h3>Maturité</h3><p>153 designs et cartes NFC pour FadCard ; caisse consolidée et thèmes pour QRFAD.</p></div></li>
+      <li><span class="timeline__year">2026</span><div><h3>Tile & CloudAf</h3><p>Le réseau social du progrès et la plateforme no-code + IA rejoignent l'écosystème — quatre plateformes en ligne.</p></div></li>
+    </ol>
+    <p class="center" style="margin-top:2rem"><a class="btn btn--outline" href="/blog">${icon("newspaper", "i--inline")} Lire le parcours complet dans le blog</a></p></section>
+  ${others.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Projets & prestations</p><h2>Études de cas clients</h2></header>
+    <div class="cards cards--3 reveal">${others.map(projectCard).join("")}</div></section>` : ""}
+  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Et le prochain chapitre ?</h2><p>Nos plateformes avancent chaque trimestre — suivez le blog, ou construisez le vôtre avec nous.</p><a class="btn btn--invert" href="/blog">Suivre le parcours ${icon("arrow-right")}</a></div></section>`;
+  return c.html(await layout(c, site, await getPageSEO(c, { title: "Réalisations & études de cas — le parcours de nos plateformes", description: "Études de cas et parcours produits Green FAD : QRFAD, FadCard, Tile, CloudAf — lancement, évolutions trimestrielles et déploiements réels depuis 2021.", canonicalPath: "/realisations" }), body));
 });
 
 publicRoutes.get("/realisations/:slug", async (c) => {

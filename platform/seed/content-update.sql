@@ -33,7 +33,7 @@ INSERT INTO menus (location, items) VALUES ('header', '[{"label": "Entreprise", 
 INSERT INTO menus (location, items) VALUES ('footer', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Blog", "url": "/blog"}, {"label": "Ressources", "url": "/ressources"}, {"label": "Carrières", "url": "/carrieres"}, {"label": "FAQ", "url": "/faq"}]');
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('entreprise', 'Green FAD', '{"text": "Entreprise technologique africaine d''innovation : nous concevons, développons et portons nos propres produits numériques à l''échelle internationale."}', 1);
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('contact', 'Contact', '{"text": "Missabougou, Bamako, Mali", "email": "contact@greenfad.tech"}', 2);
-INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('produits', 'Nos produits', '{"items": [{"label": "FAD CARD", "url": "/produits/fad-card"}, {"label": "NIAFAD", "url": "/produits/niafad"}, {"label": "QRFAD", "url": "/produits/qrfad"}, {"label": "FEREFAD", "url": "/produits/ferefad"}, {"label": "SARAPAY", "url": "/produits/sarapay"}, {"label": "Carte Santé", "url": "/produits/carte-sante"}, {"label": "L''Amitié Fad", "url": "/produits/amitie-fad"}]}', 3);
+INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('produits', 'Nos produits', '{"items": [{"label": "TILE", "url": "/produits/tile"}, {"label": "CLOUDAf", "url": "/produits/cloudaf"}, {"label": "FAD CARD", "url": "/produits/fad-card"}, {"label": "NIAFAD", "url": "/produits/niafad"}, {"label": "QRFAD", "url": "/produits/qrfad"}, {"label": "FEREFAD", "url": "/produits/ferefad"}, {"label": "SARAPAY", "url": "/produits/sarapay"}, {"label": "Carte Santé", "url": "/produits/carte-sante"}, {"label": "L''Amitié Fad", "url": "/produits/amitie-fad"}]}', 3);
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('liens', 'Informations', '{"items": [{"label": "Mentions légales", "url": "/p/mentions-legales"}, {"label": "Confidentialité", "url": "/p/confidentialite"}, {"label": "CGV", "url": "/p/cgv"}, {"label": "Ressources", "url": "/ressources"}]}', 4);
 INSERT INTO services (slug, name, summary, content_md, icon, image_key, sort_order, status, published_at, meta_title, meta_description) VALUES ('developpement-web', 'Développement Web', 'Sites vitrines, plateformes métier et applications web performantes, conçues pour les réalités du terrain africain.', '# Développement Web
 
@@ -153,105 +153,733 @@ INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, st
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Professionnels au travail', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'institution-et-equipes'), 4, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/office-workers-africa.jpg';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Burkina Faso', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'implantations'), 0, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/countries/burkina-faso.jpg';
 INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Côte d''''Ivoire', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'implantations'), 1, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/countries/cote-ivoire.jpg';
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
-  'fad-card', 'FAD CARD', 'La carte de visite numérique NFC/RFID — votre identité professionnelle, digitale',
-  'La FAD CARD de Green FAD est une carte de visite digitale NFC/RFID. En un simple geste, elle permet de partager vos coordonnées de façon moderne, sécurisée et mémorable, révolutionnant la manière de réseauter.',
-  'Les cartes de visite papier s''égarrent, se démodent et coûtent cher à réimprimer à chaque changement de numéro ou de fonction. Dans un environnement professionnel où le réseautage est décisif, l''information partagée doit rester à jour et toujours accessible.',
-  'Faire de chaque professionnel et chaque entreprise un acteur du numérique : une carte unique, réinscriptible, sans papier, qui porte l''identité complète de son porteur et reflète l''image innovante de son organisation.',
-  'FAD CARD est le produit emblématique de GREEN FAD : né de l''expérience terrain de ses fondateurs dans le réseautage professionnel à Bamako, il incarne l''alliance revendiquée par l''entreprise entre technologie et écologie.',
-  'Services professionnels, entreprises, institutions',
-  'Dirigeants, commerciaux, consultants, institutions et entreprises souhaitant moderniser leur identité professionnelle',
-  '["Partage instantané des coordonnées par simple contact NFC", "Compatibilité universelle : lecture par smartphone via NFC ou QR code", "Page profil personnalisée (nom, fonction, contacts, réseaux, liens)", "Mise à jour des informations sans réimprimer la carte", "Cartes en PVC durable, design personnalisé aux couleurs de l''entreprise", "Tableau de bord pour les entreprises qui équipent leurs équipes"]',
-  'Une identité toujours à jour, une image innovante lors de chaque échange, des économies sur les réimpressions et une démarche écoresponsable concrète.',
-  'Produit conçu et supporté localement par GREEN FAD : personnalisation complète, service client en français, livraison et accompagnement au Mali et dans la sous-région.',
-  'Cartes connectées', 'disponible', '/assets/images/portfolio/fadcard.jpg', 'package', 0, 'publie', datetime('now'),
-  'FAD CARD — Produit technologique Green FAD', 'La carte de visite numérique NFC/RFID — votre identité professionnelle, digitale', '/assets/images/portfolio/fadcard.jpg');
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'fad-card'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/fadcard.jpg';
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'fad-card'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/fadcard-logo3.png';
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
-  'qrfad', 'QRFAD', 'Le menu digital pensé pour l''Afrique — scannez, commandez, savourez',
-  'QRFAD est une solution numérique locale qui permet aux restaurants et hôtels africains de créer des menus digitaux via QR code, simples à gérer, accessibles en plusieurs langues et adaptés aux réalités du terrain.',
-  'Les menus papier s''usent, sont coûteux à modifier et compliquent la gestion des prix et des disponibilités. Les clients attendent aujourd''hui une expérience moderne, hygiénique et rapide, y compris dans les établissements de petite taille.',
-  'Donner à chaque restaurant africain — du petit maquis à l''hôtel international — un menu digital professionnel, sans investissement technique et gérable depuis un simple smartphone.',
-  'QRFAD est né de l''observation directe du secteur de la restauration à Bamako : des établissements pleins, des cartes fatiguées, et des clients équipés de smartphones. GREEN FAD a conçu la réponse la plus simple : un QR code.',
-  'Restauration, hôtellerie',
-  'Restaurants, hôtels, cafés, salons de thé et établissements de restauration rapide',
-  '["Menus digitaux accessibles par QR code, sans application à installer", "Plusieurs langues pour servir une clientèle locale et internationale", "Mise à jour des plats, prix et disponibilités en temps réel", "Photos et descriptions des plats pour une expérience appétissante", "Gestion multi-établissements pour les groupes d''hôtels-restaurants", "Tableau de bord simple, utilisable sans formation informatique"]',
-  'Un menu toujours exact, une image moderne de l''établissement, moins d''impressions, et une expérience client fluidifiée.',
-  'Une solution conçue pour le terrain africain : légère en données, multi-langues, avec un accompagnement local par l''équipe GREEN FAD.',
-  'Hospitalité', 'disponible', '/assets/images/portfolio/qrfad.jpg', 'package', 1, 'publie', datetime('now'),
-  'QRFAD — Produit technologique Green FAD', 'Le menu digital pensé pour l''Afrique — scannez, commandez, savourez', '/assets/images/portfolio/qrfad.jpg');
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'qrfad'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/qrfad.jpg';
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'qrfad'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/qrfad-logo.png';
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
+-- Plateformes 2026 : Tile & CloudAf — médias
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/tile.jpg', 'tile.jpg', 'image/jpeg', 0, NULL, NULL, 'TILE — Le Réseau du Progrès, réseau social de Green FAD', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/tile-logo.png', 'tile-logo.png', 'image/png', 0, NULL, NULL, 'Identité TILE', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/cloudaf.jpg', 'cloudaf.jpg', 'image/jpeg', 0, NULL, NULL, 'CLOUDAf — plateforme no-code + IA de Green FAD', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/cloudaf-logo.png', 'cloudaf-logo.png', 'image/png', 0, NULL, NULL, 'Identité CLOUDAf', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/niafad.jpg', 'niafad.jpg', 'image/jpeg', 0, NULL, NULL, 'NIAFAD — ERP de gestion Green FAD', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/sarapay.jpg', 'sarapay.jpg', 'image/jpeg', 0, NULL, NULL, 'SARAPAY — paiement mobile sécurisé Green FAD', '/', 'seed', datetime('now'));
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/carte-sante.jpg', 'carte-sante.jpg', 'image/jpeg', 0, NULL, NULL, 'Carte Santé — dossier médical numérique Green FAD', '/', 'seed', datetime('now'));
+
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'TILE — le Réseau du Progrès', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 8, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/tile.jpg';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité TILE', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 9, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/tile-logo.png';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'CLOUDAf — créez, déployez, scalez', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 10, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/cloudaf.jpg';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Identité CLOUDAf', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 11, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/cloudaf-logo.png';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'NIAFAD — l''ERP de gestion', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 12, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/niafad.jpg';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'SARAPAY — paiement mobile', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 13, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/sarapay.jpg';
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'Carte Santé — dossier médical', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 14, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/carte-sante.jpg';
+
+-- ============ PRODUITS (v4 — parcours 2021→2026, données réelles des plateformes) ============
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
+  'fad-card', 'FAD CARD', 'Une plateforme, six applications métier, un seul compte',
+  'FAD CARD est l''écosystème professionnel de Green FAD : un seul compte réunit six applications métier — **vCard**, **Market**, **Tickets**, **Fund**, **Vote** et **FadCard Pay**. Lancée en 2021 comme carte de visite numérique NFC, la plateforme s''est enrichie à chaque trimestre : aujourd''hui, elle couvre l''identité professionnelle, la vente, la billetterie, la collecte, le vote et l''encaissement, avec une identité partagée et des données isolées par application.
+
+Côté identité : **153 designs premium**, un QR code et un lien public dédié, des cartes NFC physiques, la prise de rendez-vous et la gestion de contacts avec validation de numéro dans **66 pays**. Côté business : analytique temps réel (vues, partages, clics, sources), plus de **40 devises** prises en charge, et une application web progressive (PWA) installable depuis n''importe quel navigateur.',
+  'Un professionnel jongle avec des outils dispersés : une carte papier qui se démode, une boutique en ligne séparée, une billetterie tiers, une cagnotte ailleurs, et des paiements réconciliés à la main. Chaque outil coûte, chaque outil fragmente les données.',
+  'Un compte unique qui porte toute l''activité professionnelle : se présenter, vendre, inviter, collecter, consulter et encaisser — avec la même identité et le même tableau de bord, du Mali vers la diaspora.',
+  'FAD CARD est le produit pionnier de Green FAD : née en 2021 à Bamako comme carte de visite numérique NFC/RFID, elle a grandi par mises à jour trimestrielles successives jusqu''à devenir une plateforme six-en-un exploitée par nos équipes.',
+  'Services professionnels, entreprises, institutions', 'Professionnels, commerçants, organisateurs d''événements, associations, communautés, entrepreneurs',
+  '["vCard : 153 designs premium, QR code et lien public dédiés", "Cartes NFC physiques, prise de rendez-vous et suivi des vues", "Market : vente de produits et services, gestion de stock, intégration WhatsApp", "Tickets : billetterie avec quotas par catégorie et QR codes uniques anti-double scan", "Fund : collectes transparentes avec objectif, progression et suivi des donateurs", "Vote : sondages et compétitions, vote secret, un vote par personne, export CSV", "FadCard Pay : encaissement centralisé, suivi des fonds, retraits et frais, comptabilité en partie double", "Analytique temps réel : vues, partages, clics et sources", "Gestion de contacts avec validation de numéro dans 66 pays et 40+ devises", "Application web progressive (PWA) installable, tableaux de bord indépendants par application"]',
+  '**Six applications, un seul compte :**
+
+- **vCard** — carte de visite numérique et rendez-vous
+- **Market** — e-commerce et gestion de stock
+- **Tickets** — billetterie d''événements par QR
+- **Fund** — collectes et campagnes de financement
+- **Vote** — sondages, compétitions et scrutins
+- **FadCard Pay** — encaissement et suivi des fonds', '- Un consultant partage sa vCard et prend ses rendez-vous
+- Un commerçant vend via Market et reçoit les commandes sur WhatsApp
+- Un organisateur vend ses tickets et contrôle les entrées par scan
+- Une association collecte des fonds avec suivi public de la progression
+- Une communauté organise un vote secret avec export CSV des résultats
+- Un entrepreneur encaisse tous ses paiements via FadCard Pay', 'Mobile-first, installable en PWA depuis n''importe quel navigateur. Identité partagée entre les six applications, tableaux de bord indépendants et données strictement isolées par application.',
+  'Une identité toujours à jour, une image innovante à chaque échange, des économies sur les réimpressions, et surtout une base unique pour toute l''activité : plus d''outils dispersés, plus de double saisie.', 'Née du terrain africain et supportée localement par Green FAD : tarification en XOF adaptée (Starter gratuit, Pro 15 000 XOF/mois, Business 45 000 XOF/mois), cartes NFC disponibles, service client en français, 66 pays couverts pour la validation téléphonique.',
+  'Écosystème professionnel', 'evolution', '/assets/images/portfolio/fadcard.jpg', 'package', 0, 'publie', datetime('now'),
+  'FAD CARD — Plateforme 6-en-1 : vCard, Market, Tickets, Fund, Vote, Pay | Green FAD', 'FadCard réunit six applications métier en un seul compte : vCard NFC 153 designs, Market, Tickets, Fund, Vote et FadCard Pay. 5 ans d''évolution, mise à jour chaque trimestre.', '/assets/images/portfolio/fadcard.jpg',
+  '[{"label": "Ouvrir FadCard", "url": "https://fadcard.greenfad.tech"}, {"label": "Contacter l''équipe", "url": "mailto:contact@fadcard.com"}]', '[{"version": "v1.0", "date": "Mai 2021", "note": "Lancement de la vCard numérique NFC à Bamako : partage des coordonnées par simple contact."}, {"version": "v1.5", "date": "Décembre 2021", "note": "QR code et lien public dédié pour chaque carte — page profil personnalisable."}, {"version": "v2.0", "date": "Juillet 2022", "note": "Market : vente de produits et services depuis sa carte, gestion de stock, intégration WhatsApp."}, {"version": "v2.5", "date": "Février 2023", "note": "Tickets : billetterie d''événements, quotas par catégorie, QR codes uniques anti-double scan."}, {"version": "v3.0", "date": "Octobre 2023", "note": "Fund : campagnes de collecte avec objectif, progression et suivi des donateurs."}, {"version": "v3.5", "date": "Mai 2024", "note": "Vote : sondages et compétitions, option scrutin secret, un vote par personne, export CSV."}, {"version": "v4.0", "date": "Décembre 2024", "note": "FadCard Pay : encaissement centralisé, suivi des fonds et retraits, comptabilité en partie double — la plateforme atteint six applications."}, {"version": "v4.5", "date": "Août 2025", "note": "153 designs premium disponibles et cartes NFC physiques commandables."}, {"version": "v5.0", "date": "Mars 2026", "note": "Analytique temps réel (vues, partages, clics, sources), validation de numéro dans 66 pays, 40+ devises, PWA installable."}, {"version": "v5.1", "date": "Juillet 2026", "note": "Mise à jour trimestrielle : performances, fiabilité des paiements et expérience mobile."}]', 'https://fadcard.greenfad.tech',
+  (SELECT id FROM services WHERE slug = 'developpement-web'));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
+  'qrfad', 'QRFAD', 'Votre menu numérique, accessible en un scan',
+  'QRFAD numérise la restauration et l''hôtellerie africaines depuis 2021. Le client scanne un QR code et consulte le menu — sans installer d''application : catégories, plats, descriptions, prix et photos, toujours à jour depuis l''espace d''administration. La modification est **centralisée** : une fois publiée, elle est immédiatement visible sur les QR codes déjà imprimés.
+
+QRFAD est devenu une plateforme complète : **commandes depuis le menu** (sur place, à emporter, livraison) qui arrivent directement sur le WhatsApp de l''établissement, **caisse (POS)** avec remises, taxes, paiements et suivi des dépenses, et gestion des **hôtels** : chambres avec photos, réservations, codes de confirmation, conciergerie et avis clients. Le portail public qrfad.com permet d''explorer les établissements partenaires — **9 établissements** publient déjà leur menu, au Congo Kinshasa, au Mali, au Niger et en Côte d''Ivoire.',
+  'Les menus papier s''usent, coûtent cher à modifier et se désynchronisent des prix réels. Les commandes se perdent entre la salle, la cuisine et le téléphone. Et aucun outil grand public ne gère à la fois le menu, la commande, la caisse et les chambres d''hôtel.',
+  'Donner à chaque restaurant — du maquis à l''hôtel international — un menu digital professionnel, une prise de commande simple et une caisse intégrée, gérables depuis un smartphone et sans formation informatique.',
+  'Né en 2021 de l''observation directe du secteur de la restauration à Bamako — des établissements pleins, des cartes fatiguées, des clients équipés de smartphones — QRFAD a été conçu par Green FAD autour de la réponse la plus simple : un QR code. Il évolue par mises à jour trimestrielles depuis.',
+  'Restaurants, hôtels, cafés, maquis et établissements de restauration rapide', 'Gérants d''établissements, chefs, responsables de salle, réceptionnistes d''hôtels et groupes de restauration',
+  '["Menu digital par QR code, sans application à installer", "Plats, descriptions, prix et photos, organisés par catégories", "Mise à jour centralisée : visible immédiatement sur les QR codes imprimés", "Commandes depuis le menu — sur place, à emporter, livraison — reçues sur WhatsApp", "Caisse (POS) intégrée : remises, taxes, paiements et suivi des dépenses", "Gestion multi-établissements avec plusieurs rôles et identité propre (logo, couverture, contacts)", "Tables physiques et thèmes de menu personnalisables", "Module hôtels : chambres avec photos, réservations et codes de confirmation", "Conciergerie et avis clients pour les établissements hôteliers", "Portail public d''exploration avec recherche : qrfad.com"]',
+  '**Trois univers dans une seule plateforme :**
+
+- **Restauration** — menu, commandes et caisse
+- **Hôtellerie** — chambres, réservations et conciergerie
+- **Administration** — établissements, rôles, thèmes et identité', '- Un maquis à Bamako imprime son QR code et met à jour ses prix chaque jour depuis son téléphone
+- Un restaurant reçoit les commandes à emporter directement sur WhatsApp, sans commission d''intermédiaire
+- Un hôtel gère ses chambres, réservations et demandes de conciergerie au même endroit
+- Un client découvre un établissement sur qrfad.com, consulte le menu et commande', 'Pensé pour le terrain : léger en données, lisible sur n''importe quel smartphone, utilisable sans formation. Le client scanne, commande, savoure — l''établissement garde le contrôle total depuis son espace d''administration.',
+  'Un menu toujours exact, une image moderne, moins d''impressions, des commandes qui arrivent proprement sur WhatsApp et une caisse qui réconcilie enfin salle, cuisine et paiements.', 'La seule plateforme locale qui réunit menu, commandes WhatsApp, caisse POS et hôtellerie — développée et supportée par Green FAD depuis 2021, sans commission sur vos commandes.',
+  'Restaurant & hôtel', 'evolution', '/assets/images/portfolio/qrfad.jpg', 'package', 1, 'publie', datetime('now'),
+  'QRFAD — Menu digital par QR code, commandes WhatsApp, caisse et hôtellerie | Green FAD', 'QRFAD : menus numériques par QR code sans application, commandes reçues sur WhatsApp, caisse POS intégrée et gestion hôtelière. 9 établissements au Congo, Mali, Niger et Côte d''Ivoire.', '/assets/images/portfolio/qrfad.jpg',
+  '[{"label": "Explorer QRFAD", "url": "https://qrfad.com"}, {"label": "WhatsApp — Admin Mali", "url": "https://wa.me/22373299900"}, {"label": "WhatsApp — Admin Congo Kinshasa", "url": "https://wa.me/243990833603"}]', '[{"version": "v1.0", "date": "Mars 2021", "note": "Lancement à Bamako : menu numérique par QR code, plats, prix et photos, sans application."}, {"version": "v1.5", "date": "Septembre 2021", "note": "Catégories de plats enrichies, QR code téléchargeable pour les tables."}, {"version": "v2.0", "date": "Juin 2022", "note": "Multi-établissements et rôles : une même équipe gère plusieurs adresses."}, {"version": "v2.5", "date": "Mars 2023", "note": "Commandes depuis le menu : sur place, à emporter ou en livraison."}, {"version": "v3.0", "date": "Novembre 2023", "note": "Intégration WhatsApp : la commande arrive directement sur le numéro de l''établissement."}, {"version": "v4.0", "date": "Septembre 2024", "note": "Module hôtels : chambres, réservations, codes de confirmation, conciergerie et avis."}, {"version": "v4.5", "date": "Juin 2025", "note": "Caisse (POS) intégrée : remises, taxes, paiements et suivi des dépenses."}, {"version": "v5.0", "date": "Mai 2026", "note": "Portail public qrfad.com : recherche et exploration des établissements — 9 menus en ligne."}, {"version": "v5.1", "date": "Août 2026", "note": "Mise à jour trimestrielle : performance mobile et fiabilité des commandes."}]', 'https://qrfad.com',
+  (SELECT id FROM services WHERE slug = 'developpement-web'));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
+  'tile', 'TILE', 'Le Réseau du Progrès — créez, partagez, connectez-vous',
+  'TILE est le réseau social conçu en Afrique, pour l''Afrique, développé et exploité par Green FAD SARL depuis Bamako. Publiez des **vidéos courtes** (jusqu''à 20 Mo), des **messages vocaux** et des **stories de 24 heures**. Suivez trois flux distincts : **Réseau** (votre communauté), **Certifié** (l''information des comptes institutionnels vérifiés et des médias) et **Pour toi** (recommandations selon vos goûts).
+
+TILE donne toute leur place aux réalités africaines : interface disponible en **français, anglais et bambara**, espaces dédiés aux **médias et organisations**, profils **Entreprises & boutiques** avec catalogue de jusqu''à 100 produits ou services et rôles d''équipe, et **Défis & récompenses** qui célèbrent les créateurs. Sans publicité tierce, sans revente de données, avec une modération active traitée par des humains. Disponible en application web (PWA), **Android** et **iOS**.',
+  'Les grands réseaux sociaux ignorent les réalités locales : langues africaines absentes, médias locaux noyés, créateurs sans monétisation adaptée, boutiques informelles invisibles, et données personnelles monétisées sans transparence.',
+  'Un réseau social où la communauté, les médias certifiés, les créateurs et les commerces africains avancent ensemble — en français, en anglais, en bambara — avec la confiance comme règle : comptes vérifiés, modération humaine, zéro revente de données.',
+  'TILE est développé par les équipes de Green FAD SARL à Bamako. Lancé en 2026, il s''appuie sur cinq ans d''expérience produit de l''entreprise et sur son infrastructure maîtrisée de bout en bout. Il est présent au Mali, au Congo, au Burkina Faso et au Niger.',
+  'Médias, réseaux sociaux et vie communautaire', 'Citoyens, créateurs, médias certifiés, entreprises et boutiques locales',
+  '["Vidéos courtes jusqu''à 20 Mo, messages vocaux et stories de 24 heures", "Trois flux : Réseau (communauté), Certifié (médias vérifiés), Pour toi (recommandations)", "Flux Certifié : l''information institutionnelle et médiatique se distingue d''un coup d''œil", "Explorer & tendances : recherche, hashtags et recommandations", "Messagerie privée avec contrôle de qui peut vous écrire", "Comptes privés réels : publications réservées aux abonnés acceptés, règle vérifiée côté serveur", "Profils Entreprises & boutiques : catalogue jusqu''à 100 produits ou services, rôles d''équipe", "Défis & récompenses : thèmes créatifs, classements, récompenses exclusives", "Interface en français, anglais et bambara", "Web (PWA), Android et iOS — chiffrement HTTPS/TLS, App Check anti-abus, sauvegardes chiffrées"]',
+  '**Quatre univers, un réseau :**
+
+- **Créateurs** — vidéos, vocaux, stories et défis
+- **Médias & organisations** — flux Certifié et badge vérifié
+- **Entreprises & boutiques** — catalogue et vitrine locale
+- **Communautés** — messagerie, groupes et comptes privés', '- Un créateur publie une story vidéo et participe au défi de la semaine
+- Un média national publie dans le flux Certifié, badge visible par tous
+- Une boutique de quartier présente son catalogue de 100 produits en français
+- Une association tient sa communauté informée en bambara et en français', 'Conçu pour les connexions et les usages africains : léger, trilingue, mobile-first, installable en PWA ou depuis les stores. La confiance est architecturale : badge de certification, comptes privés vérifiés côté serveur, modération humaine des signalements.',
+  'Un réseau qui parle vos langues, met les médias sérieux en avant, fait exister les boutiques locales et ne revend ni vos données ni votre attention à la publicité tierce.', 'Le seul réseau social trilingue français-anglais-bambara avec un flux Certifié pour les médias vérifiés, des boutiques intégrées et une règle absolue : ni publicité tierce, ni revente de données.',
+  'Réseaux sociaux & médias', 'disponible', '/assets/images/portfolio/tile.jpg', 'package', 2, 'publie', datetime('now'),
+  'TILE — Le Réseau du Progrès, réseau social africain | Green FAD', 'TILE : vidéos, vocaux, stories, flux Certifié pour les médias vérifiés et boutiques pour les entreprises. FR / EN / Bambara. Web, Android, iOS. Conçu en Afrique par Green FAD.', '/assets/images/portfolio/tile.jpg',
+  '[{"label": "Ouvrir Tile", "url": "https://tileofficiel.com"}, {"label": "Support", "url": "mailto:support@tile-app.com"}]', '[{"version": "v1.0", "date": "Avril 2026", "note": "Lancement public du Réseau du Progrès : vidéos, vocaux, stories, trois flux et messagerie privée."}, {"version": "v1.1", "date": "Juin 2026", "note": "Applications Android et iOS — ouverture du flux Certifié aux médias et organisations vérifiées."}, {"version": "v1.2", "date": "Septembre 2026", "note": "Défis & récompenses, profils Entreprises & boutiques avec catalogue, interface trilingue FR / EN / bambara."}]', 'https://tileofficiel.com',
+  (SELECT id FROM services WHERE slug = 'applications-mobiles'));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
+  'cloudaf', 'CLOUDAf', 'Créez. Déployez. Scalez.',
+  'CLOUDAf est la plateforme de Green FAD pour créer et exploiter des applications web sans se soucier de l''infrastructure. Son principe : un **double éditeur no-code + code** synchronisé en temps réel — vous construisez visuellement (Studio Builder : bibliothèque de blocs, canvas glisser-déposer, inspecteur, thèmes) ou directement en code, et vous basculez librement entre les deux modes.
+
+L''**IA intégrée** assiste chaque étape, et l''**Agent CloudAf** va plus loin : il discute avec vous, comprend votre projet et agit via de véritables outils audités — code, builds, déploiements, ressources. Le **déploiement en un clic** s''occupe du SSL automatique, du CDN mondial et du domaine personnalisé (DNS automatique). La sécurité est native : MFA TOTP, rotation des refresh tokens, chiffrement AES-256, limitation de débit et journaux d''audit. Le **CloudAf Store** permet d''acheter des templates en crédits ou de vendre vos propres projets, et le **monitoring** surveille services et métriques en temps réel avec alertes automatiques. Offres : Free (0 €), Pro (29 €/mois), Enterprise (99 €/mois).',
+  'Lancer une application demande aujourd''hui de maîtriser l''hébergement, les certificats, le CDN, les sauvegardes, la sécurité et les déploiements — ou de payer une équipe pour ça. Les builders no-code classiques, eux, plafonnent dès qu''on veut du vrai code.',
+  'Une plateforme où l''on commence par décrire son idée ou par choisir un template, où l''on crée en no-code ou en code avec l''IA à ses côtés, et où le passage du projet au produit en ligne tient en un clic — sécurisé, monitoré, évolutif.',
+  'CLOUDAf est développé par les équipes d''ingénierie de Green FAD et capitalise sur l''expérience d''exploitation de ses propres plateformes (QRFAD, FadCard, Tile). Lancée en 2026, elle s''adresse aux développeurs, entrepreneurs, profils no-code et entreprises.',
+  'Développement d''applications, cloud et intelligence artificielle', 'Développeurs, entrepreneurs, profils no-code, entreprises et agences',
+  '["Double éditeur no-code + code synchronisé en temps réel", "Agent CloudAf : l''IA qui comprend le projet et agit via des outils audités (code, builds, déploiements, ressources)", "Studio Builder : bibliothèque de blocs, canvas glisser-déposer, inspecteur, thèmes", "IA intégrée à chaque étape de la création", "Déploiement en un clic : SSL automatique, CDN mondial, domaine personnalisé avec DNS automatique", "Sécurité native : MFA TOTP, rotation des refresh tokens, AES-256, rate limiting, journaux d''audit", "CloudAf Store : templates payants en crédits, vente de vos propres projets", "Templates prêts : SaaS Starter, e-commerce, blog, portfolio, dashboard, landing", "Monitoring temps réel : métriques, santé des services, alertes automatiques", "Connexion de votre domaine en quelques minutes"]',
+  '**Le parcours CloudAf en quatre temps :**
+
+1. **Inspirez** — décrivez votre projet à l''IA ou choisissez un template du Store
+2. **Créez** — éditez en code ou en no-code, avec l''assistance IA
+3. **Déployez** — un clic : SSL, CDN, domaine
+4. **Scalez** — monitoring temps réel, auto-scaling, alertes', '- Un entrepreneur part d''un template SaaS Starter et lance son MVP en quelques jours
+- Une agence crée des sites clients en no-code puis ajuste le code là où il le faut
+- Une équipe vend ses propres templates sur le CloudAf Store contre des crédits
+- Une PME connecte son domaine, déploie et suit la santé de son service en temps réel', 'Un atelier en français : construisez dans le Studio Builder, affinez dans l''éditeur de code, laissez l''agent IA porter les tâches répétitives.',
+  'Lancer plus vite, sans équipe d''infrastructure : SSL, CDN, domaine, sauvegardes et monitoring inclus dès le départ. On démarre gratuit, on paie quand le projet grandit.', 'L''éditeur dual supprime le mur classique entre no-code et développement : on démarre visuellement, on descend au code quand on le veut. L''agent IA agit sur de vrais outils audités, pas sur des promesses. Et trois offres transparentes suivent la croissance : Free, Pro 29 €/mois, Enterprise 99 €/mois.',
+  'No-code & IA', 'disponible', '/assets/images/portfolio/cloudaf.jpg', 'package', 3, 'publie', datetime('now'),
+  'CLOUDAf — Plateforme no-code + IA : créez, déployez, scalez | Green FAD', 'CloudAf : double éditeur no-code + code, Agent IA audité, Studio Builder, déploiement en un clic (SSL, CDN, domaine), sécurité native et Store. Offres Free, Pro 29 €, Enterprise 99 €.', '/assets/images/portfolio/cloudaf.jpg',
+  '[{"label": "Ouvrir CloudAf", "url": "https://cloudaf.net"}]', '[{"version": "v1.0", "date": "Juin 2026", "note": "Lancement : double éditeur no-code + code, IA intégrée, déploiement en un clic avec SSL et CDN."}, {"version": "v1.1", "date": "Août 2026", "note": "Agent CloudAf (outils audités : code, builds, déploiements) et Studio Builder complet (blocs, canvas, inspecteur, thèmes)."}, {"version": "v1.2", "date": "Octobre 2026", "note": "CloudAf Store (templates en crédits, revente de projets) et monitoring temps réel avec alertes."}]', 'https://cloudaf.net',
+  (SELECT id FROM services WHERE slug = 'developpement-web'));
+-- Produits historiques (contenu v3 conservé, couvertures v4)
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
   'ferefad', 'FEREFAD', 'La marketplace de Green FAD — la plateforme de petites annonces pour l''Afrique',
   'FEREFAD est une plateforme inspirée par Oumar Ballo pour autonomiser la jeunesse africaine via le commerce numérique, soutenue par Green FAD pour encourager la croissance économique à travers une marketplace inclusive et transparente.',
   'Sur de nombreux marchés africains, le commerce en ligne formel reste peu accessible : les vendeurs manquent de canaux structurés et les acheteurs manquent de confiance dans les transactions à distance.',
   'Créer une place de marché inclusive et transparente qui connecte acheteurs et vendeurs et soutient la croissance économique, portée par la jeunesse africaine.',
   'FEREFAD est un projet porté avec Oumar Ballo et soutenu par GREEN FAD, qui en assure la conception technique, le développement et l''exploitation.',
-  'E-commerce, commerce',
-  'Jeunes entrepreneurs, commerçants, particuliers vendeurs et acheteurs',
+  'E-commerce, commerce', 'Jeunes entrepreneurs, commerçants, particuliers vendeurs et acheteurs',
   '["Publication d''annonces simple et guidée", "Recherche et filtres par catégorie et localisation", "Messagerie interne entre acheteurs et vendeurs", "Profils vendeurs pour renforcer la confiance", "Optimisé pour le mobile et les connexions à faible débit"]',
-  'Un canal de vente formel et accessible, une visibilité élargie pour les vendeurs, un choix structuré pour les acheteurs.',
-  'Une marketplace pensée depuis l''Afrique pour les usages africains, soutenue par une entreprise technologique locale de confiance.',
-  'E-commerce', 'disponible', '/assets/images/portfolio/ferefad1.jpg', 'package', 2, 'publie', datetime('now'),
-  'FEREFAD — Produit technologique Green FAD', 'La marketplace de Green FAD — la plateforme de petites annonces pour l''Afrique', '/assets/images/portfolio/ferefad1.jpg');
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'ferefad'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/ferefad1.jpg';
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'ferefad'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/ferefad-logo.png';
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
+  '', '', '',
+  'Un canal de vente formel et accessible, une visibilité élargie pour les vendeurs, un choix structuré pour les acheteurs.', 'Une marketplace pensée depuis l''Afrique pour les usages africains, soutenue par une entreprise technologique locale de confiance.',
+  'E-commerce', 'disponible', '/assets/images/portfolio/ferefad.jpg', 'package', 4, 'publie', datetime('now'),
+  'FEREFAD — Produit technologique Green FAD', 'La marketplace de Green FAD — la plateforme de petites annonces pour l''Afrique', '/assets/images/portfolio/ferefad.jpg',
+  '[]', '[]', '',
+  (SELECT id FROM services WHERE slug = ''));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
   'amitie-fad', 'L''Amitié Fad', 'Votre assistant hôtelier digital — le confort connecté',
   'L''Amitié Fad est une solution qui simplifie la communication en hôtel. Grâce à un QR code, les clients peuvent demander des services (ménage, taxi, etc.) directement depuis leur smartphone.',
   'Dans les hôtels, les demandes de services passent encore par des appels à la réception ou des déplacements : c''est lent, source d''erreurs et frustrant pour le client comme pour le personnel.',
   'Connecter chaque chambre à chaque service de l''hôtel : le client scanne, demande, et le personnel reçoit — une hospitalité plus fluide et plus moderne.',
   'Conçu et développé par GREEN FAD à partir des besoins exprimés par les acteurs de l''hôtellerie malienne, L''Amitié Fad est déployé comme service connecté clé en main.',
-  'Hôtellerie',
-  'Hôtels, résidences hôtelières et établissements d''hébergement',
+  'Hôtellerie', 'Hôtels, résidences hôtelières et établissements d''hébergement',
   '["Demandes de services par QR code depuis la chambre (ménage, taxi, restauration…)", "Interface simple pour le client : scan, choix, envoi", "Notification et suivi des demandes pour le personnel", "Tableau de bord de l''hôtellerie : volume de demandes, délais, historique", "Personnalisation des services proposés par l''établissement"]',
-  'Des demandes traitées plus vite, moins d''erreurs de communication, une expérience client modernisée et un service valorisé.',
-  'Un assistant hôtelier conçu localement, déployable sans matériel lourd : un QR code par chambre et un smartphone pour le personnel.',
-  'Hospitalité', 'disponible', '/assets/images/portfolio/amitiefad.jpg', 'package', 3, 'publie', datetime('now'),
-  'L''Amitié Fad — Produit technologique Green FAD', 'Votre assistant hôtelier digital — le confort connecté', '/assets/images/portfolio/amitiefad.jpg');
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'amitie-fad'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/amitiefad.jpg';
-INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'amitie-fad'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/amitiefad-logo.png';
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
+  '', '', '',
+  'Des demandes traitées plus vite, moins d''erreurs de communication, une expérience client modernisée et un service valorisé.', 'Un assistant hôtelier conçu localement, déployable sans matériel lourd : un QR code par chambre et un smartphone pour le personnel.',
+  'Hospitalité', 'disponible', '/assets/images/portfolio/amitie-fad.jpg', 'package', 5, 'publie', datetime('now'),
+  'L''Amitié Fad — Produit technologique Green FAD', 'Votre assistant hôtelier digital — le confort connecté', '/assets/images/portfolio/amitie-fad.jpg',
+  '[]', '[]', '',
+  (SELECT id FROM services WHERE slug = ''));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
   'niafad', 'NIAFAD', 'ERP — la gestion d''entreprise complète, conçue pour l''Afrique',
   'NIAFAD est la solution de gestion intégrée de GREEN FAD : un ERP qui optimise tous les processus de l''entreprise — ventes, stocks, finances, ressources humaines — dans un environnement unique et sécurisé.',
   'Beaucoup d''entreprises africaines gèrent leurs opérations avec des outils dispersés : cahiers, tableurs et logiciels non connectés. Les données sont dupliquées, les erreurs fréquentes, la vision consolidée impossible.',
   'Offrir aux entreprises africaines un ERP professionnel, adapté à leurs processus réels, déployé et supporté localement.',
   'NIAFAD est développé par les équipes d''ingénierie de GREEN FAD à partir d''accompagnements réalisés auprès d''entreprises locales.',
-  'Tous secteurs d''activité',
-  'PME, grandes entreprises et institutions souhaitant centraliser leur gestion',
+  'Tous secteurs d''activité', 'PME, grandes entreprises et institutions souhaitant centraliser leur gestion',
   '["Gestion commerciale : devis, factures, clients", "Gestion des stocks et des achats", "Finances : caisse, dépenses, états de synthèse", "Ressources humaines : employés, paie, absences", "Rôles et permissions par utilisateur", "Tableaux de bord de pilotage"]',
-  'Une source de vérité unique pour toutes les données, moins d''erreurs, des décisions fondées sur des indicateurs fiables.',
-  'Un ERP déployé et supporté par une équipe locale, avec formation des équipes incluse.',
-  'Gestion d''entreprise', 'disponible', '', 'package', 4, 'publie', datetime('now'),
-  'NIAFAD — Produit technologique Green FAD', 'ERP — la gestion d''entreprise complète, conçue pour l''Afrique', '');
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
+  '', '', '',
+  'Une source de vérité unique pour toutes les données, moins d''erreurs, des décisions fondées sur des indicateurs fiables.', 'Un ERP déployé et supporté par une équipe locale, avec formation des équipes incluse.',
+  'Gestion d''entreprise', 'disponible', '/assets/images/portfolio/niafad.jpg', 'package', 6, 'publie', datetime('now'),
+  'NIAFAD — Produit technologique Green FAD', 'ERP — la gestion d''entreprise complète, conçue pour l''Afrique', '/assets/images/portfolio/niafad.jpg',
+  '[]', '[]', '',
+  (SELECT id FROM services WHERE slug = ''));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
   'sarapay', 'SARAPAY', 'L''application de paiement sécurisée pour des transactions fiables',
   'SARAPAY est la solution de paiement mobile de GREEN FAD : des transactions sécurisées, pensées pour les usages et les opérateurs du marché africain.',
   'Les transactions numériques doivent conjuguer sécurité, simplicité et compatibilité avec les moyens de paiement locaux. Les solutions génériques ne couvrent pas toujours ces besoins.',
   'Simplifier et sécuriser les paiements digitaux pour les entreprises et leurs clients, avec une solution fiable et conforme.',
   'SARAPAY est développé par GREEN FAD au sein de son laboratoire d''innovation, en réponse aux besoins de ses plateformes (marketplace, gestion) et de ses clients.',
-  'Fintech, services',
-  'Entreprises, plateformes e-commerce et institutions acceptant les paiements digitaux',
+  'Fintech, services', 'Entreprises, plateformes e-commerce et institutions acceptant les paiements digitaux',
   '["Paiements mobiles sécurisés", "Historique et traçabilité des transactions", "Intégration aux plateformes GREEN FAD et aux systèmes clients", "Notifications et confirmations en temps réel"]',
-  'Des paiements fiables et traçables, une expérience de paiement fluide pour les clients, une réconciliation simplifiée.',
-  'Une solution de paiement conçue au sein d''un écosystème produits africain intégré.',
-  'Fintech', 'disponible', '', 'package', 5, 'publie', datetime('now'),
-  'SARAPAY — Produit technologique Green FAD', 'L''application de paiement sécurisée pour des transactions fiables', '');
-INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image) VALUES (
+  '', '', '',
+  'Des paiements fiables et traçables, une expérience de paiement fluide pour les clients, une réconciliation simplifiée.', 'Une solution de paiement conçue au sein d''un écosystème produits africain intégré.',
+  'Fintech', 'disponible', '/assets/images/portfolio/sarapay.jpg', 'package', 7, 'publie', datetime('now'),
+  'SARAPAY — Produit technologique Green FAD', 'L''application de paiement sécurisée pour des transactions fiables', '/assets/images/portfolio/sarapay.jpg',
+  '[]', '[]', '',
+  (SELECT id FROM services WHERE slug = ''));
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
   'carte-sante', 'Carte Santé', 'Votre dossier médical numérique personnel, accessible en toutes circonstances',
   'La Carte Santé de GREEN FAD est un dossier médical numérique personnel : historique, traitements, allergies et urgences accessibles en toutes circonstances, au cabinet comme aux urgences.',
   'Le suivi médical repose souvent sur des documents papier dispersés entre plusieurs structures. En cas d''urgence, l''absence d''informations fiables et immédiates peut avoir des conséquences graves.',
   'Donner à chaque patient un dossier médical personnel, portable et sécurisé, et aux professionnels de santé un accès autorisé aux informations essentielles.',
   'La Carte Santé prolonge l''expertise cartes connectées de GREEN FAD (FAD CARD) vers le secteur de la santé.',
-  'Santé',
-  'Patients, cliniques, cabinets médicaux et professionnels de santé',
+  'Santé', 'Patients, cliniques, cabinets médicaux et professionnels de santé',
   '["Dossier médical numérique personnel sécurisé", "Historique des consultations et traitements", "Informations d''urgence : allergies, groupe sanguin, contacts", "Carte physique connectée + espace numérique", "Accès contrôlé : le patient décide qui consulte son dossier"]',
-  'Un suivi médical continu et fiable, des urgences mieux informées, un patient acteur de ses données.',
-  'Un dossier médical portable pensé pour le terrain africain, lié à une carte physique résistante.',
-  'E-santé', 'disponible', '', 'package', 6, 'publie', datetime('now'),
-  'Carte Santé — Produit technologique Green FAD', 'Votre dossier médical numérique personnel, accessible en toutes circonstances', '');
+  '', '', '',
+  'Un suivi médical continu et fiable, des urgences mieux informées, un patient acteur de ses données.', 'Un dossier médical portable pensé pour le terrain africain, lié à une carte physique résistante.',
+  'E-santé', 'disponible', '/assets/images/portfolio/carte-sante.jpg', 'package', 8, 'publie', datetime('now'),
+  'Carte Santé — Produit technologique Green FAD', 'Votre dossier médical numérique personnel, accessible en toutes circonstances', '/assets/images/portfolio/carte-sante.jpg',
+  '[]', '[]', '',
+  (SELECT id FROM services WHERE slug = ''));
+-- Relations médias des nouvelles plateformes
+INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'tile'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/tile.jpg';
+INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'tile'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/tile-logo.png';
+INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'cloudaf'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/cloudaf.jpg';
+INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'cloudaf'), mi.id, 1 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/cloudaf-logo.png';
+
+-- FAQ produits (réponses factuelles des plateformes)
+INSERT INTO faqs (question, answer, category, sort_order, status) VALUES
+('Comment créer le menu de mon restaurant sur QRFAD ?', 'L''inscription se fait auprès de l''administrateur de votre pays (Mali, Niger, Côte d''Ivoire, Congo Kinshasa) via WhatsApp ou contact@greenfad.tech. L''équipe crée votre établissement, puis vous gérez plats, prix et photos depuis votre espace, sans formation informatique.', 'produit:qrfad', 0, 'publie'),
+('Faut-il installer une application pour lire le menu ?', 'Non. Le client scanne le QR code et le menu s''ouvre dans son navigateur, sur n''importe quel téléphone. Les modifications publiées sont immédiatement visibles sur les QR codes déjà imprimés.', 'produit:qrfad', 1, 'publie'),
+('Où arrivent les commandes passées depuis le menu ?', 'Sur place, à emporter ou en livraison, la commande arrive directement sur le WhatsApp de l''établissement. La caisse (POS) intégrée gère en plus remises, taxes, paiements et suivi des dépenses.', 'produit:qrfad', 2, 'publie'),
+('QRFAD gère-t-il aussi les hôtels ?', 'Oui : chambres avec photos, réservations et codes de confirmation, conciergerie et avis clients. Un même établissement peut gérer restauration et hébergement dans la même plateforme.', 'produit:qrfad', 3, 'publie'),
+('Que comprend un compte FadCard ?', 'Un seul compte réunit six applications : vCard (carte de visite numérique), Market (vente), Tickets (billetterie), Fund (collectes), Vote (sondages et scrutins) et FadCard Pay (encaissement). L''identité est partagée, les données isolées par application.', 'produit:fad-card', 4, 'publie'),
+('Puis-je obtenir une carte NFC physique ?', 'Oui. Les cartes NFC physiques sont disponibles avec l''offre Business (45 000 XOF/mois) ou sur commande via contact@fadcard.com. La carte reste toujours à jour : les informations se modifient en ligne, sans réimpression.', 'produit:fad-card', 5, 'publie'),
+('Combien coûte FadCard ?', 'Starter est gratuit (1 vCard, 5 thèmes). Pro coûte 15 000 XOF/mois (5 vCards, 30 thèmes, rendez-vous, analytics, essai de 14 jours). Business coûte 45 000 XOF/mois (vCards illimitées, tous les designs, cartes NFC, domaine personnalisé, affiliation).', 'produit:fad-card', 6, 'publie'),
+('Tile est-il gratuit ?', 'Oui, Tile est gratuit. Le réseau est financé sans publicité tierce et sans revente de données : la confiance des utilisateurs est la règle, avec une modération active traitée par des humains.', 'produit:tile', 7, 'publie'),
+('Sur quels appareils et dans quelles langues ?', 'Tile fonctionne en application web (PWA) installable, sur Android et sur iOS. L''interface est disponible en français, en anglais et en bambara.', 'produit:tile', 8, 'publie'),
+('C''est quoi le flux Certifié ?', 'Un espace réservé aux comptes institutionnels vérifiés — médias et organisations — où l''information sérieuse se distingue d''un coup d''œil grâce au badge, séparée du flux communautaire.', 'produit:tile', 9, 'publie'),
+('CloudAf propose-t-il un plan gratuit ?', 'Oui : l''offre Free comprend 1 projet, 100 crédits IA et 1 Go de stockage avec SSL automatique. Pro (29 €/mois) monte à 25 projets, 2 000 crédits IA, 50 Go et domaines personnalisés. Enterprise (99 €/mois) offre 200 projets et tous les modules avancés.', 'produit:cloudaf', 10, 'publie'),
+('Comment se passe le déploiement d''une application ?', 'En un clic : SSL automatique, CDN mondial et domaine personnalisé avec configuration DNS automatique. Le monitoring temps réel surveille ensuite métriques et santé des services avec alertes automatiques.', 'produit:cloudaf', 11, 'publie');
+
+-- Études de cas : le parcours des plateformes Green FAD
+INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
+  'qrfad-digitalisation-restauration', 'QRFAD — digitaliser la restauration et l''hôtellerie depuis 2021', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
+  'Du menu par QR code à la plateforme complète (commandes WhatsApp, caisse POS, hôtellerie) : quatre ans d''évolutions trimestrielles, 9 établissements en ligne dans quatre pays.',
+  '## Le point de départ
+
+En 2021, à Bamako, les établissements de restauration fonctionnent avec des menus papier coûteux à modifier et des commandes transmises de vive voix. QRFAD démarre avec l''interface la plus simple qui soit : un QR code imprimé, un menu à jour dans le navigateur du client, sans application à installer.
+
+## Une plateforme qui a grandi par trimestres
+
+Chaque cycle de trois mois a apporté une brique : catégories et QR téléchargeables (2021), multi-établissements (2022), commandes depuis le menu (2023), intégration WhatsApp puis module hôtelier (2023-2024), caisse POS (2025), et en 2026 le portail public qrfad.com où tout le monde peut explorer les établissements partenaires et leurs menus.',
+  '/assets/images/portfolio/qrfad.jpg', '2026-05-20', 0, 'publie', datetime('now'),
+  'Les restaurateurs perdaient du temps et de l''argent sur les menus papier, perdaient des commandes entre la salle et la cuisine, et n''avaient aucun outil abordable pour la caisse ou les chambres d''hôtel.', 'Une évolution produit trimestrielle guidée par le terrain : chaque fonctionnalité (commandes WhatsApp, POS, hôtellerie) part des difficultés réelles rapportées par les établissements équipés, puis est livrée, testée et documentée.', 'Une plateforme unique couvrant menu QR sans application, commandes WhatsApp sur place / à emporter / livraison, caisse POS (remises, taxes, paiements, dépenses), gestion hôtelière (chambres, réservations, conciergerie) et portail public avec recherche.', '9 établissements publient leur menu sur qrfad.com, au Congo Kinshasa, au Mali, au Niger et en Côte d''Ivoire. Les mises à jour de menu sont immédiates sur les QR codes imprimés, et les commandes arrivent directement sur le WhatsApp des établissements.', '**Stack :** application web mobile-first, QR codes statiques imprimables, intégration WhatsApp, module POS, infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD.',
+  (SELECT id FROM services WHERE slug = 'developpement-web'), 'QRFAD — étude de cas : 5 ans de digitalisation de la restauration | Green FAD', 'Comment QRFAD est passé du menu par QR code (2021) à la plateforme complète — commandes WhatsApp, caisse POS, hôtellerie — avec 9 établissements dans 4 pays.', '/assets/images/portfolio/qrfad.jpg');
+INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
+  'fadcard-plateforme-six-applications', 'FAD CARD — d''une carte NFC à une plateforme six-en-un', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
+  'Lancée en 2021 comme carte de visite numérique, FadCard réunit aujourd''hui six applications métier — vCard, Market, Tickets, Fund, Vote, Pay — derrière un seul compte et 153 designs.',
+  '## 2021 : la carte qui ne se démode pas
+
+FAD CARD naît comme carte de visite numérique NFC/RFID : un geste pour partager ses coordonnées, une page profil toujours à jour, un QR code en secours. Le produit résout immédiatement le problème des réimpressions et des informations périmées.
+
+## Grandir sans disperser
+
+Plutôt que d''ajouter des fonctions en vrac, FadCard a construit des **applications métier indépendantes** derrière une identité commune : Market pour vendre (2022), Tickets pour la billetterie (2023), Fund pour les collectes (2023), Vote pour les scrutins (2024), FadCard Pay pour l''encaissement (2024). Chaque application a son tableau de bord — les données restent isolées.
+
+## 2025-2026 : la maturité
+
+153 designs premium, cartes NFC physiques, analytique temps réel, validation de numéro dans 66 pays, plus de 40 devises, PWA installable : la plateforme sert aussi bien le consultant que le commerçant, l''organisateur d''événements ou l''association.',
+  '/assets/images/portfolio/fadcard.jpg', '2026-03-12', 1, 'publie', datetime('now'),
+  'Les professionnels africains gèrent leur identité, leurs ventes, leurs événements et leurs paiements dans des outils séparés, coûteux et mal adaptés au terrain.', 'Architecture multi-applications avec identité partagée et données isolées — un rythme trimestriel : chaque application a été livrée entière avant d''ouvrir la suivante.', 'Six applications (vCard, Market, Tickets, Fund, Vote, FadCard Pay) derrière un compte unique, avec analytique temps réel, 153 designs, cartes NFC, 40+ devises et validation téléphonique dans 66 pays.', 'Un écosystème professionnel complet, du freelance à l''association, avec une tarification en XOF (Starter gratuit, Pro 15 000 XOF/mois, Business 45 000 XOF/mois) et une PWA installable partout.', '**Stack :** PWA mobile-first, NFC, QR codes uniques anti-double scan, comptabilité en partie double pour FadCard Pay, infrastructure Cloudflare opérée par Green FAD.',
+  (SELECT id FROM services WHERE slug = 'developpement-web'), 'FadCard — étude de cas : la plateforme 6-en-1 | Green FAD', 'De la carte NFC de 2021 à la plateforme six applications (vCard, Market, Tickets, Fund, Vote, Pay) : le parcours produit de FadCard.', '/assets/images/portfolio/fadcard.jpg');
+INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
+  'tile-reseau-social-africain', 'TILE — un réseau social conçu en Afrique, pour l''Afrique', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
+  'Vidéos, vocaux, stories, flux Certifié pour les médias vérifiés, boutiques d''entreprises et défis créatifs : le réseau du progrès, trilingue français-anglais-bambara, sur Web, Android et iOS.',
+  '## Pourquoi un nouveau réseau ?
+
+Les plateformes globales ignorent les langues africaines, noient les médias locaux parmi le bruit, et monétisent les données sans transparence. TILE — « le Réseau du Progrès » — part d''un constat inverse : la communauté, l''information certifiée et le commerce local doivent avancer ensemble.
+
+## Trois flux, trois usages
+
+**Réseau** pour la communauté, **Certifié** pour l''information institutionnelle des comptes vérifiés (badge visible), **Pour toi** pour les recommandations. S''y ajoutent les vidéos courtes (20 Mo), les messages vocaux, les stories 24 h, la messagerie privée, les comptes privés réels vérifiés côté serveur, et les profils Entreprises & boutiques avec catalogue de 100 produits.
+
+## La confiance par l''architecture
+
+Pas de publicité tierce, pas de revente de données, modération humaine des signalements, App Check anti-abus et sauvegardes chiffrées. L''interface existe en français, en anglais et en bambara.',
+  '/assets/images/portfolio/tile.jpg', '2026-06-17', 2, 'publie', datetime('now'),
+  'Créateurs, médias et boutiques africains manquent d''un espace qui valorise leurs langues, certifie l''information et fait exister le commerce local.', 'Conception mobile-first éprouvée sur les plateformes précédentes de Green FAD, langues africaines d''abord, modération humaine intégrée dès la conception.', 'Un réseau social complet : trois flux distincts, médias certifiés, entreprises et boutiques, défis et récompenses, disponible en PWA, Android et iOS.', 'TILE est en ligne sur tileofficiel.com avec des communautés au Mali, au Congo, au Burkina Faso et au Niger, et une feuille de route trimestrielle assumée.', '**Stack :** PWA + applications Android/iOS, HTTPS/TLS, App Check, règles de base strictes et sauvegardes chiffrées.',
+  (SELECT id FROM services WHERE slug = 'applications-mobiles'), 'Tile — étude de cas : le réseau social du progrès | Green FAD', 'TILE, réseau social de Green FAD : vidéos, stories, flux Certifié, boutiques, trilingue FR/EN/bambara, sans publicité tierce ni revente de données.', '/assets/images/portfolio/tile.jpg');
+INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
+  'cloudaf-plateforme-nocode-ia', 'CLOUDAf — la plateforme no-code + IA qui déploie en un clic', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
+  'Double éditeur no-code et code synchronisé, Agent IA aux outils audités, Studio Builder, Store de templates et monitoring temps réel : créer, déployer et scaler sans équipe d''infrastructure.',
+  '## Le mur entre no-code et code
+
+Les builders visuels plafonnent dès qu''un projet exige du vrai code — les plateformes de développement exigent une équipe d''infrastructure. CLOUDAf supprime ce mur : un double éditeur synchronisé en temps réel permet de commencer en glisser-déposer (Studio Builder) et de descendre au code quand on le décide.
+
+## L''IA qui agit
+
+L''Agent CloudAf ne se contente pas de suggérer : il discute du projet, le comprend et opère de véritables outils audités — code, builds, déploiements, ressources. Le déploiement en un clic prend en charge SSL, CDN mondial et domaine personnalisé — la sécurité (MFA TOTP, rotation de tokens, AES-256, journaux d''audit) et le monitoring sont natifs.
+
+## Un écosystème ouvert
+
+Le CloudAf Store permet d''acheter des templates en crédits et de vendre les siens — les offres Free, Pro (29 €/mois) et Enterprise (99 €/mois) suivent la croissance des projets.',
+  '/assets/images/portfolio/cloudaf.jpg', '2026-10-08', 3, 'publie', datetime('now'),
+  'Créer une application web professionnelle suppose de maîtriser hébergement, certificats, CDN, sécurité et déploiements — ou d''y consacrer une équipe.', 'Capitaliser sur l''exploitation réelle des plateformes Green FAD (QRFAD, FadCard, Tile) pour outiller la chaîne complète : création, déploiement, supervision.', 'Une plateforme de création d''applications : éditeur dual, Agent IA audité, Studio Builder, déploiement un clic (SSL, CDN, DNS automatique), sécurité native, Store et monitoring.', 'Trois offres publiques (Free, Pro 29 €/mois, Enterprise 99 €/mois), six familles de templates prêtes à l''emploi, et une base technique moderne (Next.js, TypeScript, React).', '**Stack :** Next.js, TypeScript, React, intégrations IA (OpenAI, Google), infrastructure Cloudflare opérée par Green FAD.',
+  (SELECT id FROM services WHERE slug = 'developpement-web'), 'CloudAf — étude de cas : no-code + IA, déploiement un clic | Green FAD', 'CloudAf de Green FAD : double éditeur no-code + code, Agent IA aux outils audités, Studio Builder, Store et monitoring. Créez, déployez, scalez.', '/assets/images/portfolio/cloudaf.jpg');
+
+-- ============ BLOG v4 — le parcours des plateformes, articles datés ============
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-lancement-menu-qr', 'QRFAD : le menu numérique par QR code débarque à Bamako', 'En mars 2021, Green FAD lance QRFAD : un QR code imprimé, un menu à jour dans le navigateur du client, sans application à installer. Le début d''une aventure produit qui dure encore.',
+  '# QRFAD : le menu numérique par QR code débarque à Bamako
+
+En mars 2021, nous publions la première version de **QRFAD**. L''idée est née sur le terrain : des établissements pleins, des cartes fatiguées, des prix corrigés au stylo, et des clients qui, tous, ont un smartphone dans la poche.
+
+## Le pari de la simplicité
+
+Nous avons volontairement écarté tout ce qui complique : pas d''application à télécharger, pas de compte à créer pour le client. Un QR code imprimé sur la table, un menu qui s''ouvre dans le navigateur, des plats présentés avec leurs descriptions, leurs prix et leurs photos. Côté restaurateur, tout se modifie depuis un espace d''administration pensé pour être utilisé sans formation informatique.
+
+## Ce que la première version contenait
+
+- Menu numérique par QR code, consultable sur n''importe quel téléphone
+- Plats, descriptions, prix et photos, organisés par catégories
+- QR code téléchargeable pour l''impression sur les tables
+- Mise à jour des plats et des prix en temps réel
+
+## Ce qui a suivi
+
+QRFAD n''est pas resté un menu. Trimestre après trimestre, la plateforme a intégré la prise de commande, WhatsApp, la caisse et même l''hôtellerie. Cinq ans plus tard, elle équipe des établissements dans quatre pays. Nous racontons chaque étape de ce parcours dans ce blog — parce qu''un produit qui dure est un produit que l''on documente.',
+  '/assets/images/blog/qrfad-lancement-menu-qr.jpg', 'Produits', '["QRFAD", "Lancement", "Restauration"]', 'Green FAD — Équipe produit', 'article', 0, '2021-03-15 09:00:00', 'publie',
+  'Mars 2021 : lancement de QRFAD, le menu numérique par QR code de Green FAD, pensé pour les restaurants africains — sans application à installer.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-multi-etablissements', 'QRFAD passe au multi-établissements : une gestion claire pour les groupes', 'Juin 2022 : QRFAD permet désormais à une même équipe de gérer plusieurs établissements, avec des rôles par utilisateur, des tables physiques et une identité propre à chaque adresse.',
+  '# QRFAD passe au multi-établissements
+
+Un an après le lancement, une demande revenait sans cesse chez nos restaurateurs : « j''ouvre un deuxième établissement, dois-je repartir de zéro ? ». La version livrée au printemps 2022 répond : non.
+
+## Une administration pensée pour les groupes
+
+- **Multi-établissements** : un même compte administre plusieurs adresses, chacune avec son menu, ses prix et ses horaires
+- **Rôles multiples** : le gérant, le responsable de salle et l''équipe cuisine n''ont pas les mêmes droits
+- **Tables physiques** : chaque table porte son QR code, le suivi devient précis
+- **Thèmes de menu** : l''identité visuelle s''adapte à chaque établissement
+- **Identité complète** : logo, couverture et coordonnées propres à chaque adresse
+
+## Pourquoi c''était le bon moment
+
+Les premiers utilisateurs de 2021 étaient majoritairement des établissements indépendants. En 2022, des groupes de restauration et des hôtels-restaurants ont rejoint la plateforme. Le multi-établissements n''était pas une fonctionnalité de plus : c''était la condition pour grandir avec eux.
+
+Cette version a aussi fixé une règle qui n''a jamais bougé depuis : **une modification publiée est immédiatement visible sur les QR codes déjà imprimés**. Le papier ne vieillit plus.',
+  '/assets/images/blog/qrfad-multi-etablissements.jpg', 'Produits', '["QRFAD", "Multi-établissements", "Évolution produit"]', 'Green FAD — Équipe produit', 'recit', 0, '2022-06-10 09:00:00', 'publie',
+  'Juin 2022 : QRFAD ajoute la gestion multi-établissements, les rôles, les tables physiques et les thèmes de menu pour les groupes de restauration.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-commandes-depuis-menu', 'Commander depuis le menu : QRFAD connecte la salle et la cuisine', 'Mars 2023 : le menu QRFAD ne se consulte plus, il se commande. Sur place, à emporter ou en livraison, la commande part du téléphone du client et arrive structurée côté établissement.',
+  '# Commander depuis le menu
+
+Mars 2023, deuxième grande bascule de QRFAD : le menu devient un canal de commande. Le client qui scanne peut désormais commander **sur place, à emporter ou en livraison** — directement depuis la page qu''il a sous les yeux.
+
+## Ce que ça change pour l''établissement
+
+Avant, la commande traversait trois personnes avant d''atteindre la cuisine — et se perdait parfois en route. Désormais :
+
+- la commande arrive **structurée** : plats, quantités, remarques
+- elle est **horodatée** et traçable dans l''espace d''administration
+- le service à emporter et la livraison s''ouvrent sans téléphone monopolisé
+
+## Ce que ça change pour le client
+
+Plus d''attente pour être pris, plus d''erreur de recopie. Le client choisit, envoie, savoure. L''expérience reste la même sur tous les téléphones, sans application.
+
+## La suite logique
+
+Une commande crée une obligation : arriver proprement jusqu''à l''équipe. Quelques mois plus tard, nous avons connecté la commande au canal que tous les établissements utilisaient déjà — WhatsApp. C''est l''objet de la prochaine étape de ce parcours.',
+  '/assets/images/blog/qrfad-commandes-depuis-menu.jpg', 'Produits', '["QRFAD", "Commandes", "Évolution produit"]', 'Green FAD — Équipe produit', 'recit', 0, '2023-03-08 09:00:00', 'publie',
+  'Mars 2023 : QRFAD ajoute la prise de commande depuis le menu — sur place, à emporter, livraison — avec des commandes structurées côté établissement.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-whatsapp-commandes', 'QRFAD + WhatsApp : la commande arrive directement sur le numéro du restaurant', 'Novembre 2023 : les commandes passées depuis le menu QRFAD arrivent maintenant sur le WhatsApp de l''établissement. Aucun changement d''habitude pour les équipes — juste moins d''erreurs.',
+  '# QRFAD + WhatsApp
+
+En 2023, un constat s''imposait : dans chaque établissement que nous accompagnions, WhatsApp était déjà l''outil central — pour les clients comme pour les équipes. Plutôt que d''imposer un nouveau tableau de bord, QRFAD a choisi d''aller là où le terrain travaille déjà.
+
+## Le principe
+
+Le client commande depuis le menu numérique — sur place, à emporter ou en livraison. La commande, structurée et complète, **arrive directement sur le WhatsApp de l''établissement** :
+
+- plats et quantités exacts, remarques du client incluses
+- type de commande : sur place, à emporter ou livraison
+- l''équipe confirme et traite comme n''importe quel message
+
+## Pourquoi c''est important
+
+- **Aucune formation supplémentaire** : les équipes maîtrisent déjà WhatsApp
+- **Zéro intermédiaire** : pas de commission, la relation reste directe
+- **Moins d''erreurs** : la commande n''est plus recopiée à la main
+
+## Deux ans plus tard
+
+Cette intégration reste l''une des plus utilisées de la plateforme. Elle a ouvert la voie à la brique suivante : la caisse, pour réconcilier commandes, encaissements et dépenses au même endroit.',
+  '/assets/images/blog/qrfad-whatsapp-commandes.jpg', 'Produits', '["QRFAD", "WhatsApp", "Intégration"]', 'Green FAD — Équipe produit', 'article', 0, '2023-11-14 09:00:00', 'publie',
+  'Novembre 2023 : les commandes QRFAD arrivent directement sur le WhatsApp des établissements — structurées, sans commission, sans formation.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-hotels-reservations', 'QRFAD s''ouvre aux hôtels : chambres, réservations et conciergerie', 'Septembre 2024 : QRFAD étend son QR code à l''hôtellerie. Chambres avec photos, réservations et codes de confirmation, conciergerie et avis clients — la même simplicité, un nouveau métier.',
+  '# QRFAD s''ouvre aux hôtels
+
+Plusieurs de nos restaurants étaient adossés à des hôtels. La question est arrivée naturellement : « QRFAD peut-il gérer nos chambres comme il gère nos plats ? ». Septembre 2024 : la réponse est oui.
+
+## Ce que contient le module hôtellerie
+
+- **Fiches de chambres** avec photos et descriptions, consultables par QR code
+- **Réservations** avec **codes de confirmation** — simple à vérifier à l''accueil
+- **Conciergerie** : les demandes des clients arrivent structurées côté réception
+- **Avis clients** : la parole des voyageurs remonte à l''établissement
+
+## La cohérence du modèle
+
+Le QR code a fait ses preuves au restaurant : zéro installation, zéro formation, information toujours à jour. Nous avons transposé exactement la même logique à la chambre : un QR, une fiche claire, une action possible — réserver, demander, apprécier.
+
+## Un établissement, une plateforme
+
+Un hôtel-restaurant peut désormais gérer menu, commandes, caisse, chambres et réservations dans le même espace d''administration. C''est cette vision « une plateforme complète, pas seulement un menu » que nous poursuivons depuis.',
+  '/assets/images/blog/qrfad-hotels-reservations.jpg', 'Produits', '["QRFAD", "Hôtellerie", "Évolution produit"]', 'Green FAD — Équipe produit', 'recit', 0, '2024-09-05 09:00:00', 'publie',
+  'Septembre 2024 : le module hôtellerie de QRFAD — chambres avec photos, réservations à codes de confirmation, conciergerie et avis clients.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-caisse-pos', 'La caisse intégrée : QRFAD devient un outil complet de gestion', 'Juin 2025 : caisse (POS) intégrée à QRFAD — remises, taxes, paiements et suivi des dépenses. La boucle est bouclée entre le menu, la commande et l''encaissement.',
+  '# La caisse intégrée
+
+Juin 2025 : QRFAD franchit la dernière frontière du restaurant numérique — l''encaissement. La nouvelle caisse (POS) intégrée réunit enfin, au même endroit, ce qui circulaient encore sur trois supports.
+
+## Ce que la caisse apporte
+
+- **Remises et taxes** appliquées proprement, ligne par ligne
+- **Paiements** enregistrés par type, réconciliables en fin de journée
+- **Suivi des dépenses** de l''établissement, au même endroit que les recettes
+- **Commandes QR et caisse réunies** : ce que le client commande se retrouve en caisse, sans ressaisie
+
+## Le vrai enjeu : la vérité des chiffres
+
+Avant, le menu était numérique, la commande sur WhatsApp, et la caisse… dans un cahier. Personne ne pouvait répondre simplement à « quelle a été notre journée ? ». Désormais, la boucle est fermée : le client scanne, commande, l''équipe sert, la caisse encaisse — et tout concorde.
+
+## Où nous en sommes
+
+Avec la caisse, QRFAD couvre le cycle complet de l''établissement : menu, commande, encaissement, dépenses — et, depuis 2024, les chambres pour les hôtels. La suite ? Rendre tout cela visible du monde entier : c''est le portail public, l''étape suivante de ce parcours.',
+  '/assets/images/blog/qrfad-caisse-pos.jpg', 'Produits', '["QRFAD", "Caisse", "POS"]', 'Green FAD — Équipe produit', 'recit', 0, '2025-06-12 09:00:00', 'publie',
+  'Juin 2025 : la caisse POS intégrée de QRFAD — remises, taxes, paiements et dépenses réunis avec les commandes QR, sans ressaisie.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'qrfad-portail-public-9-etablissements', 'QRFAD ouvre son portail public : 9 établissements explorables en ligne', 'Mai 2026 : qrfad.com devient une vitrine publique. Recherche, exploration des menus, contacts par pays — 9 établissements du Congo, du Mali, du Niger et de Côte d''Ivoire sont en ligne.',
+  '# QRFAD ouvre son portail public
+
+Pendant cinq ans, QRFAD a grandi discrètement, établissement par établissement. Mai 2026 marque un tournant : **qrfad.com** devient un portail public où tout le monde peut découvrir les restaurants et hôtels équipés, consulter leurs menus et les contacter.
+
+## Ce que l''on peut faire sur le portail
+
+- **Explorer** les établissements partenaires et leurs menus, depuis n''importe quel téléphone
+- **Rechercher** un établissement, un plat, une ville
+- **Commander** : le menu reste le canal de commande — sur place, à emporter, livraison
+- **Contacter** l''administrateur de son pays : Congo Kinshasa, Mali, Niger, Côte d''Ivoire
+
+## Neuf établissements, quatre pays
+
+Neuf établissements publient aujourd''hui leur menu sur QRFAD. Ce chiffre est notre meilleure publicité : chaque menu en ligne est un établissement réel, avec ses plats, ses prix, ses photos — tenu à jour par son équipe.
+
+## Et maintenant ?
+
+L''inscription reste sur invitation — auprès des administrateurs pays — parce que la qualité du portail dépend de la fiabilité de chaque établissement référencé. La prochaine étape du produit est en cours : encore plus de performance mobile et de fiabilité des commandes, dans la continuité de notre cadence trimestrielle.
+
+*Vous tenez un restaurant ou un hôtel ? Contactez l''admin de votre pays depuis qrfad.com — direction@greenfad.tech ou contact@greenfad.tech.*',
+  '/assets/images/blog/qrfad-portail-public-9-etablissements.jpg', 'Produits', '["QRFAD", "Portail public", "Jalon"]', 'Green FAD — Équipe produit', 'article', 1, '2026-05-20 09:00:00', 'publie',
+  'Mai 2026 : le portail public de QRFAD met en ligne 9 établissements du Congo, du Mali, du Niger et de Côte d''Ivoire, menus et commandes inclus.', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-lancement-vcard', 'FAD CARD : la carte de visite numérique made in Green FAD', 'Mai 2021 : Green FAD lance FAD CARD, la carte de visite numérique NFC. Un geste pour partager ses coordonnées, une page profil toujours à jour — et plus jamais de réimpression.',
+  '# FAD CARD : la carte de visite numérique
+
+Mai 2021 : nous lançons **FAD CARD**, la première pierre de ce qui deviendra l''écosystème professionnel de Green FAD. Le constat de départ est universel, et particulièrement vrai sur le terrain africain : la carte de visite papier s''égare, se démode, et coûte cher à réimprimer à chaque changement de numéro ou de fonction.
+
+## Le geste qui remplace le papier
+
+- **Partage instantané** : un simple contact NFC — ou un scan du QR code en secours — ouvre la page profil
+- **Page profil complète** : nom, fonction, contacts, réseaux, liens
+- **Toujours à jour** : on modifie ses informations en ligne, la carte suit — plus jamais de réimpression
+- **Design personnalisé** : aux couleurs de l''entreprise, sur PVC durable
+
+## Pensée pour les organisations
+
+Dès la première version, FAD CARD propose un tableau de bord pour les entreprises qui équipent leurs équipes : chacun a sa carte, l''organisation garde la cohérence.
+
+## La suite de l''histoire
+
+Cinq ans plus tard, FAD CARD n''est plus seulement une carte : c''est une plateforme six applications — vCard, Market, Tickets, Fund, Vote et FadCard Pay. Chaque étape de ce parcours est documentée dans ce blog, mise à jour après mise à jour.',
+  '/assets/images/blog/fadcard-lancement-vcard.jpg', 'Produits', '["FadCard", "Lancement", "NFC"]', 'Green FAD — Équipe produit', 'article', 0, '2021-05-18 09:00:00', 'publie',
+  'Mai 2021 : lancement de FAD CARD, la carte de visite numérique NFC de Green FAD — partage instantané, profil toujours à jour, zéro réimpression.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-market', 'FadCard Market : vendre en ligne depuis sa carte', 'Juillet 2022 : FadCard s''ouvre au commerce avec Market — produits, services, gestion de stock et intégration WhatsApp, directement depuis le profil professionnel.',
+  '# FadCard Market : vendre en ligne depuis sa carte
+
+Juillet 2022 : FadCard franchit une étape majeure. La carte qui présentait son porteur peut désormais présenter — et vendre — son catalogue. C''est la naissance de **Market**.
+
+## Ce qu''apporte Market
+
+- **Vente de produits et services** directement depuis le profil FadCard
+- **Gestion de stock** simple : quantités, disponibilités
+- **Intégration WhatsApp** : la commande arrive là où le commerçant répond déjà
+- **Suivi des commandes** sans tableau Excel parallèle
+
+## Pourquoi dans FadCard
+
+Parce que la carte est déjà le point de contact professionnel : elle se partage en réunion, au comptoir, lors d''un événement. Transformer ce contact en vitrine marchande, c''est raccourcir le chemin entre « voilà qui je suis » et « voilà ce que je vends ».
+
+## Le fil rouge du parcours
+
+Market a fixé un principe qui structure toute la plateforme depuis : **des applications métier indépendantes derrière une identité commune**. Tickets suivra en 2023, puis Fund, Vote et FadCard Pay — chaque application entière, livrée à son rythme trimestriel, sans jamais disperser l''utilisateur.',
+  '/assets/images/blog/fadcard-market.jpg', 'Produits', '["FadCard", "Market", "E-commerce"]', 'Green FAD — Équipe produit', 'recit', 0, '2022-07-07 09:00:00', 'publie',
+  'Juillet 2022 : FadCard Market ajoute la vente de produits et services, la gestion de stock et l''intégration WhatsApp au profil professionnel.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-tickets', 'FadCard Tickets : la billetterie par QR code, sans contrefaçon possible', 'Février 2023 : la billetterie arrive dans FadCard. Quotas par catégorie, QR codes uniques à l''entrée et suivi des ventes en temps réel — avec anti-double scan.',
+  '# FadCard Tickets : la billetterie par QR code
+
+Février 2023 : FadCard répond à un besoin que nous croisions à chaque événement — concerts, conférences, matchs, soirées : vendre des tickets sans imprimer des souches, et contrôler les entrées sans convoiter les contrefaçons.
+
+## Ce que Tickets apporte
+
+- **Vente de tickets en ligne** : chaque participant achète et reçoit son billet
+- **Quotas par catégorie** : VIP, standard, invitation — le compteur fait foi
+- **QR codes uniques** : un billet = un code, scannable à l''entrée
+- **Anti-double scan** : un même code ne passe pas deux fois
+- **Suivi des ventes en temps réel** : le compteur est visible jusqu''au jour J
+
+## Pensé pour le terrain
+
+Le contrôle d''entrée se fait avec un simple smartphone : pas de matériel dédié, pas de lecteur spécifique à louer. L''organisateur voit ses ventes avancer, l''équipe à l''entrée scanne, tout le monde gagne du temps.
+
+## La série s''installe
+
+Tickets est la deuxième application métier de FadCard, après Market. La même année, Fund ouvrira le volet collecte — le parcours continue.',
+  '/assets/images/blog/fadcard-tickets.jpg', 'Produits', '["FadCard", "Tickets", "Billetterie"]', 'Green FAD — Équipe produit', 'recit', 0, '2023-02-09 09:00:00', 'publie',
+  'Février 2023 : FadCard Tickets — billetterie avec quotas par catégorie, QR codes uniques, anti-double scan et suivi des ventes en temps réel.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-fund', 'FadCard Fund : des collectes transparentes, suivies en temps réel', 'Octobre 2023 : Fund ajoute la collecte de fonds à FadCard — objectif, progression publique, confirmation des paiements et gestion des donateurs.',
+  '# FadCard Fund : la collecte, en toute transparence
+
+Octobre 2023 : associations, clubs, familles, causes — la collecte de fonds est partout dans la vie communautaire africaine, et presque toujours gérée à l''aveugle : qui a donné ? combien ? où en est-on ? **Fund** répond.
+
+## Ce que Fund apporte
+
+- **Campagnes de collecte** avec objectif chiffré et date
+- **Progression publique** : la jauge avance en temps réel, visible de tous
+- **Suivi des confirmations de paiement** : chaque contribution est tracée
+- **Gestion des donateurs** : remercier, relancer, rendre des comptes
+
+## Pourquoi la transparence change tout
+
+Une collecte qui se voit rassure ceux qui donnent et responsabilise ceux qui organisent. La jauge publique n''est pas un gadget : c''est l''outil de confiance qui manquait aux collectes communautaires.
+
+## Le socle s''élargit
+
+Fund est la quatrième brique de FadCard, après vCard, Market et Tickets. Restaient les décisions collectives et l''argent proprement dit — Vote et FadCard Pay prendront le relais en 2024.',
+  '/assets/images/blog/fadcard-fund.jpg', 'Produits', '["FadCard", "Fund", "Collecte"]', 'Green FAD — Équipe produit', 'recit', 0, '2023-10-11 09:00:00', 'publie',
+  'Octobre 2023 : FadCard Fund — campagnes de collecte avec objectif, progression publique en temps réel et gestion des donateurs.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-vote', 'FadCard Vote : sondages et compétitions, un vote par personne', 'Mai 2024 : Vote rejoint FadCard. Sondages, compétitions, option scrutin secret, règle d''or « un vote par personne » et export CSV des résultats.',
+  '# FadCard Vote : consulter, départager, décider
+
+Mai 2024 : avec **Vote**, FadCard outille ce que les communautés font depuis toujours — se consulter. Élections associatives, concours, sondages d''opinion, classements : la règle est simple et non négociable.
+
+## La règle d''or : un vote par personne
+
+- **Identité contrôlée** : chaque participant vote une seule fois
+- **Option scrutin secret** : le choix n''est visible de personne
+- **Résultats en direct** ou révélés à la clôture, au choix de l''organisateur
+- **Export CSV** : les résultats s''exploitent, s''archivent, se vérifient
+
+## Pour les concours aussi
+
+Vote gère les compétitions : candidats, votes du public, classement. Les communautés s''en servent pour leurs événements culturels et leurs défis créatifs — un usage que nous voyons grandir à chaque trimestre.
+
+## La collection s''achève presque
+
+vCard, Market, Tickets, Fund, Vote : cinq applications métier. Il manquait le socle financier — l''encaissement centralisé. C''est la dernière pièce du puzzle, arrivée fin 2024 sous le nom de FadCard Pay.',
+  '/assets/images/blog/fadcard-vote.jpg', 'Produits', '["FadCard", "Vote", "Scrutin"]', 'Green FAD — Équipe produit', 'recit', 0, '2024-05-16 09:00:00', 'publie',
+  'Mai 2024 : FadCard Vote — sondages et compétitions avec scrutin secret, un vote par personne et export CSV des résultats.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-pay-six-applications', 'FadCard Pay : un compte, six applications, un encaissement centralisé', 'Décembre 2024 : FadCard Pay complète la plateforme — encaissement centralisé, suivi des fonds, retraits et comptabilité en partie double. Six applications, un seul compte.',
+  '# FadCard Pay : la dernière pièce
+
+Décembre 2024 : FadCard réunit son sixième module. **FadCard Pay** est le socle financier de la plateforme — celui qui relie tout le reste.
+
+## Ce que FadCard Pay apporte
+
+- **Encaissement centralisé** : les paiements de Market, Tickets, Fund et Vote convergent au même endroit
+- **Suivi des fonds et retraits** : le solde, les mouvements, les retraits — lisibles
+- **Frais de transaction** gérés proprement, ligne par ligne
+- **Comptabilité en partie double** : chaque mouvement est traçable, créditable, auditable
+
+## « Une plateforme. Six applications, un seul compte. »
+
+Avec Pay, la promesse de FadCard devient une réalité complète : se présenter (vCard), vendre (Market), inviter (Tickets), collecter (Fund), consulter (Vote) et encaisser (Pay) — avec une identité partagée, des tableaux de bord indépendants et des données isolées par application.
+
+## Et après ?
+
+La personnalisation, la mesure, l''international : 2025 et 2026 porteront les 153 designs, les cartes NFC physiques, l''analytique temps réel et l''ouverture à 40+ devises. Le parcours continue.',
+  '/assets/images/blog/fadcard-pay-six-applications.jpg', 'Produits', '["FadCard", "Paiement", "Version majeure"]', 'Green FAD — Équipe produit', 'article', 0, '2024-12-04 09:00:00', 'publie',
+  'Décembre 2024 : FadCard Pay — encaissement centralisé, suivi des fonds, retraits et comptabilité en partie double. La plateforme atteint six applications.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-designs-nfc', '153 designs et cartes NFC : la personnalisation poussée à l''extrême', 'Août 2025 : FadCard port sa bibliothèque à 153 designs premium et lance les cartes NFC physiques commandables. La carte redevient un objet de fierté — sans jamais se démoder.',
+  '# 153 designs, et des cartes NFC en main
+
+Août 2025 : deux annonces pour FadCard, sur le même thème — la personnalisation.
+
+## 153 designs premium
+
+La bibliothèque de designs atteint **153 modèles distincts** : du plus sobre au plus affirmé, pour le consultant, l''artisan, le médecin, l''artiste ou l''entreprise. Sur l''offre Business, tous les designs sont ouverts — sur Pro, 30 thèmes — sur Starter, 5 — chacun trouve sa carte à son niveau.
+
+## La carte NFC physique
+
+Le geste NFC méritait son objet : FadCard propose désormais des **cartes NFC physiques** commandables — PVC durable, design aux couleurs de l''organisation, prêtes à distribuer aux équipes. Le principe reste le même et reste la force du produit : **l''objet change de main, l''information change en ligne**. Une réimpression pour un changement de numéro ? Fini.
+
+## Pourquoi la personnalisation compte
+
+Sur le terrain, la carte de visite est un marqueur d''image. Un design qui ressemble à l''organisation — et une carte qui ne se démode jamais — c''est un argument de vente en soi.
+
+## La suite
+
+2026 sera celle de la mesure et de l''international : analytique temps réel, 66 pays, 40+ devises. Prochaine étape du parcours.',
+  '/assets/images/blog/fadcard-designs-nfc.jpg', 'Produits', '["FadCard", "Design", "NFC"]', 'Green FAD — Équipe produit', 'recit', 0, '2025-08-21 09:00:00', 'publie',
+  'Août 2025 : FadCard atteint 153 designs premium et propose les cartes NFC physiques commandables — l''objet change de main, l''information change en ligne.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'fadcard-analytics-66-pays', 'Analytics temps réel, 66 pays, 40+ devises : FadCard passe la vitesse supérieure', 'Mars 2026 : vues, partages, clics et sources mesurés en temps réel — validation de numéro dans 66 pays — plus de 40 devises — PWA installable. FadCard entre dans sa cinquième année.',
+  '# Mesurer, ouvrir, installer : la cinquième année de FadCard
+
+Mars 2026 : pour ses cinq ans, FadCard livre sa plus grosse mise à jour transversale depuis FadCard Pay.
+
+## L''analytique temps réel
+
+Chaque application de la plateforme expose désormais ses mesures en direct :
+
+- **Vues** du profil et des publications
+- **Partages** et canaux utilisés
+- **Clics** sur les liens et boutons
+- **Sources** d''où viennent vos visiteurs
+
+Mesurer, c''est décider : quel design convertit, quel canal ramène, quel contenu engage.
+
+## L''international assumé
+
+- **Validation de numéro dans 66 pays** : vos contacts sont vérifiés, de Bamako à la diaspora
+- **40+ devises** : les prix de Market et les campagnes Fund parlent la monnaie de vos clients
+
+## Une PWA, aucune borne
+
+FadCard devient une **PWA installable** : depuis n''importe quel navigateur, l''utilisateur installe l''application sur son écran d''accueil — sans store, sans mise à jour à télécharger.
+
+## Cinq ans, une cadence
+
+Cinq ans, dix versions majeures, une mise à jour chaque trimestre. Le prochain article de ce parcours parlera de fiabilité et de performance — la discipline de la v5.1.',
+  '/assets/images/blog/fadcard-analytics-66-pays.jpg', 'Produits', '["FadCard", "Analytics", "Version majeure"]', 'Green FAD — Équipe produit', 'article', 0, '2026-03-12 09:00:00', 'publie',
+  'Mars 2026 : FadCard ajoute l''analytique temps réel, la validation de numéro dans 66 pays, 40+ devises et devient une PWA installable.', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'tile-lancement-reseau-progres', 'Tile, le Réseau du Progrès : Green FAD lance son réseau social panafricain', 'Avril 2026 : après cinq ans de produits d''utilité (QRFAD, FadCard), Green FAD publie Tile — un réseau social conçu en Afrique, trilingue, sans publicité tierce ni revente de données.',
+  '# Tile, le Réseau du Progrès
+
+Avril 2026 : Green FAD publie **Tile** — « le Réseau du Progrès ». Après cinq ans à construire des outils pour les restaurants, les professionnels et les organisations, nous ouvrons un espace pour tout le monde : créer, partager, se connecter.
+
+## Pourquoi un réseau de plus ?
+
+Parce que les réseaux globaux ignorent ce qui fait la richesse d''ici : les **langues** (le bambara a sa place à côté du français et de l''anglais), les **médias locaux** (noyés dans le bruit), les **boutiques de quartier** (invisibles), et la **confiance** (données monétisées, modération absente).
+
+## Ce que Tile propose dès le premier jour
+
+- **Vidéos courtes** (jusqu''à 20 Mo), **messages vocaux** et **stories de 24 heures**
+- **Trois flux distincts** : Réseau (votre communauté), Certifié (médias et institutions vérifiés), Pour toi (recommandations)
+- **Messagerie privée** avec contrôle de qui peut vous écrire
+- **Comptes privés réels** : publications réservées aux abonnés acceptés, règle vérifiée côté serveur
+- **Entreprises & boutiques** : profil entité, catalogue jusqu''à 100 produits ou services, rôles d''équipe
+
+## La confiance comme architecture
+
+Pas de publicité tierce. Pas de revente de données. Modération humaine des signalements. Badge de certification pour les médias. Ce ne sont pas des options : c''est la conception même de Tile.
+
+## Où nous en sommes
+
+Tile est disponible en application web (PWA) — Android, iOS et le flux Certifié sont arrivés en juin. Présent au Mali, au Congo, au Burkina Faso et au Niger — et ouvert au monde.',
+  '/assets/images/blog/tile-lancement-reseau-progres.jpg', 'Produits', '["Tile", "Lancement", "Réseau social"]', 'Green FAD — Équipe produit', 'article', 1, '2026-04-22 09:00:00', 'publie',
+  'Avril 2026 : lancement de Tile, le Réseau du Progrès — vidéos, stories, flux Certifié, boutiques, trilingue FR/EN/bambara, sans publicité tierce.', (SELECT id FROM products WHERE slug = 'tile'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'tile-android-ios-trois-flux', 'Tile arrive sur Android et iOS : trois flux, trois usages', 'Juin 2026 : Tile se dote d''applications natives Android et iOS et ouvre le flux Certifié aux médias et organisations vérifiées. Le réseau gagne en rythme et en portée.',
+  '# Tile sur Android et iOS
+
+Juin 2026 : deux mois après le lancement web, Tile est disponible en **applications Android et iOS** — et son flux **Certifié** ouvre aux médias et organisations vérifiées.
+
+## Trois flux, trois usages
+
+Tile organise le temps passé en trois espaces clairement séparés :
+
+- **Réseau** — les publications de vos abonnements et de vos proches : la communauté
+- **Certifié** — l''information des comptes institutionnels vérifiés, badge à l''appui : les médias se distinguent d''un coup d''œil
+- **Pour toi** — des recommandations choisies selon vos goûts : la découverte
+
+Pourquoi séparer ? Parce que l''information sérieuse et le divertissement n''ont pas le même contrat de confiance. Sur Tile, un média vérifié ne se noie pas dans le flux.
+
+## Les applications natives
+
+L''application web (PWA) reste là — Android et iOS apportent le confort des notifications, des partages et des performances natives. Chiffrement HTTPS/TLS, App Check anti-abus, règles de base strictes et sauvegardes chiffrées : la barre technique est haute, comme sur toutes nos plateformes.
+
+## Le rythme s''installe
+
+Septembre 2026 a suivi avec les Défis & récompenses, les boutiques d''entreprises et l''interface trilingue complète. Tile suit la même discipline que ses aînés : une mise à jour par trimestre, documentée ici.',
+  '/assets/images/blog/tile-android-ios-trois-flux.jpg', 'Produits', '["Tile", "Mobile", "Flux Certifié"]', 'Green FAD — Équipe produit', 'article', 0, '2026-06-17 09:00:00', 'publie',
+  'Juin 2026 : Tile arrive sur Android et iOS et ouvre son flux Certifié aux médias vérifiés — trois flux distincts pour la communauté, l''information et la découverte.', (SELECT id FROM products WHERE slug = 'tile'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'cloudaf-lancement', 'CloudAf : créer, déployer et scaler sans se soucier de l''infrastructure', 'Juin 2026 : Green FAD lance CloudAf — double éditeur no-code + code, IA intégrée, Studio Builder et déploiement en un clic avec SSL, CDN et domaine personnalisé.',
+  '# CloudAf : créez, déployez, scalez
+
+Juin 2026 : Green FAD publie **CloudAf**, sa plateforme de création d''applications. Cinq années d''exploitation de nos propres produits (QRFAD, FadCard, Tile) nous ont appris une chose : le plus dur n''est pas d''écrire une application — c''est tout ce qui l''entoure. CloudAf s''attaque à exactement ça.
+
+## Le double éditeur : le mur est tombé
+
+- **No-code** : Studio Builder — bibliothèque de blocs, canvas glisser-déposer, inspecteur, thèmes
+- **Code** : un éditeur complet pour aller plus loin
+- **Synchronisés en temps réel** : on commence visuellement, on descend au code quand on le décide
+
+## L''IA au travail
+
+L''IA intégrée assiste chaque étape. Et pour ceux qui veulent déléguer davantage, l''**Agent CloudAf** discute du projet, le comprend et agit via de véritables outils audités — code, builds, déploiements, ressources.
+
+## Le déploiement en un clic
+
+SSL automatique, CDN mondial, domaine personnalisé avec configuration DNS automatique. La sécurité est native — MFA TOTP, rotation des refresh tokens, AES-256, limitation de débit, journaux d''audit — et le monitoring surveille métriques et santé des services avec alertes.
+
+## Pour commencer
+
+Six familles de templates sont prêtes : SaaS Starter, e-commerce, blog, portfolio, dashboard, landing. L''offre Free permet de démarrer sans rien payer (1 projet, 100 crédits IA) — Pro (29 €/mois) et Enterprise (99 €/mois) suivent la croissance. Bienvenue dans l''atelier.',
+  '/assets/images/blog/cloudaf-lancement.jpg', 'Produits', '["CloudAf", "Lancement", "No-code"]', 'Green FAD — Équipe produit', 'article', 0, '2026-06-03 09:00:00', 'publie',
+  'Juin 2026 : lancement de CloudAf — double éditeur no-code + code, IA intégrée, Studio Builder, déploiement en un clic (SSL, CDN, domaine). Offres Free, Pro 29 €, Enterprise 99 €.', (SELECT id FROM products WHERE slug = 'cloudaf'));
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'cloudaf-agent-ia', 'L''Agent CloudAf : l''IA qui construit votre projet avec vous', 'Octobre 2026 : l''Agent CloudAf passe de l''assistance à l''action — il comprend le projet et opère de véritables outils audités : code, builds, déploiements, ressources. Le Store ouvre en même temps.',
+  '# L''Agent CloudAf passe à l''action
+
+Octobre 2026 : deux mois après le lancement, CloudAf franchit l''étape que nous avions en ligne de mire depuis le début : l''**Agent**.
+
+## Un agent, de vrais outils
+
+La plupart des assistants IA suggèrent. L''Agent CloudAf **agit** : il discute avec vous, comprend votre projet, puis opère de véritables outils — **code, builds, déploiements, ressources** — chaque action étant auditée et visible.
+
+- Décrivez ce que vous voulez : l''agent propose, vous validez, il exécute
+- Chaque opération passe par des outils **audités** : rien ne se fait dans l''ombre
+- Vous gardez la main : le double éditeur no-code + code reste là, synchronisé
+
+## Le Store ouvre ses portes
+
+Même vague de mise à jour : le **CloudAf Store** permet d''acheter des templates payants avec des crédits — et de **vendre vos propres projets**. Créer sur CloudAf peut devenir une source de revenus.
+
+## Et le monitoring pour tenir la distance
+
+Le déploiement n''est pas la fin : le monitoring temps réel suit métriques et santé des services, avec alertes automatiques. Votre application vit, vous êtes prévenu avant que vos utilisateurs ne le remarquent.
+
+## La cadence respectée
+
+C''est la troisième mise à jour majeure de CloudAf en cinq mois (v1.0 juin, v1.1 août, v1.2 octobre). La cadence trimestrielle n''est pas un slogan : c''est notre discipline depuis QRFAD en 2021.',
+  '/assets/images/blog/cloudaf-agent-ia.jpg', 'Produits', '["CloudAf", "IA", "Agent"]', 'Green FAD — Équipe produit', 'article', 1, '2026-10-08 09:00:00', 'publie',
+  'Octobre 2026 : l''Agent CloudAf agit via des outils audités (code, builds, déploiements) et le CloudAf Store ouvre — templates en crédits, revente de projets.', (SELECT id FROM products WHERE slug = 'cloudaf'));
+
 INSERT INTO countries (slug, name, iso2, flag_emoji, is_registered, presentation_md, sort_order, status, published_at) VALUES ('mali', 'Mali', 'ML', '', 1, 'GREEN FAD SARL est immatriculée au Mali. Le siège social se trouve à Missabougou, Bamako. C''est de là que sont conçus, développés et déployés nos produits et nos projets clients.', 0, 'publie', datetime('now'));
 INSERT INTO countries (slug, name, iso2, flag_emoji, is_registered, presentation_md, sort_order, status, published_at) VALUES ('burkina-faso', 'Burkina Faso', 'BF', '', 1, 'GREEN FAD intervient au Burkina Faso auprès d''organisations locales et y est immatriculée. Nos équipes y déploient des solutions digitales et accompagnent la transformation numérique des entreprises.', 1, 'publie', datetime('now'));
 INSERT INTO countries (slug, name, iso2, flag_emoji, is_registered, presentation_md, sort_order, status, published_at) VALUES ('rdc-congo', 'RD Congo', 'CD', '', 1, 'GREEN FAD est immatriculée en République démocratique du Congo et contribue à des projets de transformation digitale dans le pays.', 2, 'publie', datetime('now'));
@@ -960,7 +1588,12 @@ Merci de nous rejoindre dans cette aventure. Ensemble, accélérons la transform
 
 **L''équipe Greenfad**  
 *Accélérateur de la Transformation Numérique et Écologique en Afrique*', '', 'digital', '["blog", "lancement", "transformation digitale", "Afrique"]', 'Green FAD', 'article', 0, '2025-11-10 10:00:00', 'publie', 'Découvrez notre nouveau blog dédié à la transformation numérique et écologique en Afrique. Articles, tutoriels et actualités sur le développement web, le SEO et les technologies vertes.');
-INSERT INTO pages (slug, title, nav_label, meta_title, meta_description, blocks, status, is_home, version, published_at) VALUES ('accueil', 'Accueil', 'Accueil', 'GREEN FAD SARL — Entreprise technologique africaine : produits propriétaires, ingénierie et transformation digitale', 'Entreprise technologique africaine : FAD CARD, QRFAD, FEREFAD… Green FAD conçoit ses propres produits numériques et accompagne la transformation digitale des organisations, du Mali vers l''international.', '[{"type": "hero", "visible": true, "eyebrow": "GREEN FAD SARL — Entreprise technologique africaine", "title": "Nous concevons les produits numériques qui transforment l''Afrique", "subtitle": "Innovation, ingénierie logicielle et transformation digitale : Green FAD développe ses propres technologies et accompagne les organisations, du Mali vers l''international.", "cta_label": "Découvrir nos produits", "cta_url": "/produits", "cta2_label": "Nous contacter", "cta2_url": "/contact", "variant": "gradient"}, {"type": "section_header", "visible": true, "eyebrow": "Nos piliers", "title": "Quatre piliers stratégiques", "text": "Une méthodologie éprouvée pour garantir le succès de votre projet.", "align": "center"}, {"type": "cards", "visible": true, "source": "manual", "limit": 4, "columns": 4, "items": [{"title": "Solutions Digitales & Technologies Vertes", "text": "Des solutions complètes pour transformer les défis environnementaux en opportunités de développement durable.", "icon": "leaf"}, {"title": "Innovations & Outils sur Mesure", "text": "Création de solutions propriétaires innovantes comme la FAD CARD, alliant technologie NFC/RFID et écologie.", "icon": "lightbulb"}, {"title": "Communication Multicanale & Identité", "text": "Design graphique, création d''identités visuelles et stratégies de communication intégrée.", "icon": "palette"}, {"title": "Conseil & Accompagnement", "text": "Audit digital, formation des équipes et support post-déploiement pour une adoption pérenne.", "icon": "compass"}]}, {"type": "stats", "visible": true, "variant": "dark", "items": [{"value": "7", "label": "Produits technologiques propriétaires"}, {"value": "5", "label": "Pays d''intervention en Afrique"}, {"value": "4", "label": "Expertises d''ingénierie"}, {"value": "13", "label": "Références clients & partenaires"}]}, {"type": "section_header", "visible": true, "eyebrow": "Nos solutions", "title": "Des produits nés sur le terrain", "text": "Chaque produit GREEN FAD répond à un besoin réel observé sur le terrain africain.", "align": "center"}, {"type": "cards", "visible": true, "source": "products", "limit": 6, "columns": 3, "items": [], "view_all_label": "Voir tous les produits", "view_all_url": "/produits"}, {"type": "split", "visible": true, "title": "L''alliance de la technologie et de l''écologie", "text_md": "Fondée par des professionnels passionnés par l''innovation et sensibles aux enjeux environnementaux, **GREEN FAD SARL** accompagne la transition numérique et écologique des organisations en Afrique.\n\n**Notre vision :** un avenir où technologie et durabilité vont de pair, réduisant la fracture numérique en Afrique.\n\n**Notre ambition :** porter nos propres innovations technologiques à l''échelle internationale.", "image_key": "/assets/images/office-workers-africa.jpg", "image_side": "right", "cta_label": "Découvrir l''entreprise", "cta_url": "/p/entreprise"}, {"type": "section_header", "visible": true, "eyebrow": "Expertises", "title": "Ce que nous faisons", "align": "center"}, {"type": "cards", "visible": true, "source": "services", "limit": 4, "columns": 4, "items": [], "view_all_label": "Toutes nos expertises", "view_all_url": "/expertises"}, {"type": "gallery_album", "visible": true, "album_slug": "produits-green-fad", "limit": 6}, {"type": "countries_map", "visible": true}, {"type": "cta", "visible": true, "title": "Construisons ensemble un avenir durable et digital", "text": "Parlons de votre projet — nos équipes vous répondent rapidement.", "button_label": "Démarrer la conversation", "button_url": "/contact", "variant": "solid"}]', 'publie', 1, 1, datetime('now'));
+
+-- ============ PAGE D'ACCUEIL v5 ============
+INSERT INTO pages (slug, title, nav_label, meta_title, meta_description, blocks, status, is_home, version, published_at) VALUES (
+  'accueil', 'Accueil', 'Accueil', 'GREEN FAD SARL — 4 plateformes en ligne : QRFAD, FadCard, Tile, CloudAf', 'Entreprise technologique africaine depuis 2021 : QRFAD (restauration), FadCard (écosystème pro 6-en-1), Tile (réseau social) et CloudAf (no-code + IA). Mises à jour chaque trimestre, produits et parcours documentés.',
+  '[{"type": "hero", "variant": "gradient", "eyebrow": "GREEN FAD SARL — ENTREPRISE TECHNOLOGIQUE AFRICAINE", "title": "Cinq ans de produit. Quatre plateformes en ligne. Une ambition continentale.", "subtitle": "De QRFAD et FAD CARD, nées à Bamako en 2021 et mises à jour chaque trimestre, à TILE et CLOUDAf, nos dernières plateformes : nous concevons, développons et exploitons nos propres technologies.", "cta_label": "Découvrir nos plateformes", "cta_url": "/produits", "cta2_label": "Lire le blog", "cta2_url": "/blog"}, {"type": "stats", "variant": "dark", "items": [{"value": "4", "label": "Plateformes en ligne, accessibles publiquement"}, {"value": "5 ans", "label": "D''itérations produit, mise à jour chaque trimestre"}, {"value": "6", "label": "Applications métier réunies dans FadCard"}, {"value": "9", "label": "Établissements équipés sur QRFAD"}]}, {"type": "section_header", "eyebrow": "Nos plateformes", "title": "Quatre plateformes, ouvertes au public", "text": "Chacune vit sa vie : fonctionnalités, mises à jour trimestrielles et parcours documentés dans notre blog.", "align": "center"}, {"type": "cards", "source": "manual", "limit": 4, "columns": 4, "items": [{"title": "QRFAD", "text": "Menus digitaux par QR, commandes WhatsApp, caisse POS et hôtellerie — pour les restaurants et hôtels d''Afrique.", "image_key": "/assets/images/portfolio/qrfad.jpg", "url": "https://qrfad.com", "tag": "Restauration & hôtellerie"}, {"title": "FadCard", "text": "Six applications métier, un seul compte : vCard, Market, Tickets, Fund, Vote, FadCard Pay.", "image_key": "/assets/images/portfolio/fadcard.jpg", "url": "https://fadcard.greenfad.tech", "tag": "Écosystème professionnel"}, {"title": "Tile", "text": "Le Réseau du Progrès : vidéos, stories, flux Certifié et boutiques — Web, Android, iOS.", "image_key": "/assets/images/portfolio/tile.jpg", "url": "https://tileofficiel.com", "tag": "Nouveau · Réseau social"}, {"title": "CloudAf", "text": "Créez, déployez, scalez : no-code + code, agent IA, déploiement en un clic.", "image_key": "/assets/images/portfolio/cloudaf.jpg", "url": "https://cloudaf.net", "tag": "Nouveau · No-code & IA"}], "view_all_label": "Toutes nos plateformes", "view_all_url": "/produits"}, {"type": "timeline", "title": "Cinq ans d''innovation, mise à jour après mise à jour", "items": [{"year": "2021", "title": "QRFAD & FAD CARD voient le jour à Bamako", "text": "Le menu numérique par QR code et la carte de visite connectée NFC sont lancés auprès du terrain."}, {"year": "2022", "title": "Les produits s''enrichissent", "text": "QRFAD passe au multi-établissements — FadCard lance Market, sa vitrine marchande."}, {"year": "2023", "title": "Commandes & transactions", "text": "Commandes depuis le menu puis intégration WhatsApp sur QRFAD — Tickets puis Fund sur FadCard."}, {"year": "2024", "title": "Des plateformes complètes", "text": "QRFAD couvre l''hôtellerie puis la caisse POS — FadCard complète sa suite avec Vote et FadCard Pay."}, {"year": "2025", "title": "Maturité & personnalisation", "text": "153 designs et cartes NFC pour FadCard — caisse consolidée et thèmes pour QRFAD."}, {"year": "2026", "title": "Tile & CloudAf : deux nouvelles plateformes", "text": "Le réseau social du progrès et la plateforme no-code + IA rejoignent l''écosystème Green FAD."}]}, {"type": "section_header", "eyebrow": "Catalogue", "title": "Des produits nés sur le terrain", "text": "Chaque produit Green FAD répond à un besoin réel observé sur le terrain africain.", "align": "center"}, {"type": "cards", "source": "products", "limit": 9, "columns": 3, "view_all_label": "Voir tous les produits", "view_all_url": "/produits"}, {"type": "split", "title": "L''alliance de la technologie et de l''écologie", "text_md": "Fondée par des professionnels passionnés par l''innovation et sensibles aux enjeux environnementaux, **GREEN FAD SARL** accompagne la transition numérique et écologique des organisations en Afrique.\n\n**Notre vision :** un avenir où technologie et durabilité vont de pair, réduisant la fracture numérique en Afrique.\n\n**Notre ambition :** porter nos propres innovations technologiques à l''échelle internationale.", "image_key": "/assets/images/office-workers-africa.jpg", "image_side": "right", "cta_label": "Découvrir l''entreprise", "cta_url": "/p/entreprise"}, {"type": "section_header", "eyebrow": "Expertises", "title": "Ce que nous faisons pour votre organisation", "align": "center"}, {"type": "cards", "source": "services", "limit": 4, "columns": 4, "view_all_label": "Toutes nos expertises", "view_all_url": "/expertises"}, {"type": "section_header", "eyebrow": "Le blog", "title": "Le parcours de nos produits, documenté", "text": "Lancements, mises à jour trimestrielles, coulisses d''ingénierie : cinq ans d''histoire produit racontés au fil des publications.", "align": "center"}, {"type": "cards", "source": "posts", "limit": 3, "columns": 3, "view_all_label": "Tous les articles", "view_all_url": "/blog"}, {"type": "gallery_album", "album_slug": "produits-green-fad", "limit": 6}, {"type": "countries_map"}, {"type": "cta", "title": "Construisons ensemble un avenir durable et digital", "text": "Parlons de votre projet — nos équipes vous répondent rapidement.", "button_label": "Démarrer la conversation", "button_url": "/contact", "variant": "solid"}]', 'publie', 1, 2, datetime('now'));
+
 INSERT INTO pages (slug, title, nav_label, meta_title, meta_description, blocks, status, is_home, version, published_at) VALUES ('entreprise', 'Entreprise', 'Entreprise', 'L''entreprise GREEN FAD — identité, vision et présence internationale', 'Qui est GREEN FAD SARL : entreprise technologique africaine, produits propriétaires, ingénierie logicielle, présence au Mali, Burkina Faso, RD Congo, Niger et Côte d''Ivoire.', '[{"type": "hero", "visible": true, "eyebrow": "L''entreprise", "title": "Une entreprise technologique africaine, à ambition internationale", "subtitle": "GREEN FAD SARL conçoit, développe et porte ses propres innovations technologiques — et accompagne les organisations dans leur transformation numérique et écologique.", "cta_label": "Nos produits", "cta_url": "/produits", "cta2_label": "Nous contacter", "cta2_url": "/contact", "variant": "dark"}, {"type": "split", "visible": true, "title": "Qui sommes-nous", "text_md": "GREEN FAD SARL est une entreprise technologique africaine d''innovation, de conception, de développement et de transformation numérique. Basée à Bamako (Mali), immatriculée dans plusieurs pays africains, elle conçoit des produits numériques propriétaires et développe des solutions sur mesure pour les entreprises et institutions.\n\nFondée par des professionnels passionnés par l''innovation et sensibles aux enjeux environnementaux, GREEN FAD place l''**alliance de la technologie et de l''écologie** au cœur de son identité : *Future, Authentique, Dynamique*.", "image_key": "/assets/images/about-team.jpg", "image_side": "right", "cta_label": "", "cta_url": ""}, {"type": "section_header", "visible": true, "eyebrow": "Notre identité", "title": "Ce qui nous définit", "align": "center"}, {"type": "cards", "visible": true, "source": "manual", "limit": 4, "columns": 2, "items": [{"title": "Innovation technologique africaine", "text": "Nous ne nous contentons pas d''implémenter : nous inventons, expérimentons et documentons. Nos produits naissent de l''observation directe du terrain.", "icon": "lightbulb"}, {"title": "Produits numériques propriétaires", "text": "FAD CARD, QRFAD, FEREFAD, NIAFAD, SARAPAY, Carte Santé, L''Amitié Fad : sept produits que nous concevons, développons et exploitons nous-mêmes.", "icon": "package"}, {"title": "Ingénierie logicielle & infrastructures", "text": "Développement web et mobile, données, déploiement cloud : une chaîne de valeur technologique complète, maîtrisée de bout en bout.", "icon": "cpu"}, {"title": "Transformation digitale des organisations", "text": "Audit, conseil, développement et formation : nous accompagnons entreprises et institutions dans la durée, pas seulement au lancement.", "icon": "workflow"}]}, {"type": "stats", "visible": true, "variant": "light", "items": [{"value": "4", "label": "Pays d''immatriculation : Mali, Burkina Faso, RD Congo, Niger"}, {"value": "7", "label": "Produits propriétaires développés"}, {"value": "3", "label": "Univers : corporate, business & technology, media & knowledge"}]}, {"type": "section_header", "visible": true, "eyebrow": "Notre approche", "title": "R&D, expérimentation et transmission", "align": "center"}, {"type": "richtext", "visible": true, "content_md": "GREEN FAD ne fait pas que développer des logiciels : l''entreprise réfléchit, expérimente, documente et contribue à l''écosystème technologique africain.\n\n- **Recherche & développement** : chaque produit passe par un cycle d''expérimentation réel\n- **Veille technologique** : nous suivons et analysons les évolutions utiles au continent\n- **Transmission** : guides, analyses et retours d''expérience publiés dans notre espace Innovation\n- **Partenariats** : collaborations avec des entreprises et institutions locales et internationales\n\n> « Future, Authentique, Dynamique » — notre sigle est notre feuille de route."}, {"type": "countries_map", "visible": true}, {"type": "cta", "visible": true, "title": "Travailler avec GREEN FAD", "text": "Produit, expertise ou partenariat : échangeons sur votre projet.", "button_label": "Nous contacter", "button_url": "/contact", "variant": "solid"}]', 'publie', 0, 1, datetime('now'));
 INSERT INTO pages (slug, title, meta_title, meta_description, blocks, status, is_home, version, published_at) VALUES ('mentions-legales', 'Mentions légales', 'Mentions légales | GREEN FAD', 'Mentions légales du site greenfad.tech — éditeur, hébergement, propriété intellectuelle.', '[{"type": "hero", "visible": true, "eyebrow": "Informations légales", "title": "Mentions légales", "variant": "dark"}, {"type": "richtext", "visible": true, "content_md": "## Éditeur du site\n\nLe présent site est édité par **GREEN FAD SARL**, société immatriculée au Mali.\n\n- Siège social : Missabougou, Bamako, Mali\n- Téléphone : +223 72 19 46 54\n- Email : contact@greenfad.tech\n\n## Directeur de la publication\n\nLa direction générale de GREEN FAD SARL.\n\n## Hébergement\n\nLe site est hébergé sur linfrastructure cloud de Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, États-Unis.\n\n## Propriété intellectuelle\n\nLensemble des contenus du site (textes, visuels, logos, marques, produits GREEN FAD et leurs dénominations) est protégé. Toute reproduction ou réutilisation sans autorisation écrite préalable est interdite.\n\n## Signalement\n\nPour signaler un contenu problématique : contact@greenfad.tech."}]', 'publie', 0, 1, datetime('now'));
 INSERT INTO pages (slug, title, meta_title, meta_description, blocks, status, is_home, version, published_at) VALUES ('confidentialite', 'Politique de confidentialité', 'Confidentialité | GREEN FAD', 'Politique de confidentialité et de protection des données de greenfad.tech.', '[{"type": "hero", "visible": true, "eyebrow": "Vos données", "title": "Politique de confidentialité", "variant": "dark"}, {"type": "richtext", "visible": true, "content_md": "## Données collectées\n\nGREEN FAD SARL collecte uniquement les données que vous nous transmettez volontairement via les formulaires du site (nom, email, téléphone, société, message) afin de répondre à vos demandes.\n\n## Finalités\n\n- Répondre à vos demandes de contact, devis et démonstrations\n- Traiter vos candidatures aux offres demploi\n- Gérer vos abonnements à la newsletter (si vous vous y inscrivez)\n\n## Durée de conservation & sécurité\n\nLes données sont conservées le temps nécessaire au traitement de votre demande puis archivées ou supprimées. Elles sont stockées sur des infrastructures sécurisées (Cloudflare) et ne sont jamais vendues à des tiers.\n\n## Vos droits\n\nVous pouvez demander laccès, la rectification ou la suppression de vos données à tout moment : **contact@greenfad.tech**.\n\n## Mesure daudience & cookies\n\nLe site nutilise pas de traceurs publicitaires. Seuls des cookies techniques strictement nécessaires (session administrateur) peuvent être déposés."}]', 'publie', 0, 1, datetime('now'));
@@ -991,4 +1624,6 @@ INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/politique-de-confidentialite.html', '/p/confidentialite', 301, 1, datetime('now'));
 INSERT OR IGNORE INTO redirects (from_path, to_path, code, is_active, created_at) VALUES ('/cgv.html', '/p/cgv', 301, 1, datetime('now'));
 -- Version du contenu éditorial (la CI ré-applique ce fichier quand la valeur change)
-INSERT INTO settings (key, value) VALUES ('content_version', '3');
+
+-- Version du contenu éditorial (la CI ré-applique ce fichier quand la valeur change)
+INSERT INTO settings (key, value) VALUES ('content_version', '4');

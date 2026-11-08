@@ -195,7 +195,7 @@ async function dynamicCards(db: D1Database, source: string, limit: number): Prom
         tag: String(r.category || ""),
       }));
     if (source === "services") return map(await q(db, "SELECT slug, name, summary, image_key, icon FROM services WHERE status=? ORDER BY sort_order LIMIT ?", pub, limit), "/expertises", "name", "summary", "image_key", "icon");
-    if (source === "posts") return map(await q(db, "SELECT slug, title, excerpt, cover_key FROM posts WHERE status=? ORDER BY published_at DESC LIMIT ?", pub, limit), "/innovation", "title", "excerpt", "cover_key");
+    if (source === "posts") return map(await q(db, "SELECT slug, title, excerpt, cover_key FROM posts WHERE status=? ORDER BY published_at DESC LIMIT ?", pub, limit), "/blog", "title", "excerpt", "cover_key");
     if (source === "projects")
       return (await q(db, "SELECT slug, title, summary, image_key, category FROM projects WHERE status=? ORDER BY sort_order LIMIT ?", pub, limit)).map((r) => ({
         title: String(r.title || ""), text: String(r.summary || ""), image_key: String(r.image_key || ""), url: `/realisations/${r.slug}`, icon: "", tag: String(r.category || ""),
