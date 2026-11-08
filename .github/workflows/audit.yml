@@ -1,0 +1,85 @@
+# GREEN FAD — Audit ponctuel de la base de production (déclenché manuellement)
+# Ne déploie rien : exécute des requêtes de diagnostic D1 et les affiche dans le log.
+name: Audit base de données (lecture seule)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Diagnostic doublons / contenus morts / médias orphelins
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: 1) Comptage global des tables de contenu
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT 'pages' t, COUNT(*) n FROM pages UNION ALL SELECT 'posts', COUNT(*) FROM posts UNION ALL SELECT 'products', COUNT(*) FROM products UNION ALL SELECT 'services', COUNT(*) FROM services UNION ALL SELECT 'faqs', COUNT(*) FROM faqs UNION ALL SELECT 'media', COUNT(*) FROM media UNION ALL SELECT 'media_albums', COUNT(*) FROM media_albums UNION ALL SELECT 'media_items', COUNT(*) FROM media_items UNION ALL SELECT 'page_versions', COUNT(*) FROM page_versions UNION ALL SELECT 'audit_log', COUNT(*) FROM audit_log UNION ALL SELECT 'projects', COUNT(*) FROM projects UNION ALL SELECT 'partners', COUNT(*) FROM partners UNION ALL SELECT 'menus', COUNT(*) FROM menus UNION ALL SELECT 'footer_sections', COUNT(*) FROM footer_sections UNION ALL SELECT 'settings', COUNT(*) FROM settings UNION ALL SELECT 'redirects', COUNT(*) FROM redirects UNION ALL SELECT 'newsletter_subscribers', COUNT(*) FROM newsletter_subscribers" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 2) Slugs en doublon (pages, articles, produits, services)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT 'page' typ, slug v, COUNT(*) n FROM pages GROUP BY slug HAVING n>1 UNION ALL SELECT 'post', slug, COUNT(*) FROM posts GROUP BY slug HAVING n>1 UNION ALL SELECT 'product', slug, COUNT(*) FROM products GROUP BY slug HAVING n>1 UNION ALL SELECT 'service', slug, COUNT(*) FROM services GROUP BY slug HAVING n>1" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 3) Questions FAQ en doublon
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT question, COUNT(*) n FROM faqs GROUP BY question HAVING n>1 ORDER BY n DESC" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 4) Articles morts (brouillons, vides ou sans contenu)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT id, slug, status, length(content_md) len, title FROM posts WHERE status <> 'publie' OR content_md IS NULL OR length(content_md) < 80 ORDER BY id" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 5) Produits et services non publiés
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT 'product' typ, id, name, status FROM products WHERE status <> 'publie' UNION ALL SELECT 'service', id, name, status FROM services WHERE status <> 'publie' ORDER BY typ, id" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 6) Médias en doublon (même nom de fichier)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT filename, COUNT(*) n, GROUP_CONCAT(id) ids FROM media GROUP BY filename, folder HAVING n>1 ORDER BY n DESC LIMIT 60" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 7) Médias orphelins (aucune référence dans le contenu)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT m.id, m.folder, m.filename, m.size, m.created_at FROM media m WHERE NOT EXISTS (SELECT 1 FROM pages p WHERE instr(p.blocks, m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM posts po WHERE instr(po.content_md, m.r2_key) > 0 OR instr(COALESCE(po.cover_key,''), m.r2_key) > 0 OR instr(COALESCE(po.meta_json,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM products pr WHERE instr(COALESCE(pr.blocks,''), m.r2_key) > 0 OR instr(COALESCE(pr.image_key,''), m.r2_key) > 0 OR instr(COALESCE(pr.og_image,''), m.r2_key) > 0 OR instr(COALESCE(pr.description_md,''), m.r2_key) > 0 OR instr(COALESCE(pr.features,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM services s WHERE instr(COALESCE(s.blocks,''), m.r2_key) > 0 OR instr(COALESCE(s.image_key,''), m.r2_key) > 0 OR instr(COALESCE(s.content_md,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM media_items mi WHERE mi.r2_key = m.r2_key) AND NOT EXISTS (SELECT 1 FROM media_albums al WHERE instr(COALESCE(al.cover_key,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM settings st WHERE instr(st.value, m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM pages pg2 WHERE instr(COALESCE(pg2.meta_description,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM projects pj WHERE instr(COALESCE(pj.blocks,''), m.r2_key) > 0 OR instr(COALESCE(pj.image_key,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM footer_sections fs WHERE instr(COALESCE(fs.content,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM partners pt WHERE instr(COALESCE(pt.logo_key,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM jobs j WHERE instr(COALESCE(j.content_md,''), m.r2_key) > 0 OR instr(COALESCE(j.cover_key,''), m.r2_key) > 0) AND NOT EXISTS (SELECT 1 FROM documents d WHERE d.r2_key = m.r2_key) ORDER BY m.folder, m.id LIMIT 400" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .' | head -c 12000
+
+      - name: 8) Fragments d'URL média obsolètes référencés dans le contenu (chemins /assets/ inexistants)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT 'page' typ, id, slug, value FROM pages, json_each(CASE WHEN json_valid(blocks) THEN json_extract(blocks, '\$') ELSE '[]' END) WHERE 0 LIMIT 1" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .' || true
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT id, slug FROM pages WHERE blocks LIKE '%/assets/images/%' ORDER BY slug" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .'
+
+      - name: 9) Incohérences menus / pied de page (entrées sans cible)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT id, location, items FROM menus" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .' | head -c 6000
+          npx wrangler d1 execute greenfad-production --remote --json \
+            --command "SELECT id, section_key, title FROM footer_sections ORDER BY id" \
+            | tee /dev/stderr | jq -c '.[0].results // .results // .' | head -c 4000
