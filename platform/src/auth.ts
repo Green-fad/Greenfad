@@ -50,13 +50,55 @@ function b64decode(s: string): Uint8Array {
   return out;
 }
 
-// ---------- Sessions (KV) ----------
+// ---------- Sessions (KV avec repli D1) ----------
+// Le quota d'écritures KV du plan gratuit peut être épuisé en journée :
+// une session ne doit JAMAIS être bloquée par un quota — repli sur D1.
+async function sessPut(c: Context<{ Bindings: Env }>, id: string, raw: string, ttl: number): Promise<void> {
+  try {
+    await c.env.KV.put(`sess:${id}`, raw, { expirationTtl: ttl });
+    return;
+  } catch (e) {
+    console.warn("session:put — KV indisponible, repli D1", (e as Error)?.message);
+  }
+  await c.env.DB.prepare(
+    "INSERT INTO sessions_backup (id, data, expires_at) VALUES (?1, ?2, ?3) ON CONFLICT(id) DO UPDATE SET data = excluded.data, expires_at = excluded.expires_at"
+  ).bind(id, raw, Date.now() + ttl * 1000).run();
+}
+
+async function sessGet(c: Context<{ Bindings: Env }>, id: string): Promise<string | null> {
+  try {
+    const raw = await c.env.KV.get(`sess:${id}`);
+    if (raw) return raw;
+  } catch (e) {
+    console.warn("session:get — KV indisponible, repli D1", (e as Error)?.message);
+  }
+  try {
+    const row = await c.env.DB.prepare("SELECT data FROM sessions_backup WHERE id = ?1 AND expires_at > ?2").bind(id, Date.now()).first<{ data: string }>();
+    return row?.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function sessDel(c: Context<{ Bindings: Env }>, id: string): Promise<void> {
+  try {
+    await c.env.KV.delete(`sess:${id}`);
+  } catch {
+    /* quota/panne : la copie D1 est supprimée ci-dessous */
+  }
+  try {
+    await c.env.DB.prepare("DELETE FROM sessions_backup WHERE id = ?1").bind(id).run();
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function createSession(c: Context<{ Bindings: Env }>, user: Omit<SessionUser, "csrf">): Promise<string> {
   const id = ulid();
   const csrfBytes = crypto.getRandomValues(new Uint8Array(16));
   const csrf = Array.from(csrfBytes).map((b) => b.toString(16).padStart(2, "0")).join("");
   const data: SessionUser = { ...user, csrf };
-  await c.env.KV.put(`sess:${id}`, JSON.stringify(data), { expirationTtl: SESSION_TTL });
+  await sessPut(c, id, JSON.stringify(data), SESSION_TTL);
   setCookie(c, SESSION_COOKIE, id, {
     httpOnly: true,
     secure: true,
@@ -70,12 +112,12 @@ export async function createSession(c: Context<{ Bindings: Env }>, user: Omit<Se
 export async function getSession(c: Context<{ Bindings: Env }>): Promise<SessionUser | null> {
   const id = getCookie(c, SESSION_COOKIE);
   if (!id || !/^[A-Z0-9]{26}$/.test(id)) return null;
-  const raw = await c.env.KV.get(`sess:${id}`);
+  const raw = await sessGet(c, id);
   if (!raw) return null;
   try {
     const user = JSON.parse(raw) as SessionUser;
-    // session glissante : renouvelle le TTL
-    await c.env.KV.put(`sess:${id}`, raw, { expirationTtl: SESSION_TTL });
+    // session glissante : renouvelle le TTL (tolérant aux pannes KV)
+    await sessPut(c, id, raw, SESSION_TTL);
     return user;
   } catch {
     return null;
@@ -84,7 +126,7 @@ export async function getSession(c: Context<{ Bindings: Env }>): Promise<Session
 
 export async function destroySession(c: Context<{ Bindings: Env }>): Promise<void> {
   const id = getCookie(c, SESSION_COOKIE);
-  if (id) await c.env.KV.delete(`sess:${id}`);
+  if (id) await sessDel(c, id);
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
 }
 
@@ -127,17 +169,27 @@ function renderCsrfError(): string {
 <a href="/admin" style="color:#0e5a3c">Retour au tableau de bord</a></div></body></html>`;
 }
 
-// ---------- Anti-bruteforce (KV) ----------
+// ---------- Anti-bruteforce (KV, tolérant aux pannes) ----------
 export async function rateLimit(c: Context<{ Bindings: Env }>, key: string, max: number, windowSec: number): Promise<boolean> {
   const k = `rl:${key}`;
-  const current = parseInt((await c.env.KV.get(k)) || "0", 10);
-  if (current >= max) return false;
-  await c.env.KV.put(k, String(current + 1), { expirationTtl: windowSec });
-  return true;
+  try {
+    const current = parseInt((await c.env.KV.get(k)) || "0", 10);
+    if (current >= max) return false;
+    await c.env.KV.put(k, String(current + 1), { expirationTtl: windowSec });
+    return true;
+  } catch (e) {
+    // KV indisponible (quota gratuit épuisé, incident…) : ne pas bloquer l'accès.
+    console.warn("rateLimit — KV indisponible, tolérance ouverte", (e as Error)?.message);
+    return true;
+  }
 }
 
-export function resetRateLimit(c: Context<{ Bindings: Env }>, key: string) {
-  return c.env.KV.delete(`rl:${key}`);
+export async function resetRateLimit(c: Context<{ Bindings: Env }>, key: string): Promise<void> {
+  try {
+    await c.env.KV.delete(`rl:${key}`);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function clientIp(c: Context): string {

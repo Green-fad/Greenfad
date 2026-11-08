@@ -45,9 +45,17 @@ export async function loadSettings(db: D1Database): Promise<Record<string, unkno
   return out;
 }
 
-/** Cache KV simple pour les fragments publics (menus, settings) */
+/** Cache KV simple pour les fragments publics (menus, settings).
+ *  Tolérant aux pannes : KV n'est qu'un cache — si une écriture échoue
+ *  (quota gratuit dépassé, incident…), on renvoie simplement la valeur
+ *  de la base au lieu de faire planter toute la plateforme. */
 export async function cached<T>(env: { KV: KVNamespace }, key: string, ttlSec: number, fn: () => Promise<T>): Promise<T> {
-  const hit = await env.KV.get(`cache:${key}`);
+  let hit: string | null = null;
+  try {
+    hit = await env.KV.get(`cache:${key}`);
+  } catch (e) {
+    console.warn(`cache:get ${key} indisponible`, (e as Error)?.message);
+  }
   if (hit) {
     try {
       return JSON.parse(hit) as T;
@@ -56,10 +64,14 @@ export async function cached<T>(env: { KV: KVNamespace }, key: string, ttlSec: n
     }
   }
   const value = await fn();
-  await env.KV.put(`cache:${key}`, JSON.stringify(value), { expirationTtl: ttlSec });
+  try {
+    await env.KV.put(`cache:${key}`, JSON.stringify(value), { expirationTtl: ttlSec });
+  } catch (e) {
+    console.warn(`cache:put ${key} indisponible`, (e as Error)?.message);
+  }
   return value;
 }
 
 export function invalidateCache(env: { KV: KVNamespace }, keys: string[]): Promise<void> {
-  return Promise.all(keys.map((k) => env.KV.delete(`cache:${k}`))).then(() => undefined);
+  return Promise.all(keys.map((k) => env.KV.delete(`cache:${k}`).catch(() => undefined))).then(() => undefined);
 }

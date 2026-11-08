@@ -109,7 +109,7 @@ export const publicRoutes = new Hono<{ Bindings: Env }>();
 publicRoutes.use("*", async (c, next) => {
   const path = c.req.path;
   if (path === "/" || path.startsWith("/admin") || path.startsWith("/api") || path.startsWith("/media/") || /\.(css|js|mjs|map|jpe?g|png|webp|avif|gif|svg|ico|woff2?|ttf|eot|xml|txt|json|webmanifest)$/i.test(path)) return next();
-  const rows = await (await import("../db")).cached(c.env, "redirects", 600, () =>
+  const rows = await (await import("../db")).cached(c.env, "redirects", 3600, () =>
     q<{ from_path: string; to_path: string; code: number }>(c.env.DB, "SELECT from_path, to_path, code FROM redirects WHERE is_active = 1")
   );
   const hit = rows.find((r) => r.from_path === path || (r.from_path.endsWith("*") && path.startsWith(r.from_path.slice(0, -1))));

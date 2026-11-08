@@ -17,9 +17,9 @@ export type SiteData = {
 export async function loadSiteData(c: Context<{ Bindings: Env }>): Promise<SiteData> {
   const db = c.env.DB;
   const [settings, menuRows, footRows] = await Promise.all([
-    cached(c.env, "settings", 120, () => loadSettings(db)),
-    cached(c.env, "menus", 120, () => q<{ location: string; items: string }>(db, "SELECT location, items FROM menus")),
-    cached(c.env, "footer_sections", 120, () => q<Record<string, unknown>>(db, "SELECT * FROM footer_sections ORDER BY sort_order")),
+    cached(c.env, "settings", 3600, () => loadSettings(db)),
+    cached(c.env, "menus", 3600, () => q<{ location: string; items: string }>(db, "SELECT location, items FROM menus")),
+    cached(c.env, "footer_sections", 3600, () => q<Record<string, unknown>>(db, "SELECT * FROM footer_sections ORDER BY sort_order")),
   ]);
   const menus = Object.fromEntries(menuRows.map((m) => [m.location, parseJSON<MenuItem[]>(m.items, [])]));
   return {

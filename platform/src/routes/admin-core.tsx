@@ -772,6 +772,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const to = "/" + String(form.to_path || "").trim().replace(/^\//, "");
     if (from && to && from !== "/") {
       await c.env.DB.prepare("INSERT INTO redirects (from_path, to_path, code, is_active, created_at) VALUES (?1,?2,?3,1,datetime('now')) ON CONFLICT(from_path) DO UPDATE SET to_path = ?2, code = ?3").bind(from, to, String(form.code || "301")).run();
+      await invalidateCache(c.env, ["redirects"]);
       await audit(c, "creation_redirection", "redirects", null, { from, to });
     }
     return c.redirect("/admin/seo");
@@ -782,6 +783,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const d = deny(c, "seo", "edit");
     if (d) return d;
     await c.env.DB.prepare("DELETE FROM redirects WHERE id = ?").bind(c.req.param("id")).run();
+    await invalidateCache(c.env, ["redirects"]);
     await audit(c, "suppression_redirection", "redirects", c.req.param("id"));
     return c.redirect("/admin/seo");
   });
