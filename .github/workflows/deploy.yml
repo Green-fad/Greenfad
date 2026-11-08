@@ -74,7 +74,7 @@ jobs:
             for KEY in cache:settings cache:menus cache:footer_sections cache:redirects; do
               npx wrangler kv key delete "$KEY" --namespace-id=4d8efa4efac74c7faae30dd533f86353 2>/dev/null || true
             done
-            echo "Contenu v9 appliqué et caches KV purgés."
+            echo "Contenu v10 appliqué et caches KV purgés."
           else
             echo "Contenu déjà en v10 — aucune mise à jour."
           fi
