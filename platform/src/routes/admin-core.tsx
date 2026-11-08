@@ -26,7 +26,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
 
   r.post("/login", async (c) => {
     const ip = clientIp(c);
-    const limited = await rateLimit(c, `login:${ip}`, 6, 900);
+    const limited = await rateLimit(c, `login:${ip}`, 12, 900);
     if (!limited) {
       await audit(c, "login_refuse_rate_limit", "users", null, { ip });
       return c.html(adminLoginHTML("Trop de tentatives. Réessayez dans 15 minutes."), 429);

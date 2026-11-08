@@ -1841,8 +1841,8 @@ INSERT INTO faqs (question, answer, category, sort_order, status) VALUES
 ('CloudAf convient-il à une petite entreprise ?', 'Oui : c''est précisément sa raison d''être. Une PME lance un outil interne ou un site client sans acheter de serveur ni recruter d''administrateur système, et paie ce qu''elle utilise — avec un support en français basé à Bamako.', 'produit:cloudaf', 2, 'publie');
 
 -- 4) Accès administrateur : mot de passe réinitialisé (hash PBKDF2-SHA-256, 100 000 itérations)
-UPDATE users SET password_hash = '8ThKwzz8erem99M2w7QIDCz/Y4lttqptefx8HwEyv/I=',
-  password_salt = 'Ue6HK+/Xb3LSptDurRCfDw==', must_change_password = 0, is_active = 1
+UPDATE users SET password_hash = 'd6kfXMH5F1EULYNy8KBx5dkq3KTXLZwLnftlRtql2Pg=',
+  password_salt = 'D8Zbv690aiCIQFxhCmMlzg==', must_change_password = 0, is_active = 1
 WHERE email = 'contact@greenfad.tech';
 
 -- 5) Version du contenu
@@ -1975,4 +1975,4 @@ UPDATE pages SET
 WHERE slug = 'accueil';
 
 -- 4) Version du contenu
-UPDATE settings SET value = '7' WHERE key = 'content_version';
+UPDATE settings SET value = '8' WHERE key = 'content_version';
