@@ -2048,3 +2048,18 @@ DELETE FROM content_relations WHERE media_item_id NOT IN (SELECT id FROM media_i
 
 -- 4) Version du contenu
 UPDATE settings SET value = '10' WHERE key = 'content_version';
+
+-- =====================================================================
+-- DELTA v11 — réinitialisation de l'accès administrateur :
+--          mot de passe fourni par la direction (hash PBKDF2-SHA-256,
+--          100 000 itérations, sel 16 octets, clé 256 bits — schéma src/auth.ts)
+--          + version du contenu portée à 11
+-- =====================================================================
+
+-- 1) Mot de passe administrateur : contact@greenfad.tech / GreenFad!2026#Bko
+UPDATE users SET password_hash = 'srRz5Gp7NF/F/qElRzxX1+ODScBjLiUrB3d6e2UI4RA=',
+  password_salt = 'xBXG2Mn0UU+4tA06TjgoRg==', must_change_password = 0, is_active = 1
+WHERE email = 'contact@greenfad.tech';
+
+-- 2) Version du contenu
+UPDATE settings SET value = '11' WHERE key = 'content_version';

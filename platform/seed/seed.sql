@@ -29,8 +29,8 @@ INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('c
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('produits', 'Nos produits', '{"items": [{"label": "FAD CARD", "url": "/produits/fad-card"}, {"label": "NIAFAD", "url": "/produits/niafad"}, {"label": "QRFAD", "url": "/produits/qrfad"}, {"label": "FEREFAD", "url": "/produits/ferefad"}, {"label": "SARAPAY", "url": "/produits/sarapay"}, {"label": "Carte Santé", "url": "/produits/carte-sante"}, {"label": "L''Amitié Fad", "url": "/produits/amitie-fad"}]}', 3);
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES ('liens', 'Informations', '{"items": [{"label": "Mentions légales", "url": "/p/mentions-legales"}, {"label": "Confidentialité", "url": "/p/confidentialite"}, {"label": "CGV", "url": "/p/cgv"}, {"label": "Ressources", "url": "/ressources"}]}', 4);
 
--- ---------- UTILISATEUR ADMIN (identifiants inchangés) ----------
-INSERT INTO users (email, password_hash, password_salt, name, role, is_active, must_change_password) VALUES ('contact@greenfad.tech', 'RL4kxmn2//ztCJr+CZyEo37TDev0hmT05cn0OskJnhE=', 'ARp1F0daYtjeL/Z5cq9oZQ==', 'Administrateur GREEN FAD', 'super_admin', 1, 1);
+-- ---------- UTILISATEUR ADMIN (mot de passe v11 — GreenFad!2026#Bko) ----------
+INSERT INTO users (email, password_hash, password_salt, name, role, is_active, must_change_password) VALUES ('contact@greenfad.tech', 'srRz5Gp7NF/F/qElRzxX1+ODScBjLiUrB3d6e2UI4RA=', 'xBXG2Mn0UU+4tA06TjgoRg==', 'Administrateur GREEN FAD', 'super_admin', 1, 0);
 
 -- ---------- EXPERTISES (contenu réel de l'ancien site) ----------
 INSERT INTO services (slug, name, summary, content_md, icon, image_key, sort_order, status, published_at, meta_title, meta_description) VALUES ('developpement-web', 'Développement Web', 'Sites vitrines, plateformes métier et applications web performantes, conçues pour les réalités du terrain africain.', '# Développement Web
