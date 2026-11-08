@@ -1847,3 +1847,102 @@ WHERE email = 'contact@greenfad.tech';
 
 -- 5) Version du contenu
 UPDATE settings SET value = '5' WHERE key = 'content_version';
+
+-- =====================================================================
+-- DELTA v6 — nouveau produit PAYGFAD (paygfad.com) : fiche produit,
+--          article de blog, FAQ, médias, accueil à 5 plateformes, version 6
+-- =====================================================================
+
+-- ============ PAYGFAD — suite digitale SaaS (paygfad.com) ============
+INSERT INTO products (slug, name, tagline, description_md, problem_md, vision_md, origin_md, sector, audience, features, modules_md, use_cases_md, ux_md, benefits_md, differentiators_md, category, state, image_key, icon, sort_order, status, published_at, meta_title, meta_description, og_image, links_json, versions_json, external_url, related_service_id) VALUES (
+  'paygfad', 'PAYGFAD', 'La suite digitale qui transforme l''Afrique',
+  'PAYGFAD est la suite de gestion SaaS de Green FAD, conçue pour les entreprises, coopératives, institutions financières et établissements scolaires d''Afrique. Elle réunit cinq modules — **ERP**, **Finance**, **Energy**, **Agro** et **School** — dans une seule plateforme cloud, utilisable depuis n''importe quel navigateur de smartphone, sans application à installer.
+
+Le socle est le même partout : tableau de bord de suivi, gestion des clients, des stocks et des factures, paiements **PAYG** (Pay As You Go) et journal d''audit complet. À cela s''ajoutent, selon le module : gestion des prêts et de l''épargne pour les institutions financières, kits solaires et activations pour les opérateurs d''énergie, parcelles agricoles et récoltes pour les coopératives, élèves, notes, bulletins, présences et scolarités pour les écoles.
+
+Chaque organisation démarre avec un seul module et ajoute les autres à son rythme — l''essai gratuit de 30 jours ne demande aucune carte bancaire.',
+  'Sur le terrain, la même organisation jongle avec des cahiers, des fichiers Excel et plusieurs outils qui ne se parlent pas : clients dans un carnet, stocks approximatifs, factures manuelles, paiements suivis à part. Les logiciels classiques coûtent cher, exigent un serveur, un technicien — et tombent en panne dès que la connexion faiblit.',
+  'Une suite cloud modulaire, pensée pour les smartphones et les réalités de connectivité du continent : chaque organisation africaine — de la coopérative agricole au groupe scolaire — pilote toute son activité depuis un navigateur, hors ligne comme en ligne, sans infrastructure à gérer.',
+  'PAYGFAD est développée et exploitée par Green FAD SARL depuis Bamako. Présente en ligne depuis 2024 (© 2024–2026), la suite a été construite au contact direct des coopératives, écoles, institutions financières et opérateurs d''énergie solaire du Mali et de la sous-région.',
+  'SaaS de gestion pour organisations', 'Entreprises, coopératives, institutions financières, établissements scolaires, coopératives agricoles, opérateurs d''énergie solaire',
+  '["Tableau de bord de suivi de l''activité", "Gestion des clients, des stocks et des factures", "Gestion des paiements PAYG (Pay As You Go)", "Finance : prêts et épargne pour institutions financières", "Energy : kits solaires et activations", "Agro : membres de coopératives, parcelles agricoles, récoltes, équipements", "School : élèves, notes, bulletins, présences, scolarités", "Encaissement Mobile Money : Orange Money, Wave, MTN, Moov — plus espèces et crédit", "Interface optimisée smartphone, sans application à installer", "Fonctionnement hors ligne avec synchronisation", "Sécurité : chiffrement, authentification à deux facteurs (2FA), audit complet des actions", "Multilingue : français, anglais et langues locales", "Cloud SaaS : aucune infrastructure à gérer, modularité par module"]',
+  '**Cinq modules, une seule plateforme :**
+
+- **ERP** — clients, stocks, factures et tableau de bord de l''activité
+- **Finance** — prêts, épargne et paiements PAYG pour institutions financières
+- **Energy** — kits solaires, activations et suivi des clients PAYG
+- **Agro** — coopératives : membres, parcelles, récoltes et équipements
+- **School** — élèves, notes, bulletins, présences et scolarités', '- Une coopérative agricole tient le registre de ses membres, de ses parcelles et de ses récoltes — et suit ses équipements
+- Un opérateur d''énergie solaire active et suit ses kits solaires, avec encaissement PAYG par Mobile Money
+- Une institution de microfinance gère ses prêts et son épargne, avec audit complet des opérations
+- Un groupe scolaire gère élèves, notes, bulletins, présences et recouvrement des scolarités
+- Une PME pilote clients, stocks et factures depuis son smartphone, même hors ligne', 'Utilisable depuis n''importe quel navigateur de smartphone — aucune application à installer. Interface conçue pour les petits écrans et les connexions instables : fonctionnement hors ligne, données sécurisées par chiffrement, connexion en deux étapes (2FA) et journal d''audit complet.',
+  'Toute l''activité de l''organisation dans un seul outil : moins d''erreurs, moins de double saisie, des chiffres fiables à tout moment. Le cloud SaaS supprime l''achat de serveur et le technicien informatique : on paie l''abonnement, la suite est maintenue et évolue. L''essai gratuit de 30 jours, sans carte bancaire, permet de valider avant d''engager.', 'Née du terrain africain et supportée localement : encaissement Orange Money, Wave, MTN et Moov en plus des espèces et du crédit, interface trilingue français / anglais / langues locales, fonctionnement hors ligne réel, essai gratuit de 30 jours sans carte — et un support basé à Bamako, joignable au +223 72 35 76 41.',
+  'Suite SaaS de gestion', 'disponible', '/assets/images/portfolio/paygfad.jpg', 'grid', 4, 'publie', datetime('now'),
+  'PAYGFAD — La suite digitale qui transforme l''Afrique | Green FAD', 'PAYGFAD : suite SaaS de Green FAD avec 5 modules (ERP, Finance, Energy, Agro, School) — clients, stocks, factures, paiements PAYG, hors-ligne, Mobile Money (Orange Money, Wave, MTN, Moov), essai gratuit 30 jours. 7 pays couverts.', '/assets/images/portfolio/paygfad.jpg',
+  '[{"label": "Ouvrir PayGfad", "url": "https://paygfad.com/"}, {"label": "Demander un accès", "url": "https://paygfad.com/"}, {"label": "info@paygfad.com", "url": "mailto:info@paygfad.com"}]', '[{"version": "2024", "date": "2024", "note": "Mise en ligne de la suite par Green FAD SARL — présence attestée © 2024–2026 sur paygfad.com."}, {"version": "2026", "date": "Novembre 2026", "note": "Cinq modules proposés : ERP, Finance, Energy, Agro, School. Essai gratuit de 30 jours, encaissement Mobile Money, 7 pays couverts (Mali, Guinée, Burkina Faso, Sénégal, Côte d''Ivoire, RD Congo, Niger)."}]', 'https://paygfad.com/',
+  NULL);
+
+-- Ordre du catalogue : PayGfad suit Tile et CloudAf parmi les nouvelles plateformes
+UPDATE products SET sort_order = 5 WHERE slug = 'ferefad';
+UPDATE products SET sort_order = 6 WHERE slug = 'amitie-fad';
+UPDATE products SET sort_order = 7 WHERE slug = 'niafad';
+UPDATE products SET sort_order = 8 WHERE slug = 'sarapay';
+UPDATE products SET sort_order = 9 WHERE slug = 'carte-sante';
+
+INSERT OR IGNORE INTO media (r2_key, filename, mime, size, width, height, alt, folder, uploaded_by, created_at) VALUES ('/assets/images/portfolio/paygfad.jpg', 'paygfad.jpg', 'image/jpeg', 0, NULL, NULL, 'PAYGFAD — suite digitale de gestion SaaS de Green FAD', '/', 'seed', datetime('now'));
+INSERT INTO media_items (type, media_id, title, credit, album_id, sort_order, status, published_at, uploaded_by, created_at, updated_at) SELECT 'image', m.id, 'PAYGFAD — la suite digitale qui transforme l''Afrique', 'GREEN FAD', (SELECT id FROM media_albums WHERE slug = 'produits-green-fad'), 12, 'publie', datetime('now'), 'seed', datetime('now'), datetime('now') FROM media m WHERE m.r2_key = '/assets/images/portfolio/paygfad.jpg';
+INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug = 'paygfad'), mi.id, 0 FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE m.r2_key = '/assets/images/portfolio/paygfad.jpg';
+
+INSERT INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_description, related_product_id) VALUES (
+  'paygfad-lancement-suite-digitale', 'PayGfad rejoint les plateformes Green FAD : la suite digitale qui transforme l''Afrique', 'Avec PayGfad, Green FAD ouvre sa cinquième plateforme en ligne : une suite de gestion SaaS en cinq modules — ERP, Finance, Energy, Agro, School — pensée pour les entreprises, coopératives, institutions financières et écoles d''Afrique, hors ligne comme en ligne.',
+  '# PayGfad rejoint les plateformes Green FAD : la suite digitale qui transforme l''Afrique
+
+L''écosystème Green FAD s''agrandit : après QRFAD, FAD CARD, Tile et CloudAf, notre cinquième plateforme est en ligne. **PayGfad** (paygfad.com) est une suite de gestion SaaS complète, développée par nos équipes à Bamako pour les organisations africaines — entreprises, coopératives, institutions financières et établissements scolaires.
+
+## Une suite, cinq modules
+
+Chaque organisation démarre par le module dont elle a besoin, puis ajoute les autres à son rythme :
+
+- **ERP** — tableau de bord de suivi, gestion des clients, des stocks et des factures
+- **Finance** — gestion des prêts et de l''épargne, paiements PAYG (Pay As You Go)
+- **Energy** — gestion des kits solaires et de leurs activations, pour les opérateurs PAYG
+- **Agro** — membres de coopératives, parcelles agricoles, récoltes et équipements
+- **School** — élèves, notes, bulletins, présences et scolarités
+
+## Pensée pour le terrain, pas pour la démo
+
+PayGfad fonctionne depuis le navigateur d''un smartphone, sans application à installer. Elle est conçue dès le départ pour les réalités du continent : **mode hors ligne**, interface adaptée aux petits écrans, données sécurisées par chiffrement, authentification à deux facteurs (2FA) et audit complet des actions. L''interface parle français, anglais et langues locales.
+
+## Encaisser comme vos clients paient
+
+La suite accepte les paiements **Orange Money, Wave, MTN et Moov**, en plus des espèces et du crédit — le même réalisme sur les moyens de paiement qui guide déjà FadCard Pay.
+
+## Sept pays, un essai sans carte
+
+PayGfad est proposée au **Mali, en Guinée, au Burkina Faso, au Sénégal, en Côte d''Ivoire, en RD Congo et au Niger**. L''essai gratuit de **30 jours** ne demande aucune carte bancaire, et le support est assuré depuis Bamako (info@paygfad.com, +223 72 35 76 41, du lundi au vendredi, 8h–18h).
+
+## La famille s''agrandit, la logique reste
+
+PayGfad suit la même règle que nos quatre premières plateformes : un produit réel, exploité au quotidien, amélioré à chaque trimestre, avec son parcours documenté dans ce blog. Bienvenue à PayGfad — et au travail.',
+  '/assets/images/blog/paygfad-lancement.jpg', 'Produits', '["PayGfad", "Lancement", "SaaS", "Gestion"]', 'Green FAD — Équipe produit', 'article', 1, '2026-11-08 09:00:00', 'publie',
+  'PayGfad : Green FAD lance sa 5e plateforme — suite SaaS en 5 modules (ERP, Finance, Energy, Agro, School), hors-ligne, Mobile Money, essai gratuit 30 jours, 7 pays.', (SELECT id FROM products WHERE slug = 'paygfad'));
+
+INSERT INTO faqs (question, answer, category, sort_order, status) VALUES
+('Qu''est-ce que PayGfad ?', 'PayGfad est la suite digitale SaaS de Green FAD pour les entreprises, coopératives, institutions financières et établissements scolaires d''Afrique. Elle réunit cinq modules — ERP (clients, stocks, factures), Finance (prêts, épargne, paiements PAYG), Energy (kits solaires), Agro (parcelles, récoltes, équipements) et School (élèves, notes, bulletins) — dans une seule plateforme cloud.', 'produit:paygfad', 0, 'publie'),
+('Comment essayer PayGfad ?', 'L''essai est gratuit pendant 30 jours, sans carte bancaire : rendez-vous sur paygfad.com et cliquez sur « Demander un accès ». Le support (en français) est joignable au +223 72 35 76 41 et à info@paygfad.com, du lundi au vendredi, 8h–18h.', 'produit:paygfad', 1, 'publie'),
+('Faut-il installer une application pour utiliser PayGfad ?', 'Non. PayGfad s''utilise depuis le navigateur du smartphone, avec une interface optimisée pour les petits écrans. Elle fonctionne aussi hors ligne et synchronise dès que la connexion revient — aucune application à installer, aucun serveur à acheter.', 'produit:paygfad', 2, 'publie'),
+('Quels moyens de paiement accepte PayGfad ?', 'Orange Money, Wave, MTN et Moov pour l''encaissement Mobile Money, en plus des paiements en espèces et à crédit. La logique PAYG (Pay As You Go) permet de payer à l''usage, notamment pour les kits solaires.', 'produit:paygfad', 3, 'publie'),
+('Dans quels pays PayGfad est-elle disponible ?', 'PayGfad est proposée au Mali, en Guinée, au Burkina Faso, au Sénégal, en Côte d''Ivoire, en République démocratique du Congo et au Niger — avec un support basé à Bamako, en français, anglais et langues locales.', 'produit:paygfad', 4, 'publie');
+
+-- (Accueil mis à jour directement dans l'INSERT source ci-dessus : 5 plateformes)
+
+-- Version du contenu
+UPDATE settings SET value = '6' WHERE key = 'content_version';
+
+-- Page d'accueil : 5 plateformes en ligne (hero, stats, cartes manuelles, catalogue)
+UPDATE pages SET
+  meta_title = 'GREEN FAD SARL — 5 plateformes en ligne : QRFAD, FadCard, Tile, CloudAf, PayGfad',
+  meta_description = 'Entreprise technologique africaine depuis 2021 : QRFAD (restauration), FadCard (écosystème pro 6-en-1), Tile (réseau social), CloudAf (no-code + IA) et PayGfad (suite SaaS de gestion). Mises à jour chaque trimestre, produits et parcours documentés.',
+  blocks = '[{"type": "hero", "variant": "gradient", "eyebrow": "GREEN FAD SARL — ENTREPRISE TECHNOLOGIQUE AFRICAINE", "title": "Cinq ans de produit. Cinq plateformes en ligne. Une ambition continentale.", "subtitle": "De QRFAD et FAD CARD, nées à Bamako en 2021 et mises à jour chaque trimestre, à TILE, CLOUDAf et PAYGFAD, nos dernières plateformes : nous concevons, développons et exploitons nos propres technologies.", "cta_label": "Découvrir nos plateformes", "cta_url": "/produits", "cta2_label": "Lire le blog", "cta2_url": "/blog"}, {"type": "stats", "variant": "dark", "items": [{"value": "5", "label": "Plateformes en ligne, accessibles publiquement"}, {"value": "5 ans", "label": "D''''itérations produit, mise à jour chaque trimestre"}, {"value": "6", "label": "Applications métier réunies dans FadCard"}, {"value": "9", "label": "Établissements équipés sur QRFAD"}]}, {"type": "section_header", "eyebrow": "Nos plateformes", "title": "Cinq plateformes, ouvertes au public", "text": "Chacune vit sa vie : fonctionnalités, mises à jour trimestrielles et parcours documentés dans notre blog.", "align": "center"}, {"type": "cards", "source": "manual", "limit": "5", "columns": "5", "items": [{"title": "QRFAD", "text": "Menus digitaux par QR, commandes WhatsApp, caisse POS et hôtellerie — pour les restaurants et hôtels d''''Afrique.", "image_key": "/assets/images/portfolio/qrfad.jpg", "url": "https://qrfad.com", "tag": "Restauration & hôtellerie"}, {"title": "FadCard", "text": "Six applications métier, un seul compte : vCard, Market, Tickets, Fund, Vote, FadCard Pay.", "image_key": "/assets/images/portfolio/fadcard.jpg", "url": "https://fadcard.greenfad.tech", "tag": "Écosystème professionnel"}, {"title": "Tile", "text": "Le Réseau du Progrès : vidéos, stories, flux Certifié et boutiques — Web, Android, iOS.", "image_key": "/assets/images/portfolio/tile.jpg", "url": "https://tileofficiel.com", "tag": "Nouveau · Réseau social"}, {"title": "CloudAf", "text": "Créez, déployez, scalez : no-code + code, agent IA, déploiement en un clic.", "image_key": "/assets/images/portfolio/cloudaf.jpg", "url": "https://cloudaf.net", "tag": "Nouveau · No-code & IA"}, {"title": "PayGfad", "text": "La suite digitale qui transforme l''Afrique : ERP, Finance, Energy, Agro, School — cloud, hors-ligne, Mobile Money.", "image_key": "/assets/images/portfolio/paygfad.jpg", "url": "https://paygfad.com", "tag": "Nouveau · Suite SaaS"}], "view_all_label": "Toutes nos plateformes", "view_all_url": "/produits"}, {"type": "timeline", "title": "Cinq ans d''''innovation, mise à jour après mise à jour", "items": [{"year": "2021", "title": "QRFAD & FAD CARD voient le jour à Bamako", "text": "Le menu numérique par QR code et la carte de visite connectée NFC sont lancés auprès du terrain."}, {"year": "2022", "title": "Les produits s''''enrichissent", "text": "QRFAD passe au multi-établissements — FadCard lance Market, sa vitrine marchande."}, {"year": "2023", "title": "Commandes & transactions", "text": "Commandes depuis le menu puis intégration WhatsApp sur QRFAD — Tickets puis Fund sur FadCard."}, {"year": "2024", "title": "Des plateformes complètes", "text": "QRFAD couvre l''''hôtellerie puis la caisse POS — FadCard complète sa suite avec Vote et FadCard Pay."}, {"year": "2025", "title": "Maturité & personnalisation", "text": "153 designs et cartes NFC pour FadCard — caisse consolidée et thèmes pour QRFAD."}, {"year": "2026", "title": "Tile & CloudAf : deux nouvelles plateformes", "text": "Le réseau social du progrès et la plateforme no-code + IA rejoignent l''''écosystème Green FAD."}]}, {"type": "section_header", "eyebrow": "Catalogue", "title": "Des produits nés sur le terrain", "text": "Chaque produit Green FAD répond à un besoin réel observé sur le terrain africain.", "align": "center"}, {"type": "cards", "source": "products", "limit": "10", "columns": 3, "view_all_label": "Voir tous les produits", "view_all_url": "/produits"}, {"type": "split", "title": "L''''alliance de la technologie et de l''''écologie", "text_md": "Fondée par des professionnels passionnés par l''''innovation et sensibles aux enjeux environnementaux, **GREEN FAD SARL** accompagne la transition numérique et écologique des organisations en Afrique.\n\n**Notre vision :** un avenir où technologie et durabilité vont de pair, réduisant la fracture numérique en Afrique.\n\n**Notre ambition :** porter nos propres innovations technologiques à l''''échelle internationale.", "image_key": "/assets/images/office-workers-africa.jpg", "image_side": "right", "cta_label": "Découvrir l''''entreprise", "cta_url": "/p/entreprise"}, {"type": "section_header", "eyebrow": "Expertises", "title": "Ce que nous faisons pour votre organisation", "align": "center"}, {"type": "cards", "source": "services", "limit": 4, "columns": 4, "view_all_label": "Toutes nos expertises", "view_all_url": "/expertises"}, {"type": "section_header", "eyebrow": "Le blog", "title": "Le parcours de nos produits, documenté", "text": "Lancements, mises à jour trimestrielles, coulisses d''''ingénierie : cinq ans d''''histoire produit racontés au fil des publications.", "align": "center"}, {"type": "cards", "source": "posts", "limit": 3, "columns": 3, "view_all_label": "Tous les articles", "view_all_url": "/blog"}, {"type": "gallery_album", "album_slug": "produits-green-fad", "limit": 6}, {"type": "countries_map"}, {"type": "cta", "title": "Construisons ensemble un avenir durable et digital", "text": "Parlons de votre projet — nos équipes vous répondent rapidement.", "button_label": "Démarrer la conversation", "button_url": "/contact", "variant": "solid"}]'
+WHERE slug = 'accueil';

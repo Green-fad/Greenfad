@@ -384,13 +384,13 @@ publicRoutes.get("/realisations", async (c) => {
       <li><span class="timeline__year">2023</span><div><h3>Transactions & commandes</h3><p>Commandes depuis le menu puis WhatsApp sur QRFAD ; Tickets puis Fund sur FadCard.</p></div></li>
       <li><span class="timeline__year">2024</span><div><h3>Plateformes complètes</h3><p>Hôtellerie et caisse POS côté QRFAD ; Vote et FadCard Pay clôturent la suite FadCard.</p></div></li>
       <li><span class="timeline__year">2025</span><div><h3>Maturité</h3><p>153 designs et cartes NFC pour FadCard ; caisse consolidée et thèmes pour QRFAD.</p></div></li>
-      <li><span class="timeline__year">2026</span><div><h3>Tile & CloudAf</h3><p>Le réseau social du progrès et la plateforme no-code + IA rejoignent l'écosystème — quatre plateformes en ligne.</p></div></li>
+      <li><span class="timeline__year">2026</span><div><h3>Tile, CloudAf & PayGfad</h3><p>Le réseau social du progrès, la plateforme no-code + IA et la suite de gestion SaaS rejoignent l'écosystème — cinq plateformes en ligne.</p></div></li>
     </ol>
     <p class="center" style="margin-top:2rem"><a class="btn btn--outline" href="/blog">${icon("newspaper", "i--inline")} Lire le parcours complet dans le blog</a></p></section>
   ${others.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Projets & prestations</p><h2>Études de cas clients</h2></header>
     <div class="cards cards--3 reveal">${others.map(projectCard).join("")}</div></section>` : ""}
   <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Et le prochain chapitre ?</h2><p>Nos plateformes avancent chaque trimestre — suivez le blog, ou construisez le vôtre avec nous.</p><a class="btn btn--invert" href="/blog">Suivre le parcours ${icon("arrow-right")}</a></div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: "Réalisations & études de cas — le parcours de nos plateformes", description: "Études de cas et parcours produits Green FAD : QRFAD, FadCard, Tile, CloudAf — lancement, évolutions trimestrielles et déploiements réels depuis 2021.", canonicalPath: "/realisations" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: "Réalisations & études de cas — le parcours de nos plateformes", description: "Études de cas et parcours produits Green FAD : QRFAD, FadCard, Tile, CloudAf, PayGfad — lancement, évolutions trimestrielles et déploiements réels depuis 2021.", canonicalPath: "/realisations" }), body));
 });
 
 publicRoutes.get("/realisations/:slug", async (c) => {
