@@ -139,7 +139,128 @@ function kindBadge(kind: string): string {
   return `<span class="kind-badge${k.cls ? " " + k.cls : ""}">${icon(k.icon)} ${k.label}</span>`;
 }
 
+// ---------- Patrimoine historique (Mission CTO N°2) ----------
+// Principe cardinal : ne jamais transformer une estimation en date certaine.
+// La précision de chaque date est portée par les données et affichée publiquement.
+type MilestoneRow = {
+  id: number; product_slug: string; kind: string; title: string; description_md: string | null;
+  occurred_on: string | null; date_precision: string; version_ref: string | null; article_slug: string | null;
+  media_json: string | null; source_label: string | null; confidence: string;
+};
+type VersionRow = {
+  id: number; product_slug: string; version: string; released_on: string | null; date_precision: string;
+  kind: string; summary: string | null; features: string | null; improvements: string | null;
+  fixes: string | null; tech_notes: string | null; article_slug: string | null; media_json: string | null;
+};
+type SourceRow = {
+  id: number; product_slug: string; source_type: string; title: string; detail: string | null;
+  url: string | null; evidenced_on: string | null; confidence: string; validated_by: string | null;
+};
+
+const MILESTONE_META: Record<string, { label: string; icon: string; group: string }> = {
+  conception: { label: "Conception", icon: "lightbulb", group: "creation" },
+  cadrage: { label: "Cadrage & objectifs", icon: "compass", group: "creation" },
+  developpement: { label: "Développement", icon: "code", group: "creation" },
+  implementation: { label: "Implémentation", icon: "layers", group: "creation" },
+  annonce: { label: "Annonce aux utilisateurs", icon: "newspaper", group: "creation" },
+  tests: { label: "Tests & validation", icon: "flask", group: "production" },
+  premiere_production: { label: "Première mise en production", icon: "rocket", group: "production" },
+  premier_utilisateur: { label: "Premiers utilisateurs", icon: "users", group: "production" },
+  mise_a_jour: { label: "Mise à jour", icon: "zap", group: "production" },
+  derniere_evolution: { label: "Dernière évolution", icon: "trending-up", group: "production" },
+  situation_actuelle: { label: "Situation actuelle", icon: "target", group: "production" },
+};
+
+const VERSION_META: Record<string, { label: string; cls: string }> = {
+  mineure: { label: "Mineure", cls: "" },
+  majeure: { label: "Évolution majeure", cls: "ver-kind--majeure" },
+  module: { label: "Nouveau module", cls: "ver-kind--module" },
+  architecture: { label: "Architecture", cls: "ver-kind--archi" },
+  production: { label: "Mise en production", cls: "ver-kind--prod" },
+  correction: { label: "Correction", cls: "ver-kind--fix" },
+};
+
+const PRECISION_META: Record<string, { label: string; cls: string }> = {
+  exacte: { label: "Date confirmée", cls: "prec--exacte" },
+  approximative: { label: "Environ", cls: "prec--approx" },
+  archives: { label: "Retrouvée en archives", cls: "prec--archives" },
+  estimee: { label: "Estimation à confirmer", cls: "prec--estimee" },
+  inconnue: { label: "Date inconnue", cls: "prec--inconnue" },
+};
+
+const SOURCE_META: Record<string, { label: string; icon: string }> = {
+  fondateur: { label: "Fondateur", icon: "users" },
+  archives: { label: "Archives internes", icon: "archive" },
+  git: { label: "Dépôt Git", icon: "git-branch" },
+  release: { label: "Release / artefact", icon: "package" },
+  changelog: { label: "Changelog", icon: "file-text" },
+  article: { label: "Article", icon: "newspaper" },
+  store: { label: "Store officiel", icon: "smartphone" },
+  web: { label: "Site officiel", icon: "globe" },
+  capture: { label: "Capture d'écran", icon: "camera" },
+  deploiement: { label: "Déploiement / CI", icon: "cloud" },
+};
+
+const CONF_META: Record<string, string> = { haute: "conf--haute", moyenne: "conf--moyenne", faible: "conf--faible" };
+
+const MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+/** Affiche 2026-11-02 / 2026-11 / 2019 / texte libre — sans jamais fabriquer de certitude. */
+function fmtHistDate(v: unknown): string {
+  const s = String(v || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split("-").map(Number);
+    return `${d} ${MONTHS_FR[m - 1] || ""} ${y}`;
+  }
+  if (/^\d{4}-\d{2}$/.test(s)) {
+    const [y, m] = s.split("-").map(Number);
+    return `${MONTHS_FR[m - 1] || ""} ${y}`;
+  }
+  return s;
+}
+
+/** ISO 8601 uniquement si la date est exploitable — jamais d'invention pour le JSON-LD. */
+function histDateISO(v: unknown): string | null {
+  const s = String(v || "").trim();
+  if (/^\d{4}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  return null;
+}
+
+function precisionBadge(precision: string): string {
+  const p = PRECISION_META[precision] || PRECISION_META.inconnue;
+  return `<span class="prec ${p.cls}" title="Niveau de fiabilité de la date">${icon("clock", "i--inline")} ${p.label}</span>`;
+}
+
+function confidenceBadge(confidence: string): string {
+  const c = CONF_META[confidence] || "conf--moyenne";
+  return `<span class="conf ${c}" title="Confiance de la source">confiance ${esc(String(confidence || "moyenne"))}</span>`;
+}
+
+function milestoneKindBadge(kind: string): string {
+  const m = MILESTONE_META[kind] || MILESTONE_META.mise_a_jour;
+  return `<span class="jalon-kind">${icon(m.icon, "i--inline")} ${m.label}</span>`;
+}
+
+function versionKindBadge(kind: string): string {
+  const v = VERSION_META[kind] || VERSION_META.mineure;
+  return `<span class="ver-kind ${v.cls}">${v.label}</span>`;
+}
+
 export const publicRoutes = new Hono<{ Bindings: Env }>();
+
+/** Requête patrimoine tolérante aux pannes : si la table n'existe pas encore
+ *  (migration 0007 pas encore appliquée), la section historique ne s'affiche
+ *  simplement pas — la page reste rendue au lieu de planter. */
+async function safeQ<T = Record<string, unknown>>(db: D1Database, sql: string, ...params: unknown[]): Promise<T[]> {
+  try {
+    return await q<T>(db, sql, ...params);
+  } catch (e) {
+    console.warn("section patrimoine ignorée:", (e as Error)?.message);
+    return [];
+  }
+}
 
 // ---------- Redirections 301 pilotées par la base (cache KV 10 min) ----------
 publicRoutes.use("*", async (c, next) => {
@@ -359,12 +480,17 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const db = c.env.DB;
 
   // Médias liés (réutilisation sans duplication) + vidéos + FAQ + articles liés + autres produits
-  const [gallery, videos, productFaqs, relatedPosts, otherProducts] = await Promise.all([
+  const [gallery, videos, productFaqs, relatedPosts, otherProducts, milestones, hVersions, pSources] = await Promise.all([
     q(db, "SELECT mi.title, mi.caption, m.r2_key FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='image' AND mi.status='publie' JOIN media m ON m.id = mi.media_id WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT mi.id, mi.title, mi.description, mi.source_url FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='video' AND mi.status='publie' WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT question, answer FROM faqs WHERE status='publie' AND category = ? ORDER BY sort_order LIMIT 8", `produit:${p.slug}`),
-    q(db, "SELECT slug, title, kind, published_at FROM posts WHERE status='publie' AND (related_product_id = ? OR category = ?) ORDER BY published_at DESC LIMIT 4", p.id, String(p.category || "")),
+    safeQ(db, "SELECT slug, title, kind, published_at FROM posts WHERE status='publie' AND (related_product_id = ? OR product_slug = ? OR category = ?) ORDER BY published_at DESC LIMIT 4", p.id, String(p.slug), String(p.category || "")),
     q(db, "SELECT slug, name, tagline, image_key, logo_key, state FROM products WHERE status = ? AND id != ? ORDER BY sort_order LIMIT 3", PUBLIE, p.id),
+    // Patrimoine historique (Mission CTO N°2) — chronologie, journal des versions, sources
+    // (safeQ : si la migration 0007 n'est pas encore appliquée, les sections ne s'affichent pas)
+    safeQ<MilestoneRow>(db, "SELECT * FROM product_milestones WHERE product_slug = ? AND status = ? ORDER BY sort_order ASC, id ASC", p.slug, PUBLIE),
+    safeQ<VersionRow>(db, "SELECT * FROM product_versions WHERE product_slug = ? AND status = ? ORDER BY sort_order ASC, id ASC", p.slug, PUBLIE),
+    safeQ<SourceRow>(db, "SELECT * FROM product_sources WHERE product_slug = ? ORDER BY id ASC", p.slug),
   ]);
 
   const links = parseJSON<{ label: string; url: string }[]>(p.links_json, []);
@@ -373,6 +499,56 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const shots = parseJSON<Shot[]>(p.screenshots_json, []).filter((s) => s && s.key);
   const downloads = parseJSON<Download[]>(p.downloads_json, []).filter((d) => d && /^https?:\/\//.test(String(d.url || "")));
   const features = parseJSON<string[]>(p.features, []);
+
+  // ---------- Patrimoine historique : rendu des jalons / versions ----------
+  const latestVer = hVersions.length ? hVersions[hVersions.length - 1] : null;
+
+  const milestoneHTML = (m: MilestoneRow) => {
+    const meta = MILESTONE_META[m.kind] || MILESTONE_META.mise_a_jour;
+    const media = parseJSON<{ key: string; alt?: string }[]>(m.media_json, []).filter((x) => x && x.key);
+    const dateTxt = fmtHistDate(m.occurred_on);
+    const iso = histDateISO(m.occurred_on);
+    return `<li class="htimeline__item" data-tl-group="${meta.group}">
+      <span class="htimeline__marker" aria-hidden="true">${icon(meta.icon)}</span>
+      <div class="htimeline__card">
+        <div class="htimeline__head">
+          ${milestoneKindBadge(m.kind)}
+          <span class="htimeline__date">${dateTxt ? `<time datetime="${esc(iso || "")}">${esc(dateTxt)}</time>` : ""} ${precisionBadge(m.date_precision)}</span>
+        </div>
+        <h3>${esc(m.title)}</h3>
+        ${m.description_md ? `<div class="prose htimeline__desc">${md(m.description_md)}</div>` : ""}
+        ${(m.version_ref || m.article_slug) ? `<div class="htimeline__extras">
+          ${m.version_ref ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(m.version_ref)}</span>` : ""}
+          ${m.article_slug ? `<a class="btn btn--ghost btn--sm" href="/blog/${esc(m.article_slug)}">${icon("newspaper", "i--inline")} Article relié</a>` : ""}
+        </div>` : ""}
+        ${media.length ? `<div class="htimeline__media" data-lightbox>${media.map((x) => { const src = mediaSrc(x.key); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(x.alt || m.title)}" loading="lazy"></figure>`; }).join("")}</div>` : ""}
+        ${m.source_label ? `<p class="htimeline__source">${icon("shield", "i--inline")} Source&nbsp;: ${esc(m.source_label)} ${confidenceBadge(m.confidence)}</p>` : ""}
+      </div>
+    </li>`;
+  };
+
+  const verHTML = (v: VersionRow) => {
+    const feats = parseJSON<string[]>(v.features, []);
+    const media = parseJSON<{ key: string; alt?: string }[]>(v.media_json, []).filter((x) => x && x.key);
+    const dateTxt = fmtHistDate(v.released_on);
+    const iso = histDateISO(v.released_on);
+    return `<article class="ver-card">
+      <div class="ver-card__head">
+        <span class="ver-card__num">${icon("git-branch")} v${esc(v.version)}</span>
+        ${versionKindBadge(v.kind)}
+        <span class="ver-card__date">${dateTxt ? `<time datetime="${esc(iso || "")}">${esc(dateTxt)}</time>` : ""} ${precisionBadge(v.date_precision)}</span>
+      </div>
+      ${v.summary ? `<p class="ver-card__summary">${esc(v.summary)}</p>` : ""}
+      ${feats.length ? `<ul class="feat-list ver-card__feat">${feats.map((f) => `<li>${icon("check-circle")} <span>${esc(f)}</span></li>`).join("")}</ul>` : ""}
+      ${v.improvements ? `<p class="ver-card__line">${icon("trending-up", "i--inline")} <strong>Améliorations&nbsp;:</strong> ${esc(v.improvements)}</p>` : ""}
+      ${v.fixes ? `<p class="ver-card__line">${icon("shield", "i--inline")} <strong>Corrections&nbsp;:</strong> ${esc(v.fixes)}</p>` : ""}
+      ${v.tech_notes ? `<p class="ver-card__line muted">${icon("code", "i--inline")} <strong>Notes techniques&nbsp;:</strong> ${esc(v.tech_notes)}</p>` : ""}
+      ${(v.article_slug || media.length) ? `<div class="htimeline__extras">
+        ${v.article_slug ? `<a class="btn btn--ghost btn--sm" href="/blog/${esc(v.article_slug)}">${icon("newspaper", "i--inline")} Article d'annonce</a>` : ""}
+        ${media.length ? `<div class="htimeline__media" data-lightbox>${media.map((x) => { const src = mediaSrc(x.key); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(x.alt || `Version ${v.version}`)}" loading="lazy"></figure>`; }).join("")}</div>` : ""}
+      </div>` : ""}
+    </article>`;
+  };
 
   const specCard = (title: string, iconName: string, content: unknown) =>
     content ? `<div class="spec-card"><h3>${icon(iconName)} ${esc(title)}</h3><div class="prose" style="font-size:.95rem">${md(content)}</div></div>` : "";
@@ -405,6 +581,8 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const anchors: { id: string; label: string }[] = [
     { id: "presentation", label: "Présentation" },
     ...(shots.length ? [{ id: "apercus", label: `Aperçus (${shots.length})` }] : []),
+    ...(milestones.length ? [{ id: "parcours", label: "Parcours historique" }] : []),
+    ...(hVersions.length ? [{ id: "versions", label: `Versions (${hVersions.length})` }] : []),
     ...(downloads.length ? [{ id: "telechargements", label: "Téléchargements" }] : []),
     ...(productFaqs.length ? [{ id: "faq", label: "FAQ" }] : []),
   ];
@@ -424,7 +602,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
           <p class="eyebrow store-hero__eyebrow">Produit technologique GREEN FAD</p>
           <h1>${esc(String(p.name))}</h1>
           ${p.tagline ? `<p class="store-hero__tagline">${esc(String(p.tagline))}</p>` : ""}
-          <div class="pdp__meta">${p.category ? `<span class="tag">${esc(String(p.category))}</span>` : ""}${statePill(String(p.state || "developpement"))}${versions.length ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(versions[0].version)}</span>` : ""}</div>
+          <div class="pdp__meta">${p.category ? `<span class="tag">${esc(String(p.category))}</span>` : ""}${statePill(String(p.state || "developpement"))}${latestVer ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(latestVer.version)}</span>` : versions.length ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(versions[0].version)}</span>` : ""}${milestones.length ? `<span class="tag tag--soft">${icon("route", "i--inline")} ${milestones.length} jalon${milestones.length > 1 ? "s" : ""}</span>` : ""}</div>
         </div>
       </div>
       ${heroActions ? `<div class="store-hero__actions">${heroActions}</div>` : ""}
@@ -481,6 +659,35 @@ publicRoutes.get("/produits/:slug", async (c) => {
   ${p.use_cases_md ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Terrain</p><h2>Cas d'usage concrets</h2></header>
     <div class="split"><div class="split__body prose reveal">${md(p.use_cases_md)}</div></div></section>` : ""}
 
+  ${milestones.length ? `<section class="container" id="parcours">
+    <header class="sec-head sec-head--left reveal"><p class="eyebrow">Parcours historique</p><h2>L'histoire de ${esc(String(p.name))}, de l'idée à aujourd'hui</h2></header>
+    ${p.history_intro_md ? `<div class="prose hist-intro reveal">${md(p.history_intro_md)}</div>` : ""}
+    <p class="muted hist-note reveal">${icon("info", "i--inline")} Chaque date est accompagnée de son niveau de fiabilité — aucune estimation n'est présentée comme un fait établi.</p>
+    <div class="hist-filters reveal" data-tl-tabs role="group" aria-label="Filtrer les jalons">
+      <button type="button" class="is-active" data-tl-filter="all">${icon("layers", "i--inline")} Tout le parcours</button>
+      <button type="button" data-tl-filter="creation">${icon("lightbulb", "i--inline")} Conception & développement</button>
+      <button type="button" data-tl-filter="production">${icon("rocket", "i--inline")} Production & évolutions</button>
+    </div>
+    <ol class="htimeline reveal" data-tl>${milestones.map(milestoneHTML).join("")}</ol>
+  </section>` : ""}
+
+  ${hVersions.length ? `<section class="container" id="versions">
+    <header class="sec-head sec-head--left reveal"><p class="eyebrow">Journal des versions</p><h2>Versions & évolutions de ${esc(String(p.name))}</h2></header>
+    <div class="ver-timeline reveal">${hVersions.map(verHTML).join("")}</div>
+  </section>` : ""}
+
+  ${pSources.length ? `<section class="container"><details class="hist-sources reveal">
+    <summary>${icon("shield", "i--inline")} Sources & traçabilité de cet historique (${pSources.length})</summary>
+    <ul class="hist-sources__list">${pSources.map((s) => `<li>
+      <span class="hist-sources__type">${icon((SOURCE_META[s.source_type] || SOURCE_META.archives).icon, "i--inline")} ${(SOURCE_META[s.source_type] || SOURCE_META.archives).label}</span>
+      <div><strong>${esc(s.title)}</strong>${s.detail ? ` — <span class="muted">${esc(s.detail)}</span>` : ""}
+        ${s.url ? ` <a href="${esc(s.url)}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} vérifier la source</a>` : ""}
+        ${s.evidenced_on ? ` <em class="muted">preuve du ${esc(fmtHistDate(s.evidenced_on))}</em>` : ""}
+        ${confidenceBadge(s.confidence)}${s.validated_by ? ` <em class="muted">· ${esc(s.validated_by)}</em>` : ""}
+      </div></li>`).join("")}</ul>
+    <p class="muted hist-sources__note">Règle éditoriale GREEN FAD&nbsp;: les dates marquées « Environ », « Archives », « Estimation » ou « Inconnue » ne sont pas présentées comme des faits établis — elles sont enrichies et validées au fil des vérifications avec le fondateur.</p>
+  </details></section>` : ""}
+
   ${downloads.length ? `<section class="container" id="telechargements"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Téléchargements</p><h2>Obtenez ${esc(String(p.name))}</h2></header>
     <div class="dl-grid reveal">${downloads.map(dlCard).join("")}</div>
     <p class="muted dl-note">${icon("info", "i--inline")} Les liens de téléchargement officiels sont maintenus par les équipes GREEN FAD — en cas de lien obsolète, <a href="/contact">signalez-le nous</a>.</p>
@@ -491,7 +698,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Démonstrations</p><h2>Vidéos du produit</h2></header>
     <div class="video-grid reveal">${videos.map((v) => { const pv = parseVideo(String(v.source_url || "")); return `<div class="video-card"><div class="video-embed"><iframe src="${esc(pv.embed)}" allowfullscreen loading="lazy" title="${esc(String(v.title))}"></iframe></div><div class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description))}</p>` : ""}</div></div>`; }).join("")}</div></section>` : ""}
   ${blocks.length ? (await renderBlocks(blocks, c.env)) : ""}
-  ${versions.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Historique</p><h2>Versions & évolutions publiables</h2></header>
+  ${(versions.length && !hVersions.length) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Historique</p><h2>Versions & évolutions publiables</h2></header>
     <div class="version-list reveal">${versions.map((v) => `<div class="version-item"><strong>${esc(v.version)}</strong><span><em>${esc(v.date || "")}</em>${esc(v.note || "")}</span></div>`).join("")}</div></section>` : ""}
   ${productFaqs.length ? `<section class="container" id="faq"><header class="sec-head sec-head--left reveal"><p class="eyebrow">FAQ</p><h2>Questions fréquentes sur ${esc(String(p.name))}</h2></header>
     <div class="faq reveal" style="margin:0">${productFaqs.map((f) => `<details><summary>${esc(String(f.question))}</summary><div class="prose">${md(f.answer)}</div></details>`).join("")}</div></section>` : ""}
@@ -517,7 +724,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const osList = [...new Set(downloads.map((d) => dlMeta(d.platform).os).filter(Boolean))];
   const abs = (k: string) => String(site.settings.site_url || "") + mediaSrc(String(k));
   const primaryDl = downloads.find((d) => ["android", "apk", "ios"].includes(String(d.platform || "").toLowerCase())) || downloads[0];
-  const jsonLd = [{
+  const jsonLd: Record<string, unknown>[] = [{
     "@context": "https://schema.org",
     "@type": downloads.length ? "SoftwareApplication" : "Product",
     name: String(p.name),
@@ -528,10 +735,31 @@ publicRoutes.get("/produits/:slug", async (c) => {
     ...(shots.length ? { screenshot: shots.slice(0, 10).map((s) => abs(String(s.key))) } : {}),
     ...(p.category ? { applicationCategory: String(p.category) } : {}),
     ...(osList.length ? { operatingSystem: osList.join(", ") } : {}),
-    ...(versions[0]?.version ? { softwareVersion: String(versions[0].version) } : {}),
+    ...(versions[0]?.version || latestVer ? { softwareVersion: String(latestVer?.version || versions[0]?.version) } : {}),
     ...(p.external_url ? { url: String(p.external_url), ...(downloads.length ? {} : { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: orgName(site) } } }) } : {}),
     ...(downloads.length && primaryDl ? { downloadUrl: String(primaryDl.url) } : {}),
   }];
+  // Chronologie crawlable (Mission CTO N°2 §10) : les jalons existent dans les données structurées.
+  // Une date non confirmée n'est JAMAIS exposée comme startDate certaine — elle reste descriptive.
+  if (milestones.length) {
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `Parcours historique de ${String(p.name)}`,
+      itemListElement: milestones.map((m, i) => {
+        const iso = histDateISO(m.occurred_on);
+        const certain = m.date_precision === "exacte" || m.date_precision === "archives";
+        const when = iso ? (certain ? `le ${fmtHistDate(m.occurred_on)}` : `environ ${fmtHistDate(m.occurred_on)}`) : "date à confirmer";
+        const ev: Record<string, unknown> = {
+          "@type": "Event",
+          name: String(m.title),
+          description: `${MILESTONE_META[m.kind]?.label || "Jalon"} — ${when}. ${excerptFromMd(m.description_md, 180)}`.trim(),
+        };
+        if (iso && certain) ev.startDate = iso;
+        return { "@type": "ListItem", position: i + 1, item: ev };
+      }),
+    });
+  }
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || `${p.name} — Produit technologique`), description: String(p.meta_description || p.tagline || excerptFromMd(p.description_md, 160)), ogImage: String(p.og_image || mediaSrc(String(p.image_key))), canonicalPath: `/produits/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }] }), body));
 });
 
@@ -539,6 +767,34 @@ publicRoutes.get("/produits/:slug", async (c) => {
 publicRoutes.get("/realisations", async (c) => {
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, title, summary, image_key, category, client_type FROM projects WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
+  // Centre d'histoire technologique (Mission CTO N°2) : produits vivants avec chronologies publiées
+  const histProducts = await safeQ<Record<string, unknown>>(c.env.DB, `SELECT p.slug, p.name, p.tagline, p.logo_key, p.image_key, p.state,
+    (SELECT COUNT(*) FROM product_milestones m WHERE m.product_slug = p.slug AND m.status = 'publie') AS n_milestones,
+    (SELECT MAX(m.occurred_on) FROM product_milestones m WHERE m.product_slug = p.slug AND m.status = 'publie' AND m.occurred_on IS NOT NULL) AS last_event,
+    (SELECT m.occurred_on FROM product_milestones m WHERE m.product_slug = p.slug AND m.status = 'publie' AND m.kind = 'conception' ORDER BY m.sort_order LIMIT 1) AS conception_on,
+    (SELECT v.version FROM product_versions v WHERE v.product_slug = p.slug AND v.status = 'publie' ORDER BY v.sort_order DESC LIMIT 1) AS last_version
+    FROM products p WHERE p.status = ? ORDER BY p.sort_order`, PUBLIE);
+  const histCard = (h: Record<string, unknown>) => {
+    const n = Number(h.n_milestones || 0);
+    if (!n) return "";
+    return `<a class="hist-card" href="/produits/${esc(String(h.slug))}#parcours">
+      <span class="hist-card__logo">${h.logo_key ? `<img src="${esc(mediaSrc(String(h.logo_key)))}" alt="Logo ${esc(String(h.name))}" loading="lazy">` : icon("package")}</span>
+      <span class="hist-card__body">
+        <strong>${esc(String(h.name))}</strong>
+        <em>${esc(String(h.tagline || ""))}</em>
+        <span class="hist-card__meta">
+          ${statePill(String(h.state || "developpement"))}
+          ${h.last_version ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(String(h.last_version))}</span>` : ""}
+          <span class="hist-card__count">${icon("route", "i--inline")} ${n} jalon${n > 1 ? "s" : ""}</span>
+        </span>
+        <span class="hist-card__dates">
+          ${h.conception_on ? `<span>${icon("lightbulb", "i--inline")} Idée&nbsp;: ${esc(fmtHistDate(h.conception_on))}</span>` : ""}
+          ${h.last_event ? `<span>${icon("trending-up", "i--inline")} Dernière évolution&nbsp;: ${esc(fmtHistDate(h.last_event))}</span>` : ""}
+        </span>
+        <span class="card__more">Explorer la chronologie ${icon("arrow-right")}</span>
+      </span>
+    </a>`;
+  };
   const prop = rows.filter((r) => String(r.category || "").includes("Produit propriétaire"));
   const others = rows.filter((r) => !String(r.category || "").includes("Produit propriétaire"));
   const projectCard = (r: Record<string, unknown>) => `<article class="card"><a class="card__media" href="/realisations/${esc(String(r.slug))}">${r.image_key ? `<img src="${esc(mediaSrc(String(r.image_key)))}" alt="${esc(String(r.title))}" loading="lazy">` : ""}</a>
@@ -548,6 +804,11 @@ publicRoutes.get("/realisations", async (c) => {
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Réalisations" }])}<p class="eyebrow">Projets & réalisations</p>
     <h1>${heroTitleHTML(hero)}</h1>
     ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
+  ${histProducts.some((h) => Number(h.n_milestones || 0)) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Centre d'histoire technologique</p><h2>Nos produits vivent, évoluent et racontent leur histoire</h2>
+    <p class="muted">Chaque produit GREEN FAD dispose d'un parcours historique documenté et vérifiable&nbsp;: naissance de l'idée, conception, développement, mises en production, premiers utilisateurs, évolutions successives. Les dates sont accompagnées de leur niveau de fiabilité — les estimations ne sont jamais présentées comme des faits établis.</p></header>
+    <div class="hist-grid reveal" data-stagger>${histProducts.map(histCard).filter(Boolean).join("")}</div>
+    <p class="center muted" style="margin-top:1.4rem">${icon("shield", "i--inline")} Chronologies traçables&nbsp;: chaque jalon renvoie à sa source (fondateur, archives, dépôts, stores officiels).</p>
+  </section>` : ""}
   ${prop.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Produits propriétaires</p><h2>Le parcours de nos plateformes</h2></header>
     <div class="cards cards--${Math.min(prop.length, 3)} reveal">${prop.map(projectCard).join("")}</div></section>` : ""}
   <section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Depuis 2021</p><h2>Le chemin parcouru</h2></header>
@@ -558,7 +819,8 @@ publicRoutes.get("/realisations", async (c) => {
     <div class="cards cards--3 reveal" data-stagger>${others.map(projectCard).join("")}</div></section>` : ""}
   ${ct ? ctaBandHTML(ct) : ""}`;
   const seo = await seoOf(c, site, "/realisations", "Réalisations & études de cas");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/realisations" }), body));
+  const histLd = histProducts.filter((h) => Number(h.n_milestones || 0)).map((h, i) => ({ "@type": "ListItem", position: i + 1, name: String(h.name), url: `${String(site.settings.site_url || "")}/produits/${h.slug}` }));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/realisations", ...(histLd.length ? { jsonLd: [{ "@context": "https://schema.org", "@type": "ItemList", name: "Historique technologique des produits GREEN FAD", itemListElement: histLd }] } : {}) }), body));
 });
 
 publicRoutes.get("/realisations/:slug", async (c) => {
@@ -791,7 +1053,10 @@ publicRoutes.get("/blog/:slug", async (c) => {
   const relatedFallback = related.length < 3
     ? [...related, ...await q(c.env.DB, "SELECT slug, title, kind, excerpt, cover_key, published_at FROM posts WHERE status='publie' AND id != ? ORDER BY published_at DESC LIMIT ?", p.id, 3 - related.length)].filter((v, i, a) => a.findIndex((x) => x.slug === v.slug) === i).slice(0, 3)
     : related;
-  const product = p.related_product_id ? await q1<{ slug: string; name: string }>(c.env.DB, "SELECT slug, name FROM products WHERE slug IS NOT NULL AND (id = ? OR slug = ?)", p.related_product_id, String(p.related_product_id || "")) : null;
+  const product = (p.product_slug
+    ? await q1<{ slug: string; name: string }>(c.env.DB, "SELECT slug, name FROM products WHERE slug = ? AND status = ?", String(p.product_slug), PUBLIE)
+    : null)
+    || (p.related_product_id ? await q1<{ slug: string; name: string }>(c.env.DB, "SELECT slug, name FROM products WHERE slug IS NOT NULL AND (id = ? OR slug = ?)", p.related_product_id, String(p.related_product_id || "")) : null);
 
   const articleUrl = `${String(site.settings.site_url || c.env.SITE_URL || "https://greenfad.tech")}/blog/${p.slug}`;
   const tags = parseJSON<string[]>(p.tags, []);

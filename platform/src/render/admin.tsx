@@ -14,6 +14,9 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
     items: [
       { label: "Pages & Page Builder", url: "/admin/pages", icon: "layers" },
       { label: "Produits technologiques", url: "/admin/products", icon: "package" },
+      { label: "Jalons & chronologies", url: "/admin/jalons", icon: "route" },
+      { label: "Versions produits", url: "/admin/versions", icon: "git-branch" },
+      { label: "Sources & traçabilité", url: "/admin/sources", icon: "shield" },
       { label: "Services & Expertises", url: "/admin/services", icon: "briefcase" },
       { label: "Projets & Réalisations", url: "/admin/projects", icon: "award" },
       { label: "Blog & Publications", url: "/admin/posts", icon: "book-open" },

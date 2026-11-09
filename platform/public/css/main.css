@@ -747,3 +747,116 @@ html:not(.js) .reveal{opacity:1;transform:none} /* sans JS (robots, chargement l
 .dl-card:hover .dl-card__go .i{transform:translateX(3px)}
 .dl-note{margin-top:1rem;font-size:.85rem;display:flex;gap:6px;align-items:center}
 .dl-note .i{width:13px;height:13px;flex:none}
+
+/* ============================================================
+   PATRIMOINE HISTORIQUE (Mission CTO N°2) — chronologies vivantes,
+   journal des versions, centre d'histoire technologique, sources.
+   ============================================================ */
+.hist-note{margin:.4rem 0 1.2rem;font-size:.86rem;display:flex;gap:6px;align-items:center}
+.hist-note .i{width:14px;height:14px;flex:none;color:var(--teal-600)}
+.hist-intro{max-width:860px;margin-bottom:1.4rem;color:var(--ink-soft)}
+
+/* Filtres de chronologie */
+.hist-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 1.6rem}
+.hist-filters button{border:1px solid rgba(70,146,155,.3);background:#fff;border-radius:99px;padding:7px 16px;font-size:.85rem;font-weight:600;color:var(--ink-soft);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.hist-filters button .i{width:14px;height:14px}
+.hist-filters button:hover{border-color:var(--teal-500);color:var(--teal-600)}
+.hist-filters button.is-active{background:var(--teal-600);border-color:var(--teal-600);color:#fff;box-shadow:0 6px 16px -6px rgba(46,110,120,.45)}
+
+/* Chronologie verticale des jalons */
+.htimeline{max-width:880px;margin:0 auto;list-style:none;position:relative;padding-left:64px}
+.htimeline::before{content:"";position:absolute;left:26px;top:8px;bottom:8px;width:3px;border-radius:3px;background:linear-gradient(180deg,var(--teal-400),var(--gold-soft) 70%,transparent)}
+.htimeline__item{position:relative;padding-bottom:30px}
+.htimeline__marker{position:absolute;left:-64px;top:-2px;width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid rgba(70,146,155,.35);color:var(--teal-600);box-shadow:0 8px 20px -10px rgba(31,74,84,.35)}
+.htimeline__marker .i{width:24px;height:24px}
+.htimeline__item[data-tl-group="production"] .htimeline__marker{border-color:rgba(217,169,39,.5);color:var(--gold-600)}
+.htimeline__card{background:#fff;border:1px solid rgba(31,74,84,.09);border-radius:18px;padding:20px 22px;box-shadow:0 10px 26px -18px rgba(31,74,84,.28);transition:.25s}
+.htimeline__item:hover .htimeline__card{box-shadow:0 16px 34px -18px rgba(31,74,84,.4);transform:translateY(-2px)}
+.htimeline__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:.55rem}
+.jalon-kind{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;letter-spacing:.02em;color:var(--teal-700);background:var(--teal-soft,#EAF4F5);border-radius:99px;padding:4px 12px}
+.jalon-kind .i{width:13px;height:13px}
+.htimeline__date{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);margin-left:auto;flex-wrap:wrap}
+.htimeline__date time{font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.prec{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;border-radius:99px;padding:2px 9px;border:1px solid transparent;white-space:nowrap}
+.prec .i{width:11px;height:11px}
+.prec--exacte{background:#E8F6EE;color:#1E7A46;border-color:rgba(30,122,70,.25)}
+.prec--approx{background:#FDF6E4;color:#8A6A14;border-color:rgba(138,106,20,.25)}
+.prec--archives{background:#E9F1FB;color:#1E56A8;border-color:rgba(30,86,168,.25)}
+.prec--estimee{background:#F4F0FA;color:#5B4EA6;border-color:rgba(91,78,166,.25)}
+.prec--inconnue{background:#F1F3F5;color:#68757E;border-color:rgba(104,117,126,.3)}
+.htimeline__card h3{font-size:1.06rem;margin:0 0 .45rem;color:var(--ink)}
+.htimeline__desc{font-size:.93rem;color:var(--muted)}
+.htimeline__extras{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:.7rem}
+.htimeline__media{display:flex;gap:10px;overflow-x:auto;padding:.7rem 0 .2rem;margin-top:.4rem}
+.htimeline__media figure{flex:none;width:130px;height:230px;border-radius:12px;overflow:hidden;border:1px solid rgba(31,74,84,.12);cursor:zoom-in;background:var(--paper,#F6F8F9)}
+.htimeline__media figure img{width:100%;height:100%;object-fit:cover;display:block}
+.htimeline__source{margin:.75rem 0 0;padding-top:.7rem;border-top:1px dashed rgba(31,74,84,.14);font-size:.78rem;color:var(--faint);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.htimeline__source .i{width:13px;height:13px;flex:none}
+.conf{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;padding:2px 8px}
+.conf--haute{background:#E8F6EE;color:#1E7A46}
+.conf--moyenne{background:#FDF6E4;color:#8A6A14}
+.conf--faible{background:#F1F3F5;color:#68757E}
+/* Filtre actif : masquer les groupes non concernés */
+.htimeline[data-tl-active="creation"] .htimeline__item[data-tl-group="production"],
+.htimeline[data-tl-active="production"] .htimeline__item[data-tl-group="creation"]{display:none}
+
+/* Journal des versions */
+.ver-timeline{max-width:880px;margin:0 auto;display:grid;gap:16px}
+.ver-card{background:#fff;border:1px solid rgba(31,74,84,.09);border-left:4px solid var(--teal-500);border-radius:16px;padding:18px 22px;box-shadow:0 8px 22px -16px rgba(31,74,84,.3)}
+.ver-card__head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ver-card__num{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-head);font-weight:800;font-size:1.05rem;color:var(--teal-700)}
+.ver-card__num .i{width:17px;height:17px}
+.ver-kind{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;padding:3px 10px;background:#F1F3F5;color:#51606A}
+.ver-kind--majeure{background:#E9F1FB;color:#1E56A8}
+.ver-kind--module{background:#E8F6EE;color:#1E7A46}
+.ver-kind--archi{background:#F4F0FA;color:#5B4EA6}
+.ver-kind--prod{background:#FDF6E4;color:#8A6A14}
+.ver-kind--fix{background:#FBEAEA;color:#A33A3A}
+.ver-card__date{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.ver-card__date time{font-weight:700;color:var(--ink-soft)}
+.ver-card__summary{margin:.6rem 0 0;color:var(--ink-soft);font-size:.95rem}
+.ver-card__feat{margin:.7rem 0 0}
+.ver-card__feat li{font-size:.9rem;color:var(--muted)}
+.ver-card__line{margin:.55rem 0 0;font-size:.9rem;color:var(--muted);display:flex;gap:7px;align-items:flex-start}
+.ver-card__line .i{width:15px;height:15px;flex:none;margin-top:2px;color:var(--teal-600)}
+
+/* Sources & traçabilité */
+.hist-sources{max-width:880px;margin:0 auto;background:#fff;border:1px solid rgba(31,74,84,.09);border-radius:16px;padding:0 22px}
+.hist-sources summary{cursor:pointer;font-weight:700;color:var(--teal-700);padding:16px 0;display:flex;align-items:center;gap:8px;list-style:none}
+.hist-sources summary::-webkit-details-marker{display:none}
+.hist-sources summary .i{width:17px;height:17px}
+.hist-sources[open] summary{border-bottom:1px dashed rgba(31,74,84,.14)}
+.hist-sources__list{list-style:none;margin:14px 0;padding:0 0 4px;display:grid;gap:12px}
+.hist-sources__list li{display:flex;gap:12px;align-items:flex-start;font-size:.88rem}
+.hist-sources__type{flex:none;min-width:150px;display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:700;color:var(--teal-700);background:var(--teal-soft,#EAF4F5);border-radius:99px;padding:4px 12px}
+.hist-sources__type .i{width:13px;height:13px}
+.hist-sources__list a{white-space:nowrap}
+.hist-sources__note{margin:8px 0 16px;font-size:.8rem}
+
+/* Centre d'histoire technologique — /realisations */
+.hist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin-top:1.6rem}
+.hist-card{display:flex;gap:16px;background:#fff;border:1px solid rgba(31,74,84,.09);border-radius:18px;padding:18px;box-shadow:0 10px 26px -20px rgba(31,74,84,.3);transition:.25s;position:relative;overflow:hidden}
+.hist-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(180deg,var(--teal-400),var(--gold-400))}
+.hist-card:hover{transform:translateY(-3px);box-shadow:0 18px 38px -20px rgba(31,74,84,.45)}
+.hist-card__logo{flex:none;width:56px;height:56px;border-radius:14px;background:var(--paper,#F6F8F9);border:1px solid rgba(31,74,84,.1);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hist-card__logo img{width:100%;height:100%;object-fit:contain}
+.hist-card__logo .i{width:24px;height:24px;color:var(--teal-600)}
+.hist-card__body{display:flex;flex-direction:column;gap:.4rem;min-width:0}
+.hist-card__body strong{font-family:var(--font-head);font-size:1.02rem;color:var(--ink)}
+.hist-card__body em{font-style:normal;font-size:.85rem;color:var(--muted);line-height:1.4}
+.hist-card__meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hist-card__count{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:700;color:var(--gold-600)}
+.hist-card__count .i{width:13px;height:13px}
+.hist-card__dates{display:flex;flex-direction:column;gap:3px;font-size:.8rem;color:var(--faint)}
+.hist-card__dates .i{width:12px;height:12px;color:var(--teal-600)}
+.hist-card .card__more{margin-top:auto;color:var(--teal-600);font-size:.84rem;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+
+@media (max-width:760px){
+  .htimeline{padding-left:44px}
+  .htimeline::before{left:17px}
+  .htimeline__marker{left:-44px;width:40px;height:40px;border-radius:12px}
+  .htimeline__marker .i{width:18px;height:18px}
+  .htimeline__date{margin-left:0}
+  .hist-grid{grid-template-columns:1fr}
+  .hist-sources__list li{flex-direction:column;gap:4px}
+}

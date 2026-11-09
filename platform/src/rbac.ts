@@ -21,6 +21,14 @@ export const PERMISSIONS: Record<string, Partial<Record<Action, Role[]>>> = {
     delete: ["admin"],
     publish: ["admin", "gestionnaire_produits"],
   },
+  // Patrimoine historique des produits (jalons, versions, sources) — Mission CTO N°2
+  patrimoine: {
+    view: ["admin", "gestionnaire_produits", "responsable_editorial", "lecteur"],
+    create: ["admin", "gestionnaire_produits", "responsable_editorial"],
+    edit: ["admin", "gestionnaire_produits", "responsable_editorial"],
+    delete: ["admin"],
+    publish: ["admin", "gestionnaire_produits", "responsable_editorial"],
+  },
   services: {
     view: ["admin", "gestionnaire_services", "responsable_editorial", "lecteur"],
     create: ["admin", "gestionnaire_services"],

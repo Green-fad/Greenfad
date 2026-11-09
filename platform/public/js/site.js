@@ -163,6 +163,26 @@
     }
   });
 
+  // Filtres de la chronologie historique (jalons : conception & développement / production & évolutions)
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-tl-tabs] button[data-tl-filter]");
+    if (!b) return;
+    var wrap = b.closest("[data-tl-tabs]");
+    wrap.querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-active", x === b); });
+    var f = b.getAttribute("data-tl-filter");
+    var tl = document.querySelector("[data-tl]");
+    if (!tl) return;
+    if (f === "all") {
+      tl.removeAttribute("data-tl-active");
+    } else {
+      tl.setAttribute("data-tl-active", f);
+    }
+    // Si aucun jalon du groupe choisi n'existe, on reste sur « tout » pour ne pas afficher une liste vide
+    if (f !== "all" && !tl.querySelector('[data-tl-group="' + f + '"]')) {
+      tl.removeAttribute("data-tl-active");
+    }
+  });
+
   // Anti double-soumission des formulaires publics
   document.querySelectorAll("form[method=post]").forEach(function (f) {
     f.addEventListener("submit", function () {

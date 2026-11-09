@@ -20,7 +20,7 @@ export type Field = {
   type: FieldType;
   required?: boolean;
   options?: { value: string; label: string }[];
-  relation?: { table: string; label: string; value: "id" };
+  relation?: { table: string; label: string; value: "id" | "slug" };
   placeholder?: string;
   help?: string;
   list?: boolean; // visible dans la liste
@@ -55,6 +55,58 @@ const PRODUCT_STATES = [
   { value: "disponible", label: "Disponible" },
   { value: "evolution", label: "En évolution" },
   { value: "archive", label: "Archivé" },
+];
+
+// ---------- Patrimoine historique (Mission CTO N°2) ----------
+const MILESTONE_KINDS = [
+  { value: "conception", label: "Conception — naissance de l'idée" },
+  { value: "cadrage", label: "Cadrage — définition du projet et des objectifs" },
+  { value: "developpement", label: "Développement — début du développement" },
+  { value: "implementation", label: "Implémentation — grandes fonctionnalités" },
+  { value: "annonce", label: "Annonce — communication aux utilisateurs" },
+  { value: "tests", label: "Tests — validation et préparation" },
+  { value: "premiere_production", label: "Première mise en production" },
+  { value: "premier_utilisateur", label: "Premier utilisateur réel" },
+  { value: "mise_a_jour", label: "Mise à jour — versions et améliorations" },
+  { value: "derniere_evolution", label: "Dernière évolution connue" },
+  { value: "situation_actuelle", label: "Situation actuelle du produit" },
+];
+
+const VERSION_KINDS = [
+  { value: "mineure", label: "Mise à jour mineure" },
+  { value: "majeure", label: "Évolution majeure" },
+  { value: "module", label: "Nouveau module" },
+  { value: "architecture", label: "Changement d'architecture" },
+  { value: "production", label: "Mise en production" },
+  { value: "correction", label: "Correction importante" },
+];
+
+// exacte = date confirmée · approximative = communiquée · archives = retrouvée · estimee = à confirmer · inconnue
+const DATE_PRECISIONS = [
+  { value: "exacte", label: "Confirmée (preuve datée)" },
+  { value: "approximative", label: "Environ (approximation communiquée)" },
+  { value: "archives", label: "Retrouvée dans les archives" },
+  { value: "estimee", label: "Estimation à confirmer" },
+  { value: "inconnue", label: "Inconnue" },
+];
+
+const CONFIDENCE_LEVELS = [
+  { value: "haute", label: "Haute" },
+  { value: "moyenne", label: "Moyenne" },
+  { value: "faible", label: "Faible" },
+];
+
+const SOURCE_TYPES = [
+  { value: "fondateur", label: "Fondateur" },
+  { value: "archives", label: "Archives internes" },
+  { value: "git", label: "Dépôt Git (commits, tags, branches)" },
+  { value: "release", label: "Release / artefact" },
+  { value: "changelog", label: "Changelog" },
+  { value: "article", label: "Article / publication" },
+  { value: "store", label: "Store officiel (Play, App Store…)" },
+  { value: "web", label: "Site web officiel" },
+  { value: "capture", label: "Capture d'écran" },
+  { value: "deploiement", label: "Historique de déploiement / CI" },
 ];
 
 const POST_KINDS = [
@@ -98,6 +150,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "benefits_md", label: "Bénéfices et valeur ajoutée", type: "markdown", form_span: true },
       { name: "differentiators_md", label: "Éléments différenciateurs", type: "markdown", form_span: true },
       { name: "use_cases_md", label: "Cas d'utilisation", type: "markdown", form_span: true },
+      { name: "history_intro_md", label: "Intro du parcours historique", type: "markdown", form_span: true, help: "Introduction affichée au-dessus de la chronologie (section « Parcours historique » de la fiche produit) — laissez vide pour l'intro par défaut." },
       { name: "related_service_id", label: "Expertise mobilisée", type: "relation", relation: { table: "services", label: "name", value: "id" } },
       { name: "links_json", label: "Liens officiels", type: "kvlist", form_span: true, help: "Un lien par ligne : Nom du lien | https://adresse — aucun JSON à écrire" },
       { name: "versions_json", label: "Historique des versions publiables", type: "kvlist", form_span: true, help: "Une version par ligne : 1.0 | 2025 | Note des changements" },
@@ -156,6 +209,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "author", label: "Auteur", type: "text" },
       { name: "content_md", label: "Contenu (markdown)", type: "markdown", form_span: true, help: "Images : ![alt](/media/…). Citations : > texte. Blocs techniques : ```code```" },
       { name: "related_product_id", label: "Produit lié", type: "relation", relation: { table: "products", label: "name", value: "id" } },
+      { name: "product_slug", label: "Produit du patrimoine (chronologie)", type: "relation", relation: { table: "products", label: "name", value: "slug" }, help: "Relie cet article au parcours historique d'un produit — l'article apparaît alors sur la fiche du produit et ses jalons peuvent y renvoyer." },
       { name: "related_project_id", label: "Projet lié", type: "relation", relation: { table: "projects", label: "title", value: "id" } },
       { name: "related_service_id", label: "Service lié", type: "relation", relation: { table: "services", label: "name", value: "id" } },
       { name: "country_id", label: "Pays concerné", type: "relation", relation: { table: "countries", label: "name", value: "id" } },
@@ -348,6 +402,87 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "is_public", label: "Téléchargeable publiquement", type: "boolean" },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
       { name: "published_at", label: "Date de publication", type: "datetime" },
+    ],
+  },
+  // ---------- PATRIMOINE HISTORIQUE (Mission CTO N°2) ----------
+  jalons: {
+    key: "jalons", table: "product_milestones", title: "Jalons & chronologies", single: "jalon", perm: "patrimoine", statusable: true,
+    order: "product_slug ASC, sort_order ASC", searchable: ["title", "product_slug", "version_ref"],
+    intro: "Chronologie vivante de chaque produit : naissance de l'idée, conception, développement, annonces, tests, premières mises en production, premiers utilisateurs, mises à jour, situation actuelle. Ne jamais transformer une estimation en date certaine — le niveau de précision est affiché publiquement.",
+    columns: [
+      { name: "product_slug", label: "Produit", type: "relation", relation: { table: "products", label: "name", value: "slug" }, list: true },
+      { name: "kind", label: "Type de jalon", type: "select", options: MILESTONE_KINDS, list: true },
+      { name: "title", label: "Titre", type: "text", list: true },
+      { name: "occurred_on", label: "Date", type: "text", list: true },
+      { name: "date_precision", label: "Précision", type: "select", options: DATE_PRECISIONS, list: true },
+      { name: "status", label: "Statut", type: "readonly", list: true },
+    ],
+    fields: [
+      { name: "product_slug", label: "Produit concerné", type: "relation", relation: { table: "products", label: "name", value: "slug" }, required: true },
+      { name: "kind", label: "Type de jalon", type: "select", options: MILESTONE_KINDS, required: true },
+      { name: "title", label: "Titre du jalon", type: "text", required: true, form_span: true },
+      { name: "description_md", label: "Description (markdown)", type: "markdown", form_span: true, help: "Ce qui s'est passé, ce qui a été décidé ou livré — uniquement des faits vérifiables." },
+      { name: "occurred_on", label: "Date du jalon", type: "text", help: "Formats acceptés : 2026-11-08 (jour), 2026-11 (mois), 2019 (année). Laisser vide si la date est inconnue — ne jamais inventer." },
+      { name: "date_precision", label: "Niveau de précision de la date", type: "select", options: DATE_PRECISIONS, help: "« Confirmée » = preuve datée ; « Environ » = approximation communiquée ; « Archives » = retrouvée dans les archives ; « Estimation » = à confirmer ; « Inconnue » = pas de date." },
+      { name: "version_ref", label: "Version associée (optionnel)", type: "text", help: "ex. 1.0.6+724, 2.2.0" },
+      { name: "article_slug", label: "Article de blog relié (annonce / retour)", type: "relation", relation: { table: "posts", label: "title", value: "slug" }, help: "Article d'annonce publié AVANT l'implémentation, ou article de retour après mise en production. Uniquement un article réellement existant." },
+      { name: "media_json", label: "Images du jalon", type: "screenshots", form_span: true, help: "Captures ou visuels associés à ce jalon — choisissez dans la bibliothèque (le type Mobile/Desktop n'est pas affiché ici, seule la légende compte)." },
+      { name: "source_label", label: "Source de l'information", type: "text", form_span: true, help: "ex. « Fondateur — mission CTO N°2, 10/11/2026 » ou « Archives : TILE_FINAL_RELEASE_REPORT.md, 17/07/2026 »" },
+      { name: "confidence", label: "Niveau de confiance", type: "select", options: CONFIDENCE_LEVELS },
+      { name: "sort_order", label: "Ordre chronologique d'affichage", type: "number", help: "1 = premier jalon. Suivre l'ordre chronologique réel." },
+      { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
+    ],
+  },
+  versions: {
+    key: "versions", table: "product_versions", title: "Versions produits", single: "version", perm: "patrimoine", statusable: true,
+    order: "product_slug ASC, sort_order ASC", searchable: ["version", "summary", "product_slug"],
+    intro: "Journal des versions par produit : numéros, dates, types (mineure, majeure, nouveau module, architecture, production, correction), fonctionnalités ajoutées, corrections, article d'annonce. La date de la dernière mise à jour provient de données vérifiables, jamais de la date de modification d'une page éditoriale.",
+    columns: [
+      { name: "product_slug", label: "Produit", type: "relation", relation: { table: "products", label: "name", value: "slug" }, list: true },
+      { name: "version", label: "Version", type: "text", list: true },
+      { name: "released_on", label: "Sortie", type: "text", list: true },
+      { name: "kind", label: "Type", type: "select", options: VERSION_KINDS, list: true },
+      { name: "status", label: "Statut", type: "readonly", list: true },
+    ],
+    fields: [
+      { name: "product_slug", label: "Produit concerné", type: "relation", relation: { table: "products", label: "name", value: "slug" }, required: true },
+      { name: "version", label: "Numéro ou nom de version", type: "text", required: true, help: "ex. 1.0, 1.0.6+724, 2.2.0" },
+      { name: "released_on", label: "Date de sortie", type: "text", help: "Formats : 2026-11-02, 2026-11, 2026. Vide si inconnue." },
+      { name: "date_precision", label: "Niveau de précision", type: "select", options: DATE_PRECISIONS },
+      { name: "kind", label: "Type de mise à jour", type: "select", options: VERSION_KINDS, required: true },
+      { name: "summary", label: "Résumé de la version", type: "textarea", form_span: true },
+      { name: "features", label: "Fonctionnalités ajoutées", type: "list", form_span: true, help: "Une fonctionnalité par ligne" },
+      { name: "improvements", label: "Améliorations", type: "textarea", form_span: true },
+      { name: "fixes", label: "Corrections", type: "textarea", form_span: true, help: "Une correction par ligne" },
+      { name: "tech_notes", label: "Changements techniques publiables", type: "textarea", form_span: true, help: "Uniquement ce qui est autorisé à être public — jamais de secret technique." },
+      { name: "article_slug", label: "Article d'annonce relié", type: "relation", relation: { table: "posts", label: "title", value: "slug" } },
+      { name: "media_json", label: "Médias de la version", type: "screenshots", form_span: true, help: "Captures associées à cette version (bibliothèque média)." },
+      { name: "sort_order", label: "Ordre d'affichage", type: "number", help: "1 = version la plus ancienne. Les plus récentes en dernier." },
+      { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
+    ],
+  },
+  sources: {
+    key: "sources", table: "product_sources", title: "Sources & traçabilité", single: "source", perm: "patrimoine",
+    order: "product_slug ASC, id ASC", searchable: ["title", "product_slug", "detail"],
+    intro: "Preuves historiques : informations du fondateur, dépôts Git, rapports de missions, stores officiels, articles, captures. Chaque jalon ou version doit pouvoir être relié à une source. Ne jamais inventer un historique pour remplir une chronologie.",
+    columns: [
+      { name: "product_slug", label: "Produit", type: "relation", relation: { table: "products", label: "name", value: "slug" }, list: true },
+      { name: "source_type", label: "Type", type: "select", options: SOURCE_TYPES, list: true },
+      { name: "title", label: "Source", type: "text", list: true },
+      { name: "evidenced_on", label: "Preuve du", type: "text", list: true },
+      { name: "confidence", label: "Confiance", type: "select", options: CONFIDENCE_LEVELS, list: true },
+    ],
+    fields: [
+      { name: "product_slug", label: "Produit concerné", type: "relation", relation: { table: "products", label: "name", value: "slug" }, required: true },
+      { name: "source_type", label: "Type de source", type: "select", options: SOURCE_TYPES, required: true },
+      { name: "title", label: "Intitulé de la source", type: "text", required: true, form_span: true },
+      { name: "detail", label: "Détail / correspondance avec les événements", type: "textarea", form_span: true },
+      { name: "url", label: "Lien de la preuve (si public)", type: "url" },
+      { name: "evidenced_on", label: "Date de la preuve", type: "text", help: "ex. 2026-11-02" },
+      { name: "confidence", label: "Niveau de confiance", type: "select", options: CONFIDENCE_LEVELS },
+      { name: "milestone_id", label: "Jalon relié (id)", type: "number", help: "Optionnel — id affiché dans /admin/jalons (#n)" },
+      { name: "version_id", label: "Version reliée (id)", type: "number", help: "Optionnel — id affiché dans /admin/versions (#n)" },
+      { name: "validated_by", label: "Validation fondateur", type: "text", help: "ex. « Validé par le fondateur le 10/11/2026 » — laisser vide si non validé" },
     ],
   },
   leads: {
@@ -791,7 +926,9 @@ async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, fo
         break;
       }
       case "relation":
-        data[f.name] = s === "" ? null : Number(s) || null;
+        // Relation numérique (id) ou textuelle (slug) selon la définition — produits & articles
+        // du patrimoine sont reliés par slug (stable et lisible).
+        data[f.name] = s === "" ? null : f.relation && f.relation.value !== "id" ? s : (Number(s) || null);
         break;
       case "datetime":
         data[f.name] = s === "" ? null : s.replace("T", " ") + (s.length === 16 ? ":00" : "");
