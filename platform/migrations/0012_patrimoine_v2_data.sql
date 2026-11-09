@@ -468,18 +468,6 @@ UPDATE products SET problem_md = REPLACE(problem_md, '**Stack :**', '**Approche 
 UPDATE products SET architecture_md = REPLACE(architecture_md, '**Stack :**', '**Approche :**') WHERE architecture_md LIKE '%**Stack :**%';
 UPDATE products SET ux_md = REPLACE(ux_md, '**Stack :**', '**Approche :**') WHERE ux_md LIKE '%**Stack :**%';
 
--- Introduction de l'histoire (history_intro_md) : mêmes reformulations
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD', 'infrastructure cloud opérée et supervisée par Green FAD') WHERE history_intro_md LIKE '%Cloudflare%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'infrastructure Cloudflare opérée par Green FAD', 'infrastructure cloud opérée par Green FAD') WHERE history_intro_md LIKE '%Cloudflare%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'base technique moderne (Next.js, TypeScript, React)', 'base technique moderne et éprouvée') WHERE history_intro_md LIKE '%Next.js%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, '**Stack :** Next.js, TypeScript, React, intégrations IA', '**Approche :** intégrations IA') WHERE history_intro_md LIKE '%Next.js%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, '**Stack :**', '**Approche :**') WHERE history_intro_md LIKE '%**Stack :**%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE history_intro_md LIKE '%Flutter%';
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'Flutter/Firebase', 'd''ingénierie') WHERE history_intro_md LIKE '%Flutter%';
-UPDATE products SET meta_title = REPLACE(meta_title, 'Flutter/Firebase', 'd''ingénierie') WHERE meta_title LIKE '%Flutter%';
-UPDATE products SET meta_description = REPLACE(meta_description, 'Flutter/Firebase', 'd''ingénierie') WHERE meta_description LIKE '%Flutter%';
-UPDATE products SET meta_description = REPLACE(meta_description, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE meta_description LIKE '%Flutter%';
-
 -- Service mobile : tech_json reformulé en capacités (sans Flutter/Firebase)
 UPDATE services SET tech_json = '["Progressive Web Apps (PWA) installables", "Applications natives Android et iOS", "Synchronisation cloud temps réel", "API REST sécurisées", "Mode hors-ligne avec stockage local", "Paiements : Stripe, CinetPay, FedaPay, PayPal, Mobile Money", "Notifications push et e-mails transactionnels", "Publication sur les stores et distribution APK signée"]' WHERE tech_json LIKE '%Flutter%';
 
@@ -505,8 +493,6 @@ UPDATE product_sources SET detail = REPLACE(detail, 'infrastructure Cloudflare o
 UPDATE posts SET excerpt = REPLACE(excerpt, 'Flutter/Firebase', 'd''ingénierie') WHERE excerpt LIKE '%Flutter%';
 UPDATE posts SET content_md = REPLACE(content_md, 'Flutter/Firebase', 'd''ingénierie') WHERE content_md LIKE '%Flutter%';
 UPDATE posts SET content_md = REPLACE(content_md, '**Flutter** pour Android, iOS et le Web/PWA, **Firebase** pour les fonctions et les données, **React** pour l''administration', 'une application multiplateforme pour Android, iOS et le Web/PWA, des services cloud pour les fonctions et les données, une console d''administration dédiée') WHERE content_md LIKE '%Flutter%';
-UPDATE posts SET content_md = REPLACE(content_md, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE content_md LIKE '%Flutter%';
-UPDATE posts SET excerpt = REPLACE(excerpt, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE excerpt LIKE '%Flutter%';
 UPDATE posts SET content_md = REPLACE(content_md, 'analyse Flutter sans erreur', 'analyse de qualité du code sans erreur') WHERE content_md LIKE '%Flutter%';
 UPDATE posts SET meta_description = REPLACE(meta_description, 'Flutter/Firebase', 'd''ingénierie') WHERE meta_description LIKE '%Flutter%';
 UPDATE posts SET tags = REPLACE(tags, '"flutter",', '') WHERE tags LIKE '%flutter%';
