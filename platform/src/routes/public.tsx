@@ -145,7 +145,17 @@ function kindBadge(kind: string): string {
 type MilestoneRow = {
   id: number; product_slug: string; kind: string; title: string; description_md: string | null;
   occurred_on: string | null; date_precision: string; version_ref: string | null; article_slug: string | null;
-  media_json: string | null; source_label: string | null; confidence: string;
+  media_json: string | null; source_label: string | null; confidence: string; version_num: string | null;
+  version_id: number | null;
+};
+type PubRow = {
+  id: number; product_slug: string; slug: string; post_slug: string | null; event_id: number | null;
+  version_id: number | null; kind: string; title: string; original_pub_on: string | null;
+  original_pub_precision: string; announcement_on: string | null; announcement_precision: string;
+  delivery_on: string | null; delivery_precision: string; version_ref: string | null;
+  context_md: string | null; evolution_md: string | null; features_json: string | null;
+  benefits_md: string | null; result_md: string | null; media_json: string | null;
+  provenance: string; source_label: string | null; confidence: string;
 };
 type VersionRow = {
   id: number; product_slug: string; version: string; released_on: string | null; date_precision: string;
@@ -480,7 +490,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const db = c.env.DB;
 
   // Médias liés (réutilisation sans duplication) + vidéos + FAQ + articles liés + autres produits
-  const [gallery, videos, productFaqs, relatedPosts, otherProducts, milestones, hVersions, pSources] = await Promise.all([
+  const [gallery, videos, productFaqs, relatedPosts, otherProducts, milestones, hVersions, pSources, pPubs] = await Promise.all([
     q(db, "SELECT mi.title, mi.caption, m.r2_key FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='image' AND mi.status='publie' JOIN media m ON m.id = mi.media_id WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT mi.id, mi.title, mi.description, mi.source_url FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='video' AND mi.status='publie' WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT question, answer FROM faqs WHERE status='publie' AND category = ? ORDER BY sort_order LIMIT 8", `produit:${p.slug}`),
@@ -488,9 +498,11 @@ publicRoutes.get("/produits/:slug", async (c) => {
     q(db, "SELECT slug, name, tagline, image_key, logo_key, state FROM products WHERE status = ? AND id != ? ORDER BY sort_order LIMIT 3", PUBLIE, p.id),
     // Patrimoine historique (Mission CTO N°2) — chronologie, journal des versions, sources
     // (safeQ : si la migration 0007 n'est pas encore appliquée, les sections ne s'affichent pas)
-    safeQ<MilestoneRow>(db, "SELECT * FROM product_milestones WHERE product_slug = ? AND status = ? ORDER BY sort_order ASC, id ASC", p.slug, PUBLIE),
+    safeQ<MilestoneRow>(db, "SELECT m.*, pv.version AS version_num FROM product_milestones m LEFT JOIN product_versions pv ON pv.id = m.version_id WHERE m.product_slug = ? AND m.status = ? ORDER BY m.sort_order ASC, m.id ASC", p.slug, PUBLIE),
     safeQ<VersionRow>(db, "SELECT * FROM product_versions WHERE product_slug = ? AND status = ? ORDER BY sort_order ASC, id ASC", p.slug, PUBLIE),
     safeQ<SourceRow>(db, "SELECT * FROM product_sources WHERE product_slug = ? ORDER BY id ASC", p.slug),
+    // Publications du parcours (directive CTO : annonces ↔ implémentations ↔ versions)
+    safeQ<PubRow>(db, "SELECT * FROM product_publications WHERE product_slug = ? AND status = ? ORDER BY sort_order ASC, id ASC", p.slug, PUBLIE),
   ]);
 
   const links = parseJSON<{ label: string; url: string }[]>(p.links_json, []);
@@ -518,7 +530,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
         <h3>${esc(m.title)}</h3>
         ${m.description_md ? `<div class="prose htimeline__desc">${md(m.description_md)}</div>` : ""}
         ${(m.version_ref || m.article_slug) ? `<div class="htimeline__extras">
-          ${m.version_ref ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(m.version_ref)}</span>` : ""}
+          ${(m.version_ref || m.version_num) ? `<a class="tag tag--soft" href="#ver-${m.version_id || ""}">${icon("git-branch", "i--inline")} v${esc(String(m.version_num || m.version_ref))}</a>` : ""}
           ${m.article_slug ? `<a class="btn btn--ghost btn--sm" href="/blog/${esc(m.article_slug)}">${icon("newspaper", "i--inline")} Article relié</a>` : ""}
         </div>` : ""}
         ${media.length ? `<div class="htimeline__media" data-lightbox>${media.map((x) => { const src = mediaSrc(x.key); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(x.alt || m.title)}" loading="lazy"></figure>`; }).join("")}</div>` : ""}
@@ -532,7 +544,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
     const media = parseJSON<{ key: string; alt?: string }[]>(v.media_json, []).filter((x) => x && x.key);
     const dateTxt = fmtHistDate(v.released_on);
     const iso = histDateISO(v.released_on);
-    return `<article class="ver-card">
+    return `<article class="ver-card" id="ver-${v.id}">
       <div class="ver-card__head">
         <span class="ver-card__num">${icon("git-branch")} v${esc(v.version)}</span>
         ${versionKindBadge(v.kind)}
@@ -547,6 +559,43 @@ publicRoutes.get("/produits/:slug", async (c) => {
         ${v.article_slug ? `<a class="btn btn--ghost btn--sm" href="/blog/${esc(v.article_slug)}">${icon("newspaper", "i--inline")} Article d'annonce</a>` : ""}
         ${media.length ? `<div class="htimeline__media" data-lightbox>${media.map((x) => { const src = mediaSrc(x.key); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(x.alt || `Version ${v.version}`)}" loading="lazy"></figure>`; }).join("")}</div>` : ""}
       </div>` : ""}
+    </article>`;
+  };
+
+  // Publications du parcours (directive CTO §4) : chaque annonce reliée à son
+  // événement, sa version, sa date d'annonce et sa date réelle de livraison.
+  const PUB_META: Record<string, { label: string; cls: string; icon: string }> = {
+    original_retrouve: { label: "Article original retrouvé", cls: "pub--original", icon: "newspaper" },
+    reconstruite: { label: "Publication reconstituée", cls: "pub--reconstruite", icon: "history" },
+    nouvelle: { label: "Publication historique", cls: "pub--nouvelle", icon: "clock" },
+  };
+  const pubHTML = (pub: PubRow) => {
+    const meta = PUB_META[String(pub.provenance)] || PUB_META.nouvelle;
+    const feats = parseJSON<string[]>(pub.features_json, []);
+    const media = parseJSON<{ key: string; alt?: string }[]>(pub.media_json, []).filter((x) => x && x.key);
+    const ver = pub.version_id ? hVersions.find((v) => v.id === pub.version_id) : null;
+    const annTxt = pub.announcement_on ? `${fmtHistDate(pub.announcement_on)} ${precisionBadge(pub.announcement_precision)}` : "";
+    const dlvTxt = pub.delivery_on ? `${fmtHistDate(pub.delivery_on)} ${precisionBadge(pub.delivery_precision)}` : "";
+    const detail = `<div class="pub-card__detail prose">
+      ${pub.context_md ? `<p><strong>Contexte&nbsp;:</strong> ${md(pub.context_md)}</p>` : ""}
+      ${pub.evolution_md ? `<p><strong>Évolution annoncée&nbsp;:</strong> ${md(pub.evolution_md)}</p>` : ""}
+      ${feats.length ? `<ul class="feat-list">${feats.map((f) => `<li>${icon("check-circle")} <span>${esc(f)}</span></li>`).join("")}</ul>` : ""}
+      ${pub.benefits_md ? `<p><strong>Bénéfices attendus&nbsp;:</strong> ${md(pub.benefits_md)}</p>` : ""}
+      ${pub.result_md ? `<p><strong>Résultat livré&nbsp;:</strong> ${md(pub.result_md)}</p>` : ""}
+      ${media.length ? `<div class="htimeline__media" data-lightbox>${media.map((x) => { const src = mediaSrc(x.key); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(x.alt || pub.title)}" loading="lazy"></figure>`; }).join("")}</div>` : ""}
+      ${pub.source_label ? `<p class="htimeline__source">${icon("shield", "i--inline")} ${esc(pub.source_label)} ${confidenceBadge(pub.confidence)}</p>` : ""}
+    </div>`;
+    return `<article class="pub-card ${meta.cls}">
+      <div class="pub-card__head">
+        <span class="pub-card__prov">${icon(meta.icon, "i--inline")} ${esc(meta.label)}</span>
+        ${ver ? `<a class="tag tag--soft" href="#ver-${ver.id}">${icon("git-branch", "i--inline")} v${esc(ver.version)}</a>` : pub.version_ref ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(pub.version_ref)}</span>` : ""}
+        ${annTxt ? `<span class="pub-card__date">${icon("newspaper", "i--inline")} Annonce&nbsp;: ${annTxt}</span>` : ""}
+        ${dlvTxt ? `<span class="pub-card__date">${icon("rocket", "i--inline")} Livraison&nbsp;: ${dlvTxt}</span>` : ""}
+      </div>
+      <h3>${pub.post_slug ? `<a href="/blog/${esc(pub.post_slug)}">${esc(pub.title)}</a>` : esc(pub.title)}</h3>
+      ${pub.post_slug
+        ? `${detail}<a class="btn btn--ghost btn--sm" href="/blog/${esc(pub.post_slug)}">${icon("newspaper", "i--inline")} Lire l'article original</a>`
+        : `<details class="pub-card__more"><summary>${icon("history", "i--inline")} Consulter cette publication</summary>${detail}</details>`}
     </article>`;
   };
 
@@ -581,7 +630,7 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const anchors: { id: string; label: string }[] = [
     { id: "presentation", label: "Présentation" },
     ...(shots.length ? [{ id: "apercus", label: `Aperçus (${shots.length})` }] : []),
-    ...(milestones.length ? [{ id: "parcours", label: "Parcours historique" }] : []),
+    ...(milestones.length || pPubs.length ? [{ id: "parcours", label: "Histoire & évolution" }] : []),
     ...(hVersions.length ? [{ id: "versions", label: `Versions (${hVersions.length})` }] : []),
     ...(downloads.length ? [{ id: "telechargements", label: "Téléchargements" }] : []),
     ...(productFaqs.length ? [{ id: "faq", label: "FAQ" }] : []),
@@ -669,6 +718,12 @@ publicRoutes.get("/produits/:slug", async (c) => {
       <button type="button" data-tl-filter="production">${icon("rocket", "i--inline")} Production & évolutions</button>
     </div>
     <ol class="htimeline reveal" data-tl>${milestones.map(milestoneHTML).join("")}</ol>
+  </section>` : ""}
+
+  ${pPubs.length ? `<section class="container" id="publications">
+    <header class="sec-head sec-head--left reveal"><p class="eyebrow">Annonces & publications</p><h2>Les publications qui ont raconté l'évolution de ${esc(String(p.name))}</h2></header>
+    <p class="muted hist-note reveal">${icon("info", "i--inline")} Chaque publication est reliée à son événement et, le cas échéant, à sa version. Une annonce n'est jamais confondue avec la date de livraison&nbsp;; les publications reconstituées sont identifiées comme telles.</p>
+    <div class="pub-list reveal">${pPubs.map(pubHTML).join("")}</div>
   </section>` : ""}
 
   ${hVersions.length ? `<section class="container" id="versions">

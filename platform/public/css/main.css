@@ -860,3 +860,20 @@ html:not(.js) .reveal{opacity:1;transform:none} /* sans JS (robots, chargement l
   .hist-grid{grid-template-columns:1fr}
   .hist-sources__list li{flex-direction:column;gap:4px}
 }
+
+/* ---------- Publications du parcours (patrimoine v2) ---------- */
+.pub-list{display:grid;gap:14px;margin:18px 0 8px}
+.pub-card{background:var(--card,#fff);border:1px solid var(--line,#e5e7eb);border-radius:14px;padding:16px 18px}
+.pub-card__head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.pub-card__prov{font-size:.8rem;font-weight:700;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px;color:var(--accent,#0f766e)}
+.pub--reconstruite .pub-card__prov{color:#92400e}
+.pub--nouvelle .pub-card__prov{color:#4338ca}
+.pub-card__date{font-size:.85rem;color:var(--muted,#6b7280);display:inline-flex;align-items:center;gap:5px}
+.pub-card h3{margin:2px 0 8px;font-size:1.05rem}
+.pub-card h3 a{color:inherit;text-decoration:none}
+.pub-card h3 a:hover{color:var(--accent,#0f766e)}
+.pub-card__detail{margin:6px 0 10px}
+.pub-card__detail p{margin:.35rem 0}
+.pub-card__more summary{cursor:pointer;font-size:.9rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;color:var(--accent,#0f766e)}
+.pub-card__more[open] summary{margin-bottom:8px}
+@media (max-width:760px){.pub-card{padding:14px}}

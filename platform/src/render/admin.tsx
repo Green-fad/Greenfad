@@ -16,6 +16,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
       { label: "Produits technologiques", url: "/admin/products", icon: "package" },
       { label: "Jalons & chronologies", url: "/admin/jalons", icon: "route" },
       { label: "Versions produits", url: "/admin/versions", icon: "git-branch" },
+      { label: "Publications du parcours", url: "/admin/publications", icon: "newspaper" },
       { label: "Sources & traçabilité", url: "/admin/sources", icon: "shield" },
       { label: "Services & Expertises", url: "/admin/services", icon: "briefcase" },
       { label: "Projets & Réalisations", url: "/admin/projects", icon: "award" },
