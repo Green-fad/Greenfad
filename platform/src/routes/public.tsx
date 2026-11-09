@@ -5,7 +5,7 @@ import { Hono, Context } from "hono";
 import { Env } from "../types";
 import { q, q1, count, getSetting } from "../db";
 import { layout, loadSiteData, PageSEO, crumbsHTML, Crumb } from "../render/layout";
-import { renderBlocks, renderBlock, Block, parseVideo } from "../blocks";
+import { renderBlocks, renderBlock, Block, parseVideo, countriesCardsHTML } from "../blocks";
 import { md, esc, fmtDate, excerptFromMd, stripFirstH1, parseJSON } from "../utils";
 import { icon } from "../icons";
 import { audit } from "../audit";
@@ -752,13 +752,7 @@ publicRoutes.get("/implantation", async (c) => {
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Implantation" }])}<p class="eyebrow">Présence internationale</p>
     <h1>${heroTitleHTML(hero)}</h1>
     ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
-  <section class="container"><div class="countries reveal">${countries
-    .map((co) => `<a class="country" href="/implantation/${esc(String(co.slug))}">
-      <span class="country__code${Number(co.is_registered) ? "" : " country__code--teal"}">${esc(String(co.iso2 || "AF"))}</span>
-      <h3>${esc(String(co.name))}</h3>
-      <p>${co.offices ? `${co.offices} bureau${Number(co.offices) > 1 ? "x" : ""} · ` : ""}${esc(String(co.presentation_md || "").replace(/[#*>`]/g, "").slice(0, 110))}</p>
-      <span class="country__arrow">${icon("arrow-right")}</span></a>`)
-    .join("")}</div></section>`;
+  <section class="container"><div class="countries countries--modern reveal" data-stagger>${countriesCardsHTML(countries)}</div></section>`;
   const seo = await seoOf(c, site, "/implantation", "Implantation & présence internationale");
   return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/implantation" }), body));
 });

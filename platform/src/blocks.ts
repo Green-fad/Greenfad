@@ -109,7 +109,13 @@ export const blockSchemas = {
   partners: z.object({
     limit: z.number().int().min(1).max(24).default(12),
   }),
-  countries_map: z.object({}),
+  countries_map: z.object({
+    eyebrow: z.string().max(80).optional().or(z.literal("")),
+    title: z.string().max(160).optional().or(z.literal("")),
+    text: z.string().max(400).optional().or(z.literal("")),
+    cta_label: z.string().max(80).optional().or(z.literal("")),
+    cta_url: z.string().max(200).optional().or(z.literal("")),
+  }),
   timeline: z.object({
     title: z.string().max(200).optional().or(z.literal("")),
     items: z.array(z.object({ year: z.string().max(20), title: z.string().max(200), text: z.string().max(600).optional().or(z.literal("")) })).max(20),
@@ -363,7 +369,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
           const thumb = v.provider === "youtube" ? v.thumb : "";
           return `<a class="video-card" href="/galerie/video/${r.id}">
             <span class="video-card__thumb">${thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : ""}<span class="video-card__play"><span>${icon("play")}</span></span></span>
-            <span class="video-card__body"><h3>${esc(String(r.title || ""))}</h3>${r.description ? `<p>${esc(String(r.description).slice(0, 120))}</p>` : ""}</span></a>`;
+            <span class="video-card__body"><h3>${esc(String(r.title || ""))}</h3>${r.description ? `<p>${esc(String(r.description).slice(0, 120))}${String(r.description).length > 120 ? "…" : ""}</p>` : ""}</span></a>`;
         })
         .join("")}</div></div>`;
     }
@@ -496,11 +502,15 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
         .join("")}</div></section>`;
     }
     case "countries_map": {
-      const rows = await q(ctx.env.DB, "SELECT c.slug, c.name, c.iso2, c.is_registered, COUNT(o.id) AS offices FROM countries c LEFT JOIN offices o ON o.country_id = c.id AND o.status='publie' WHERE c.status='publie' GROUP BY c.id ORDER BY c.sort_order");
+      const rows = await q(ctx.env.DB, "SELECT c.slug, c.name, c.iso2, c.is_registered, c.presentation_md, COUNT(o.id) AS offices FROM countries c LEFT JOIN offices o ON o.country_id = c.id AND o.status='publie' WHERE c.status='publie' GROUP BY c.id ORDER BY c.sort_order");
       if (!rows.length) return "";
-      return `<section class="container"><div class="countries reveal" data-stagger>${rows
-        .map((r) => `<a class="country" href="/implantation/${esc(r.slug)}"><span class="country__code${Number(r.is_registered) ? "" : " country__code--teal"}">${esc(String(r.iso2 || "AF"))}</span><h3>${esc(r.name)}</h3><p class="muted">${r.offices ? `${r.offices} bureau${Number(r.offices) > 1 ? "x" : ""}` : "Présence &amp; partenariats"}</p><span class="country__arrow">${icon("arrow-right")}</span></a>`)
-        .join("")}</div></section>`;
+      const head = p.eyebrow || p.title || p.text
+        ? `<header class="sec-head sec-head--center reveal"><p class="eyebrow">${esc(String(p.eyebrow || "Implantation internationale"))}</p><h2>${esc(String(p.title || "Enracinés en Afrique, tournés vers le monde"))}</h2>${p.text ? `<p class="sec-head__text">${esc(String(p.text))}</p>` : ""}</header>`
+        : "";
+      const cta = p.cta_label && p.cta_url
+        ? `<p class="center" style="margin-top:2rem"><a class="btn btn--outline" href="${esc(String(p.cta_url))}">${esc(String(p.cta_label))} ${icon("arrow-right")}</a></p>`
+        : "";
+      return `<section class="container">${head}<div class="countries countries--modern reveal" data-stagger>${countriesCardsHTML(rows)}</div>${cta}</section>`;
     }
     case "timeline": {
       const items = (p.items as { year: string; title: string; text?: string }[]) || [];
@@ -533,4 +543,22 @@ export async function renderBlocks(blocks: Block[], env: Env): Promise<string> {
   const out: string[] = [];
   for (const b of blocks) out.push(await renderBlock(b, { env }));
   return out.join("\n");
+}
+
+// Cartes pays modernes (accueil + page Implantation) — données 100 % D1 (countries, offices)
+export function countriesCardsHTML(rows: Record<string, unknown>[]): string {
+  return rows
+    .map((r) => {
+      const registered = Number(r.is_registered);
+      const offices = Number(r.offices || 0);
+      const snippet = String(r.presentation_md || "").replace(/[#*>`]/g, "").replace(/\s+/g, " ").trim().slice(0, 110);
+      return `<a class="country" href="/implantation/${esc(String(r.slug))}" aria-label="${esc(String(r.name))} — voir la page d'implantation">
+      <span class="country__top"><span class="country__code${registered ? "" : " country__code--teal"}">${esc(String(r.iso2 || "AF"))}</span>
+      <span class="country__badge ${registered ? "country__badge--registered" : "country__badge--partner"}">${registered ? "Immatriculée" : "Partenariat"}</span></span>
+      <h3>${esc(String(r.name))}</h3>
+      <span class="country__meta"><span class="country__dot" aria-hidden="true"></span>${offices ? `${offices} bureau${offices > 1 ? "x" : ""}` : "Présence &amp; partenariats"}</span>
+      ${snippet ? `<p>${esc(snippet)}${String(r.presentation_md || "").length > 110 ? "…" : ""}</p>` : ""}
+      <span class="country__go">Découvrir ${icon("arrow-right")}</span></a>`;
+    })
+    .join("");
 }

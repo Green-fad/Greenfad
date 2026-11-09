@@ -103,7 +103,7 @@
     var field = input.closest("[data-media-field]");
     var thumb = field && field.querySelector("[data-media-thumb]");
     if (thumb) {
-      if (key && isImg !== false) { thumb.src = "/media/" + key; thumb.classList.remove("is-empty"); }
+      if (key && isImg !== false) { thumb.src = key.indexOf("/") === 0 ? key : "/media/" + key; thumb.classList.remove("is-empty"); }
       else { thumb.removeAttribute("src"); thumb.classList.add("is-empty"); }
     }
   }

@@ -240,6 +240,21 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     return c.redirect(c.req.header("referer") || "/admin/media");
   });
 
+  // Sélecteur de média réutilisable (téléversement + bibliothèque) — même markup que les formulaires CRUD
+  function mediaPicker(name: string, label: string, value: unknown, help = ""): string {
+    const v = value == null ? "" : String(value);
+    const src = v ? (v.startsWith("/") ? v : "/media/" + v) : "";
+    return `<div class="adm-field adm-field--media" data-media-field>
+      <span>${esc(label)}</span>
+      <div class="media-pick"><img src="${esc(src)}" alt="" class="media-pick__thumb ${v ? "" : "is-empty"}" data-media-thumb>
+      <div class="media-pick__main"><input name="${esc(name)}" value="${esc(v)}" placeholder="Téléversez une image depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>
+      <div class="media-pick__btns">
+      <button type="button" class="btn btn--sm btn--primary" data-media-upload>${icon("upload")} Téléverser</button>
+      <button type="button" class="btn btn--sm" data-media-open>Choisir</button>
+      <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
+      </div></div></div>${help ? `<small>${esc(help)}</small>` : ""}</div>`;
+  }
+
   // ---------- MEDIA CENTER : albums & galeries publiques ----------
   const ALBUM_CATEGORIES = [
     { value: "general", label: "Galerie générale" },
@@ -325,17 +340,21 @@ export function adminCore(): Hono<{ Bindings: Env }> {
       <section class="adm-panel" style="margin-top:22px"><h3>Visuels de l'album (${items.length})</h3>
       ${canEdit ? `<form method="post" action="/admin/media/albums/${a.id}/items" class="adm-form adm-form--inline">
         <input type="hidden" name="_csrf" value="${user.csrf}">
-        <label class="adm-field"><span>Image de la bibliothèque (clé R2)</span><input name="r2_key" placeholder="media/2025/01/…jpg" required></label>
-        <label class="adm-field"><span>Titre public</span><input name="title" maxlength="160" required></label>
+        ${mediaPicker("r2_key", "Image à ajouter", "", "Téléversez depuis votre appareil ou choisissez une image déjà présente dans la bibliothèque.")}
+        <label class="adm-field"><span>Titre public *</span><input name="title" maxlength="160" required></label>
         <label class="adm-field"><span>Crédit photo</span><input name="credit" maxlength="160"></label>
         <label class="adm-field"><span>Texte alternatif</span><input name="alt" maxlength="300"></label>
-        <button class="btn btn--primary" type="submit">${icon("plus")} Ajouter au album</button>
+        <label class="adm-field"><span>Position</span><input type="number" name="sort_order" value="${items.length}" min="0"></label>
+        <button class="btn btn--primary" type="submit">${icon("plus")} Ajouter à l'album</button>
       </form>` : ""}
       ${items.length ? `<table class="adm-table"><thead><tr><th>Aperçu</th><th>Titre</th><th>Type</th><th>Statut</th><th></th></tr></thead><tbody>${items
-        .map((it) => `<tr><td>${it.r2_key ? `<img src="/media/${esc(String(it.r2_key))}" style="height:44px;border-radius:6px" alt="">` : `<span class="pill">${icon("video")}</span>`}</td>
-        <td><strong>${esc(String(it.title))}</strong>${it.credit ? `<br><span class="muted">crédit : ${esc(String(it.credit))}</span>` : ""}</td><td>${esc(String(it.type))}</td>
+        .map((it) => `<tr><td>${it.r2_key ? `<img src="${esc(String(it.r2_key).startsWith("/") ? String(it.r2_key) : "/media/" + String(it.r2_key))}" style="height:44px;border-radius:6px" alt="">` : `<span class="pill">${icon("video")}</span>`}</td>
+        <td><strong>${esc(String(it.title))}</strong>${it.credit ? `<br><span class="muted">crédit : ${esc(String(it.credit))}</span>` : ""}<br><span class="muted">position : ${esc(String(it.sort_order ?? 0))}</span></td><td>${esc(String(it.type))}</td>
         <td><span class="pill ${it.status === "publie" ? "ok" : ""}">${esc(String(it.status))}</span></td>
         <td class="adm-actions">
+          ${canEdit ? `<a class="btn btn--sm" href="/admin/media/albums/${a.id}/items/${it.id}">${icon("edit")} Modifier</a>` : ""}
+          ${canEdit ? `<form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/move" class="inline"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="dir" value="up"><button class="btn btn--sm" title="Remonter" aria-label="Remonter">${icon("arrow-up")}</button></form>
+          <form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/move" class="inline"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="dir" value="down"><button class="btn btn--sm" title="Descendre" aria-label="Descendre">${icon("arrow-down")}</button></form>` : ""}
           ${canEdit ? `<form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/status" class="inline"><input type="hidden" name="_csrf" value="${user.csrf}"><input type="hidden" name="status" value="${it.status === "publie" ? "depublie" : "publie"}"><button class="btn btn--sm">${it.status === "publie" ? "Dépublier" : "Publier"}</button></form>` : ""}
           ${can(user.role, "media", "delete") ? `<form method="post" action="/admin/media/albums/${a.id}/items/${it.id}/delete" data-confirm="Retirer ce visuel de l'album ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Retirer</button></form>` : ""}
         </td></tr>`).join("")}</tbody></table>` : `<p class="muted">Aucun visuel dans cet album.</p>`}
@@ -363,11 +382,85 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     if (d) return d;
     const form = await c.req.parseBody();
     if (typeof form === "string") return c.redirect("/admin/media/albums");
-    const media = await q1<{ id: number }>(c.env.DB, "SELECT id FROM media WHERE r2_key = ?", String(form.r2_key || "").trim());
-    await c.env.DB.prepare("INSERT INTO media_items (type, media_id, title, alt, credit, album_id, status, uploaded_by, created_at, updated_at) VALUES ('image',?1,?2,?3,?4,?5,'publie',?6,datetime('now'),datetime('now'))")
-      .bind(media?.id ?? null, String(form.title || "").slice(0, 160), String(form.alt || "").slice(0, 300), String(form.credit || "").slice(0, 160), c.req.param("id"), user.email)
+    const r2Key = String(form.r2_key || "").trim();
+    if (!r2Key) return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+    const media = await q1<{ id: number }>(c.env.DB, "SELECT id FROM media WHERE r2_key = ?", r2Key);
+    await c.env.DB.prepare("INSERT INTO media_items (type, media_id, title, alt, credit, album_id, sort_order, status, uploaded_by, created_at, updated_at) VALUES ('image',?1,?2,?3,?4,?5,?6,'publie',?7,datetime('now'),datetime('now'))")
+      .bind(media?.id ?? null, String(form.title || "").slice(0, 160), String(form.alt || "").slice(0, 300), String(form.credit || "").slice(0, 160), c.req.param("id"), Math.max(0, Number(form.sort_order) || 0), user.email)
       .run();
     await audit(c, "ajout_visuel_album", "media_items", null, { album: c.req.param("id") });
+    return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+  });
+
+  // Édition complète d'un visuel d'album : remplacer l'image, titre, crédit, alt, position, statut
+  r.get("/media/albums/:id/items/:itemId", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const a = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media_albums WHERE id = ?", c.req.param("id"));
+    const it = await q1<Record<string, unknown>>(c.env.DB, "SELECT mi.*, m.r2_key FROM media_items mi LEFT JOIN media m ON m.id = mi.media_id WHERE mi.id = ? AND mi.album_id = ?", c.req.param("itemId"), c.req.param("id"));
+    if (!a || !it) return c.notFound();
+    const val = (k: string) => esc(String(it[k] ?? ""));
+    const body = `<div class="adm-toolbar"><a class="btn btn--sm" href="/admin/media/albums/${esc(c.req.param("id"))}">${icon("arrow-left")} Retour à l'album</a></div>
+    <section class="adm-panel"><h3>Modifier le visuel — ${esc(String(a.name))}</h3>
+    <form method="post" action="/admin/media/albums/${esc(c.req.param("id"))}/items/${esc(c.req.param("itemId"))}" class="adm-form">
+      <input type="hidden" name="_csrf" value="${user.csrf}">
+      ${mediaPicker("r2_key", "Image (remplacer si besoin)", String(it.r2_key ?? ""))}
+      <label class="adm-field"><span>Titre public *</span><input name="title" value="${val("title")}" required maxlength="160"></label>
+      <label class="adm-field"><span>Crédit photo</span><input name="credit" value="${val("credit")}" maxlength="160"></label>
+      <label class="adm-field"><span>Texte alternatif</span><input name="alt" value="${val("alt")}" maxlength="300"></label>
+      <label class="adm-field"><span>Position (ordre d'affichage)</span><input type="number" name="sort_order" value="${val("sort_order") || "0"}" min="0"></label>
+      <label class="adm-field"><span>Statut</span><select name="status">${["publie", "depublie", "brouillon"].map((s) => `<option ${String(it.status) === s ? "selected" : ""}>${s}</option>`).join("")}</select></label>
+      <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/media/albums/${esc(c.req.param("id"))}">Annuler</a></div>
+    </form></section>`;
+    return c.html(adminLayout(c, user, `Visuel : ${String(it.title)}`, body, "/admin/media/albums"));
+  });
+
+  r.post("/media/albums/:id/items/:itemId", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/media/albums");
+    const r2Key = String(form.r2_key || "").trim();
+    let mediaId: number | null = null;
+    if (r2Key) {
+      const media = await q1<{ id: number }>(c.env.DB, "SELECT id FROM media WHERE r2_key = ?", r2Key);
+      mediaId = media?.id ?? null;
+    }
+    const status = ["publie", "depublie", "brouillon"].includes(String(form.status)) ? String(form.status) : "publie";
+    await c.env.DB.prepare(`UPDATE media_items SET
+      ${mediaId !== null ? "media_id = ?1," : ""}
+      title = ?2, alt = ?3, credit = ?4, sort_order = ?5, status = ?6,
+      published_at = CASE WHEN ?6='publie' AND published_at IS NULL THEN datetime('now') ELSE published_at END,
+      updated_at = datetime('now')
+      WHERE id = ?7 AND album_id = ?8`)
+      .bind(...(mediaId !== null ? [mediaId] : []), String(form.title || "").slice(0, 160), String(form.alt || "").slice(0, 300), String(form.credit || "").slice(0, 160), Math.max(0, Number(form.sort_order) || 0), status, c.req.param("itemId"), c.req.param("id"))
+      .run();
+    await audit(c, "modification_visuel_album", "media_items", c.req.param("itemId"));
+    return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+  });
+
+  // Réordonnancement : échange la position avec le voisin (monter / descendre)
+  r.post("/media/albums/:id/items/:itemId/move", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    const dir = typeof form !== "string" && form.dir === "down" ? "down" : "up";
+    const it = await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM media_items WHERE id = ? AND album_id = ?", c.req.param("itemId"), c.req.param("id"));
+    if (!it) return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
+    const target = dir === "up"
+      ? await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM media_items WHERE album_id = ? AND sort_order < ? ORDER BY sort_order DESC LIMIT 1", c.req.param("id"), it.sort_order)
+      : await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM media_items WHERE album_id = ? AND sort_order > ? ORDER BY sort_order ASC LIMIT 1", c.req.param("id"), it.sort_order);
+    if (target) {
+      const stmts = [
+        c.env.DB.prepare("UPDATE media_items SET sort_order = ? WHERE id = ?").bind(target.sort_order, it.id),
+        c.env.DB.prepare("UPDATE media_items SET sort_order = ? WHERE id = ?").bind(it.sort_order, target.id),
+      ];
+      await c.env.DB.batch(stmts);
+      await audit(c, "reordonnancement_visuel_album", "media_items", it.id, { dir });
+    }
     return c.redirect(`/admin/media/albums/${c.req.param("id")}`);
   });
 
