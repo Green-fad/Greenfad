@@ -152,3 +152,9 @@ export function fmtBytes(n: number | null | undefined): string {
   }
   return `${v.toFixed(i ? 1 : 0)} ${units[i]}`;
 }
+
+/** Clé média → URL publique : les clés « /assets/… » sont servies en statique, les autres via R2 (/media/…) */
+export function mediaSrc(key: string | null | undefined): string {
+  if (!key) return "";
+  return key.startsWith("/") ? key : `/media/${key}`;
+}

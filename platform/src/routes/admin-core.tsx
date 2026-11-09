@@ -7,7 +7,7 @@ import { hashPassword, verifyPassword, createSession, destroySession, rateLimit,
 import { can } from "../rbac";
 import { audit } from "../audit";
 import { saveToR2, deleteMedia, isAllowedMime } from "../media";
-import { esc, fmtDate, fmtBytes, parseJSON, slugify } from "../utils";
+import { esc, fmtDate, fmtBytes, parseJSON, slugify, mediaSrc } from "../utils";
 import { icon } from "../icons";
 
 export function adminCore(): Hono<{ Bindings: Env }> {
@@ -156,14 +156,14 @@ export function adminCore(): Hono<{ Bindings: Env }> {
 
     const itemHtml = (m: Record<string, unknown>) => {
       const isImg = /image/.test(String(m.mime || ""));
-      const preview = isImg ? `<img src="/media/${esc(m.r2_key)}" alt="${esc(String(m.alt || m.filename))}" loading="lazy">` : `<div class="media-item__doc">${icon("file-text")}</div>`;
+      const preview = isImg ? `<img src="${mediaSrc(String(m.r2_key))}" alt="${esc(String(m.alt || m.filename))}" loading="lazy">` : `<div class="media-item__doc">${icon("file-text")}</div>`;
       const delForm = canDel
         ? `<form method="post" action="/admin/media/${m.id}/delete" data-confirm="Supprimer ce média de R2 et de la base ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">${icon("trash")} Suppr.</button></form>`
         : "";
       return `<div class="media-item">${preview}
         <div class="media-item__meta"><strong title="${esc(String(m.filename))}">${esc(String(m.filename).slice(0, 30))}</strong><span class="muted">${fmtBytes(Number(m.size))}</span>
         <span class="muted">${esc(String(m.r2_key))}</span></div>
-        <div class="media-item__actions"><a class="btn btn--sm" href="/admin/media/${m.id}/edit">${icon("edit")} Métadonnées</a><button class="btn btn--sm" data-copy="/media/${esc(String(m.r2_key))}">${icon("link")} URL</button>${delForm}</div></div>`;
+        <div class="media-item__actions"><a class="btn btn--sm" href="/admin/media/${m.id}/edit">${icon("edit")} Métadonnées</a><button class="btn btn--sm" data-copy="${esc(mediaSrc(String(m.r2_key)))}">${icon("link")} URL</button>${delForm}</div></div>`;
     };
 
     const uploadBar = canUp
@@ -187,7 +187,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const m = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media WHERE id = ?", c.req.param("id"));
     if (!m) return c.notFound();
     const body = `<div class="adm-panel">
-      ${/image/.test(String(m.mime)) ? `<img src="/media/${esc(String(m.r2_key))}" alt="" style="max-height:300px;border-radius:10px">` : ""}
+      ${/image/.test(String(m.mime)) ? `<img src="${mediaSrc(String(m.r2_key))}" alt="" style="max-height:300px;border-radius:10px">` : ""}
       <form method="post" action="/admin/media/${m.id}/edit" class="adm-form" style="margin-top:16px">
         <input type="hidden" name="_csrf" value="${user.csrf}">
         <label class="adm-field"><span>Nom de fichier</span><input value="${esc(String(m.filename))}" disabled></label>

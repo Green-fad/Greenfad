@@ -315,3 +315,15 @@ code{background:var(--teal-soft);padding:2px 7px;border-radius:6px;font-size:.82
   body.adm{background:#fff}
   .adm-content{padding:0;max-width:none}
 }
+
+/* v15 — éditeur de captures produit (mobile & desktop) */
+.shot-editor{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.shot-row{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;display:flex;flex-direction:column;gap:8px;opacity:.62;transition:opacity .15s,border-color .15s,box-shadow .15s}
+.shot-row.is-on{opacity:1;border-color:rgba(70,146,155,.55);box-shadow:0 0 0 1px rgba(70,146,155,.35)}
+.shot-row__pick{display:flex;gap:8px;align-items:center;cursor:pointer}
+.shot-row__pick input{width:16px;height:16px;flex:none;accent-color:#46929B}
+.shot-row__pick img{width:54px;height:54px;object-fit:cover;border-radius:8px;background:var(--paper-dim);flex:none}
+.shot-row__pick span{font-size:.78rem;color:var(--muted);word-break:break-all}
+.shot-row__cfg{display:flex;gap:8px}
+.shot-row__cfg select{flex:none;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:.8rem;background:#fff}
+.shot-row__cfg input{flex:1;min-width:0;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:.8rem}

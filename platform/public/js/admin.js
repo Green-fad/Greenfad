@@ -191,7 +191,7 @@
       var isImg = m.mime && m.mime.indexOf("image/") === 0;
       return '<div class="media-modal__wrap">' +
         '<button type="button" class="media-modal__item" data-key="' + m.r2_key + '" data-img="' + (isImg ? 1 : 0) + '">' +
-        (isImg ? '<img src="/media/' + m.r2_key + '" alt="" loading="lazy">' : '<div class="media-modal__item is-doc"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h5"/></svg></div>') +
+        (isImg ? '<img src="' + (m.r2_key.indexOf("/") === 0 ? m.r2_key : "/media/" + m.r2_key) + '" alt="" loading="lazy">' : '<div class="media-modal__item is-doc"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h5"/></svg></div>') +
         "<span>" + m.filename.replace(/</g, "&lt;").slice(0, 26) + "</span></button>" +
         '<button type="button" class="media-modal__del" data-del-key="' + m.r2_key + '" title="Supprimer ce média de R2">' +
         '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>' +

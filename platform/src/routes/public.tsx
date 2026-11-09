@@ -6,7 +6,7 @@ import { Env } from "../types";
 import { q, q1, count, getSetting } from "../db";
 import { layout, loadSiteData, PageSEO, crumbsHTML, Crumb } from "../render/layout";
 import { renderBlocks, renderBlock, Block, parseVideo, countriesCardsHTML } from "../blocks";
-import { md, esc, fmtDate, excerptFromMd, stripFirstH1, parseJSON } from "../utils";
+import { md, esc, fmtDate, excerptFromMd, stripFirstH1, parseJSON, mediaSrc } from "../utils";
 import { icon } from "../icons";
 import { audit } from "../audit";
 
@@ -94,10 +94,6 @@ async function getPageSEO(c: Context<{ Bindings: Env }>, seo: PageSEO): Promise<
   };
 }
 
-function mediaSrc(key: string | null | undefined): string {
-  if (!key) return "";
-  return key.startsWith("/") ? key : `/media/${key}`;
-}
 
 function cardHTML(item: { url: string; title: string; text?: string; image?: string; tag?: string; icon?: string; iconBadge?: boolean }): string {
   const media = item.image
@@ -334,8 +330,27 @@ publicRoutes.get("/produits", async (c) => {
     .join("")}</div></section>
   ${rows.length ? "" : `<section class="container center muted">Les fiches produits seront publiées prochainement.</section>`}`;
   const seo = await seoOf(c, site, "/produits", "Produits technologiques");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/produits" }), body));
+  const base = String(site.settings.site_url || "");
+  const itemListLd = [{ "@context": "https://schema.org", "@type": "ItemList", name: "Produits technologiques GREEN FAD", itemListElement: rows.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: String(p.name), url: `${base}/produits/${p.slug}` })) }];
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/produits", jsonLd: itemListLd }), body));
 });
+
+// ---------- Fiche produit « style store » : héros, captures, téléchargements ----------
+type Shot = { key: string; type?: string; alt?: string };
+type Download = { platform?: string; url?: string; label?: string };
+
+const DL_PLATFORMS: Record<string, { label: string; icon: string; cls: string; os: string }> = {
+  ios: { label: "App Store", icon: "smartphone", cls: "dl-card--ios", os: "iOS" },
+  android: { label: "Google Play", icon: "play", cls: "dl-card--android", os: "Android" },
+  apk: { label: "Fichier APK", icon: "download", cls: "dl-card--apk", os: "Android" },
+  web: { label: "Application web", icon: "globe", cls: "dl-card--web", os: "Web" },
+  windows: { label: "Microsoft Store", icon: "monitor", cls: "dl-card--win", os: "Windows" },
+  mac: { label: "Mac App Store", icon: "monitor", cls: "dl-card--mac", os: "macOS" },
+};
+function dlMeta(platform?: string): { label: string; icon: string; cls: string; os: string } {
+  const key = String(platform || "").toLowerCase().trim();
+  return DL_PLATFORMS[key] || { label: platform || "Lien officiel", icon: "external-link", cls: "", os: key };
+}
 
 publicRoutes.get("/produits/:slug", async (c) => {
   const p = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM products WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
@@ -343,58 +358,121 @@ publicRoutes.get("/produits/:slug", async (c) => {
   const site = await loadSiteData(c);
   const db = c.env.DB;
 
-  // Médias liés (réutilisation sans duplication) + vidéos + FAQ + articles liés
-  const [gallery, videos, productFaqs, relatedPosts] = await Promise.all([
+  // Médias liés (réutilisation sans duplication) + vidéos + FAQ + articles liés + autres produits
+  const [gallery, videos, productFaqs, relatedPosts, otherProducts] = await Promise.all([
     q(db, "SELECT mi.title, mi.caption, m.r2_key FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='image' AND mi.status='publie' JOIN media m ON m.id = mi.media_id WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT mi.id, mi.title, mi.description, mi.source_url FROM content_relations cr JOIN media_items mi ON mi.id = cr.media_item_id AND mi.type='video' AND mi.status='publie' WHERE cr.content_type='product' AND cr.content_id = ? ORDER BY cr.sort_order", p.id),
     q(db, "SELECT question, answer FROM faqs WHERE status='publie' AND category = ? ORDER BY sort_order LIMIT 8", `produit:${p.slug}`),
     q(db, "SELECT slug, title, kind, published_at FROM posts WHERE status='publie' AND (related_product_id = ? OR category = ?) ORDER BY published_at DESC LIMIT 4", p.id, String(p.category || "")),
+    q(db, "SELECT slug, name, tagline, image_key, logo_key, state FROM products WHERE status = ? AND id != ? ORDER BY sort_order LIMIT 3", PUBLIE, p.id),
   ]);
 
   const links = parseJSON<{ label: string; url: string }[]>(p.links_json, []);
   const versions = parseJSON<{ version: string; date: string; note: string }[]>(p.versions_json, []);
   const blocks = p.blocks ? parseJSON<Block[]>(String(p.blocks), []) : [];
+  const shots = parseJSON<Shot[]>(p.screenshots_json, []).filter((s) => s && s.key);
+  const downloads = parseJSON<Download[]>(p.downloads_json, []).filter((d) => d && /^https?:\/\//.test(String(d.url || "")));
+  const features = parseJSON<string[]>(p.features, []);
 
   const specCard = (title: string, iconName: string, content: unknown) =>
     content ? `<div class="spec-card"><h3>${icon(iconName)} ${esc(title)}</h3><div class="prose" style="font-size:.95rem">${md(content)}</div></div>` : "";
 
   const demoIntro = overridesOf(site).product_demo_intro || "";
-  const body = `<section class="page-hero" style="padding-bottom:0"><div class="page-hero__inner">
-    ${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }])}
-    <p class="eyebrow">Produit technologique</p>
-    <h1>${esc(String(p.name))}</h1>
-    ${p.tagline ? `<p class="page-hero__text">${esc(String(p.tagline))}</p>` : ""}
-    <div class="pdp__meta" style="margin-top:1.4rem">${p.category ? `<span class="tag">${esc(String(p.category))}</span>` : ""}${statePill(String(p.state || "developpement"))}</div>
-    ${links.length ? `<div class="pdp__links">${links.map((l) => `<a class="btn btn--ghost btn--sm" href="${esc(l.url)}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} ${esc(l.label)}</a>`).join("")}</div>` : ""}
-  </div></section>
-  <section class="container flush" style="padding-top:0">
-    <div class="pdp" style="padding-top:44px">
-      <div class="pdp__info">
-        <h2 style="margin-bottom:1rem">Présentation générale</h2>
-        <div class="prose">${md(stripFirstH1(p.description_md))}</div>
-        <div class="pdp__cta">
-          <a class="btn btn--primary" href="#demo">${icon("rocket", "i--inline")} Demander une démonstration</a>
-          ${p.external_url ? `<a class="btn btn--accent" href="${esc(String(p.external_url))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} Accéder au produit</a>` : ""}
-          <a class="btn btn--outline" href="/contact">${icon("mail", "i--inline")} Partenariat & contact</a>
+  const hasMobile = shots.some((s) => String(s.type) !== "desktop");
+  const hasDesktop = shots.some((s) => String(s.type) === "desktop");
+
+  const dlCard = (d: Download) => {
+    const meta = dlMeta(d.platform);
+    const small = meta.os === "Web" ? "Ouvrir" : "Télécharger sur";
+    return `<a class="dl-card ${meta.cls}" href="${esc(String(d.url))}" target="_blank" rel="noopener">
+      <span class="dl-card__icon">${icon(meta.icon)}</span>
+      <span class="dl-card__meta"><small>${esc(small)}</small><strong>${esc(String(d.label || meta.label))}</strong>${d.label && meta.label !== d.label ? `<small class="dl-card__plat">${esc(meta.label)}</small>` : ""}</span>
+      <span class="dl-card__go">${icon("arrow-right")}</span>
+    </a>`;
+  };
+
+  const shotHTML = (s: Shot, i: number) => {
+    const src = mediaSrc(String(s.key));
+    const isDesktop = String(s.type) === "desktop";
+    const alt = String(s.alt || `${p.name} — capture d'écran ${i + 1}`);
+    return `<figure class="shot ${isDesktop ? "shot--desktop" : "shot--mobile"}" data-type="${isDesktop ? "desktop" : "mobile"}" data-full="${esc(src)}">
+      <div class="shot__frame"><img src="${esc(src)}" alt="${esc(alt)}" loading="${i < 3 ? "eager" : "lazy"}"></div>
+      <figcaption><span class="shot__chip">${isDesktop ? `${icon("monitor")} Desktop` : `${icon("smartphone")} Mobile`}</span><span class="shot__alt">${esc(alt)}</span></figcaption>
+    </figure>`;
+  };
+
+  // Ancres de navigation interne (uniquement les sections réellement présentes)
+  const anchors: { id: string; label: string }[] = [
+    { id: "presentation", label: "Présentation" },
+    ...(shots.length ? [{ id: "apercus", label: `Aperçus (${shots.length})` }] : []),
+    ...(downloads.length ? [{ id: "telechargements", label: "Téléchargements" }] : []),
+    ...(productFaqs.length ? [{ id: "faq", label: "FAQ" }] : []),
+  ];
+
+  const heroActions = [
+    ...downloads.slice(0, 4).map(dlCard),
+    p.external_url ? `<a class="btn btn--ghost store-hero__btn" href="${esc(String(p.external_url))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} Accéder au produit</a>` : "",
+    `<a class="btn btn--accent store-hero__btn" href="#demo">${icon("rocket", "i--inline")} Demander une démo</a>`,
+  ].filter(Boolean).join("");
+
+  const body = `<section class="store-hero"><div class="container store-hero__grid">
+    <div class="store-hero__main">
+      ${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }])}
+      <div class="store-hero__id">
+        ${p.logo_key ? `<img class="store-hero__logo" src="${esc(mediaSrc(String(p.logo_key)))}" alt="Logo ${esc(String(p.name))}">` : ""}
+        <div>
+          <p class="eyebrow store-hero__eyebrow">Produit technologique GREEN FAD</p>
+          <h1>${esc(String(p.name))}</h1>
+          ${p.tagline ? `<p class="store-hero__tagline">${esc(String(p.tagline))}</p>` : ""}
+          <div class="pdp__meta">${p.category ? `<span class="tag">${esc(String(p.category))}</span>` : ""}${statePill(String(p.state || "developpement"))}${versions.length ? `<span class="tag tag--soft">${icon("git-branch", "i--inline")} v${esc(versions[0].version)}</span>` : ""}</div>
         </div>
       </div>
-      <div class="pdp__media">${p.image_key ? `<img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))}">` : ""}</div>
+      ${heroActions ? `<div class="store-hero__actions">${heroActions}</div>` : ""}
+      ${links.length ? `<div class="pdp__links">${links.map((l) => `<a class="btn btn--ghost btn--sm" href="${esc(l.url)}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} ${esc(l.label)}</a>`).join("")}</div>` : ""}
+      ${anchors.length ? `<nav class="store-anchors" aria-label="Sections de la fiche">${anchors.map((a) => `<a href="#${a.id}">${esc(a.label)}</a>`).join("")}</nav>` : ""}
     </div>
-  </section>
-  ${(p.problem_md || p.vision_md || p.origin_md) ? `<section class="container"><div class="spec-grid reveal">
+    ${p.image_key ? `<div class="store-hero__media"><img src="${esc(mediaSrc(String(p.image_key)))}" alt="${esc(String(p.name))} — présentation"></div>` : ""}
+  </div></section>
+
+  <section class="container" id="presentation"><div class="pdp-brief reveal">
+    <div class="pdp-brief__text">
+      <header class="sec-head sec-head--left"><p class="eyebrow">Présentation</p><h2>À propos de ${esc(String(p.name))}</h2></header>
+      <div class="prose">${md(stripFirstH1(p.description_md))}</div>
+      <div class="pdp__cta">
+        <a class="btn btn--primary" href="#demo">${icon("rocket", "i--inline")} Demander une démonstration</a>
+        ${p.external_url ? `<a class="btn btn--outline" href="${esc(String(p.external_url))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} Site du produit</a>` : ""}
+        <a class="btn btn--outline" href="/contact">${icon("mail", "i--inline")} Partenariat & contact</a>
+      </div>
+    </div>
+    ${features.length ? `<aside class="pdp-brief__feat"><h3>${icon("zap")} Fonctionnalités clés</h3><ul class="feat-list">${features.map((f) => `<li>${icon("check-circle")} <span>${esc(f)}</span></li>`).join("")}</ul></aside>` : ""}
+  </div></section>
+
+  ${shots.length ? `<section class="container" id="apercus">
+    <header class="sec-head sec-head--left reveal"><p class="eyebrow">Aperçus</p><h2>Le produit en images</h2></header>
+    ${hasMobile && hasDesktop ? `<div class="shots-tabs reveal" data-shots-tabs role="group" aria-label="Filtrer les captures">
+      <button type="button" class="is-active" data-filter="all">${icon("layers", "i--inline")} Tout voir</button>
+      <button type="button" data-filter="mobile">${icon("smartphone", "i--inline")} Mobile</button>
+      <button type="button" data-filter="desktop">${icon("monitor", "i--inline")} Desktop</button>
+    </div>` : ""}
+    <div class="shots reveal" data-lightbox data-shots>${shots.map(shotHTML).join("")}</div>
+    <p class="muted shots-hint">${icon("info", "i--inline")} Faites défiler horizontalement et cliquez pour agrandir.</p>
+  </section>` : ""}
+
+  ${(p.problem_md || p.vision_md || p.origin_md || p.modules_md) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Conception</p><h2>Pourquoi ${esc(String(p.name))} existe</h2></header>
+    <div class="spec-grid reveal">
     ${specCard("Le problème résolu", "target", p.problem_md)}
     ${specCard("Vision & objectif", "lightbulb", p.vision_md)}
     ${specCard("Origine du produit", "history", p.origin_md)}
+    ${specCard("Modules & services intégrés", "layers", p.modules_md)}
   </div></section>` : ""}
-  ${(p.features && (p.features as string).length > 2 && p.features !== "[]") ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Fonctionnalités</p><h2>Ce que le produit fait pour vous</h2></header>
-    <div class="spec-grid reveal"><div class="spec-card"><h3>${icon("zap")} Fonctionnalités détaillées</h3><ul>${parseJSON<string[]>(p.features, []).map((f) => `<li>${icon("check")} <span>${esc(f)}</span></li>`).join("")}</ul></div>
-    ${p.modules_md ? `<div class="spec-card"><h3>${icon("layers")} Modules & services intégrés</h3><div class="prose" style="font-size:.95rem">${md(p.modules_md)}</div></div>` : ""}</div></section>` : ""}
+
   ${(p.architecture_md || p.ux_md || p.audience || p.sector) ? `<section class="container"><div class="spec-grid reveal">
     ${specCard("Architecture & technologies", "server", p.architecture_md)}
     ${specCard("Expérience utilisateur", "smartphone", p.ux_md)}
     ${specCard("Publics cibles", "users", p.audience)}
     ${specCard("Secteur d'activité", "briefcase", p.sector)}
   </div></section>` : ""}
+
   ${(p.benefits_md || p.differentiators_md) ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Valeur ajoutée</p><h2>Pourquoi choisir ${esc(String(p.name))}</h2></header>
     <div class="spec-grid reveal">
     ${specCard("Bénéfices & valeur ajoutée", "trending-up", p.benefits_md)}
@@ -402,17 +480,25 @@ publicRoutes.get("/produits/:slug", async (c) => {
   </div></section>` : ""}
   ${p.use_cases_md ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Terrain</p><h2>Cas d'usage concrets</h2></header>
     <div class="split"><div class="split__body prose reveal">${md(p.use_cases_md)}</div></div></section>` : ""}
-  ${gallery.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Galerie</p><h2>Le produit en images</h2></header>
+
+  ${downloads.length ? `<section class="container" id="telechargements"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Téléchargements</p><h2>Obtenez ${esc(String(p.name))}</h2></header>
+    <div class="dl-grid reveal">${downloads.map(dlCard).join("")}</div>
+    <p class="muted dl-note">${icon("info", "i--inline")} Les liens de téléchargement officiels sont maintenus par les équipes GREEN FAD — en cas de lien obsolète, <a href="/contact">signalez-le nous</a>.</p>
+  </section>` : ""}
+
+  ${gallery.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Galerie</p><h2>Le produit en situation</h2></header>
     <div class="gallery gallery--3 reveal" data-lightbox>${gallery.map((g) => { const src = mediaSrc(String(g.r2_key)); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(String(g.title || ""))}" loading="lazy">${g.caption ? `<figcaption>${esc(String(g.caption))}</figcaption>` : ""}</figure>`; }).join("")}</div></section>` : ""}
   ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Démonstrations</p><h2>Vidéos du produit</h2></header>
     <div class="video-grid reveal">${videos.map((v) => { const pv = parseVideo(String(v.source_url || "")); return `<div class="video-card"><div class="video-embed"><iframe src="${esc(pv.embed)}" allowfullscreen loading="lazy" title="${esc(String(v.title))}"></iframe></div><div class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description))}</p>` : ""}</div></div>`; }).join("")}</div></section>` : ""}
   ${blocks.length ? (await renderBlocks(blocks, c.env)) : ""}
   ${versions.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Historique</p><h2>Versions & évolutions publiables</h2></header>
     <div class="version-list reveal">${versions.map((v) => `<div class="version-item"><strong>${esc(v.version)}</strong><span><em>${esc(v.date || "")}</em>${esc(v.note || "")}</span></div>`).join("")}</div></section>` : ""}
-  ${productFaqs.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">FAQ</p><h2>Questions fréquentes sur ${esc(String(p.name))}</h2></header>
+  ${productFaqs.length ? `<section class="container" id="faq"><header class="sec-head sec-head--left reveal"><p class="eyebrow">FAQ</p><h2>Questions fréquentes sur ${esc(String(p.name))}</h2></header>
     <div class="faq reveal" style="margin:0">${productFaqs.map((f) => `<details><summary>${esc(String(f.question))}</summary><div class="prose">${md(f.answer)}</div></details>`).join("")}</div></section>` : ""}
   ${relatedPosts.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Actualités liées</p><h2>À lire sur ce produit</h2></header>
     <div class="cards cards--${Math.min(relatedPosts.length, 3)} reveal">${relatedPosts.map((r) => `<article class="card"><div class="card__body"><span class="kind-badge">${icon((KIND_LABELS[String(r.kind)] || KIND_LABELS.article).icon)} ${(KIND_LABELS[String(r.kind)] || KIND_LABELS.article).label}</span><h3><a href="/blog/${esc(String(r.slug))}">${esc(String(r.title))}</a></h3><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+  ${otherProducts.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Écosystème GREEN FAD</p><h2>Autres produits qui pourraient vous servir</h2></header>
+    <div class="cards cards--3 reveal">${otherProducts.map((pr) => `<article class="card">${(pr.logo_key || pr.image_key) ? `<a class="card__media" href="/produits/${esc(String(pr.slug))}"><img src="${esc(mediaSrc(String(pr.logo_key || pr.image_key)))}" alt="${esc(String(pr.name))}" loading="lazy"></a>` : `<a class="card__media card__media--empty" href="/produits/${esc(String(pr.slug))}" aria-hidden="true" tabindex="-1">${icon("package")}</a>`}<div class="card__body"><h3><a href="/produits/${esc(String(pr.slug))}">${esc(String(pr.name))}</a></h3><p>${esc(String(pr.tagline || ""))}</p><span class="card__more">Voir la fiche produit ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
   <section class="container" id="demo"><div class="form-card reveal">
     <h2>Demander une démonstration de ${esc(String(p.name))}</h2>
     ${demoIntro ? `<p class="muted">${esc(demoIntro)}</p>` : ""}
@@ -427,16 +513,24 @@ publicRoutes.get("/produits/:slug", async (c) => {
       <button class="btn btn--primary btn--full" type="submit">${icon("send", "i--inline")} Envoyer la demande</button>
     </form></div></section>`;
 
+  // Données structurées : SoftwareApplication (produits installables) ou Product
+  const osList = [...new Set(downloads.map((d) => dlMeta(d.platform).os).filter(Boolean))];
+  const abs = (k: string) => String(site.settings.site_url || "") + mediaSrc(String(k));
+  const primaryDl = downloads.find((d) => ["android", "apk", "ios"].includes(String(d.platform || "").toLowerCase())) || downloads[0];
   const jsonLd = [{
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": downloads.length ? "SoftwareApplication" : "Product",
     name: String(p.name),
-    description: String(p.tagline || excerptFromMd(p.description_md, 200)),
+    description: String(p.meta_description || p.tagline || excerptFromMd(p.description_md, 200)),
     brand: { "@type": "Brand", name: String(site.settings.site_name || "GREEN FAD") },
     manufacturer: { "@type": "Organization", name: orgName(site), url: String(site.settings.site_url || "") },
-    image: p.image_key ? String(site.settings.site_url || "") + mediaSrc(String(p.image_key)) : undefined,
-    category: p.category ? String(p.category) : undefined,
-    ...(p.external_url ? { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: orgName(site) } } } : {}),
+    ...(p.image_key ? { image: abs(String(p.image_key)) } : {}),
+    ...(shots.length ? { screenshot: shots.slice(0, 10).map((s) => abs(String(s.key))) } : {}),
+    ...(p.category ? { applicationCategory: String(p.category) } : {}),
+    ...(osList.length ? { operatingSystem: osList.join(", ") } : {}),
+    ...(versions[0]?.version ? { softwareVersion: String(versions[0].version) } : {}),
+    ...(p.external_url ? { url: String(p.external_url), ...(downloads.length ? {} : { offers: { "@type": "Offer", url: String(p.external_url), availability: "https://schema.org/InStock", seller: { "@type": "Organization", name: orgName(site) } } }) } : {}),
+    ...(downloads.length && primaryDl ? { downloadUrl: String(primaryDl.url) } : {}),
   }];
   return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || `${p.name} — Produit technologique`), description: String(p.meta_description || p.tagline || excerptFromMd(p.description_md, 160)), ogImage: String(p.og_image || mediaSrc(String(p.image_key))), canonicalPath: `/produits/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Produits", url: "/produits" }, { label: String(p.name) }] }), body));
 });
@@ -733,7 +827,7 @@ publicRoutes.get("/blog/:slug", async (c) => {
     mainEntityOfPage: articleUrl,
     inLanguage: "fr",
   }];
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || p.title), description: String(p.meta_description || p.excerpt || ""), ogImage: String(p.og_image || mediaSrc(String(p.cover_key))), canonicalPath: `/blog/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: String(p.title) }] }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(p.meta_title || p.title), description: String(p.meta_description || p.excerpt || ""), ogImage: String(p.og_image || mediaSrc(String(p.cover_key))), ogType: "article", canonicalPath: `/blog/${p.slug}`, jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Blog", url: "/blog" }, { label: String(p.title) }] }), body));
 });
 
 // ---------- Anciennes URL Innovation → Blog (301) ----------

@@ -129,6 +129,19 @@
     });
   }
 
+  // Onglets captures produit (Tout / Mobile / Desktop) — délégation, sans jQuery
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-shots-tabs] button[data-filter]");
+    if (!b) return;
+    var wrap = b.closest("[data-shots-tabs]");
+    wrap.querySelectorAll("button").forEach(function (x) { x.classList.toggle("is-active", x === b); });
+    var f = b.getAttribute("data-filter");
+    document.querySelectorAll("[data-shots]").forEach(function (s) {
+      s.classList.toggle("shots--mobile-only", f === "mobile");
+      s.classList.toggle("shots--desktop-only", f === "desktop");
+    });
+  });
+
   // Copier un lien (boutons de partage d'article)
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-copy]");

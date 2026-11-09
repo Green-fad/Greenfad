@@ -52,6 +52,8 @@ export type PageSEO = {
   title: string;
   description?: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: string;
   canonicalPath?: string;
   noindex?: boolean;
   jsonLd?: Record<string, unknown>[];
@@ -125,13 +127,15 @@ ${seo.description ? `<meta name="description" content="${esc(seo.description)}">
 ${seo.noindex ? `<meta name="robots" content="noindex,nofollow">` : `<meta name="robots" content="index,follow">`}
 <link rel="canonical" href="${esc(canonical)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta property="og:type" content="website">
+<meta property="og:type" content="${esc(seo.ogType || "website")}">
 <meta property="og:site_name" content="${esc(siteName)}">
+<meta property="og:locale" content="fr_FR">
 <meta property="og:title" content="${esc(seo.title)}">
 ${seo.description ? `<meta property="og:description" content="${esc(seo.description)}">` : ""}
 <meta property="og:url" content="${esc(canonical)}">
 ${ogImg ? `<meta property="og:image" content="${esc(ogImg.startsWith("http") ? ogImg : siteUrl + ogImg)}">` : ""}
-<meta name="twitter:card" content="summary_large_image">
+${ogImg ? `<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(seo.title)}">${seo.description ? `<meta name="twitter:description" content="${esc(seo.description)}">` : ""}<meta name="twitter:image" content="${esc(ogImg.startsWith("http") ? ogImg : siteUrl + ogImg)}">` : `<meta name="twitter:card" content="summary">`}
+${ogImg ? `<meta property="og:image:alt" content="${esc(seo.ogImageAlt || seo.title)}">` : ""}
 ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

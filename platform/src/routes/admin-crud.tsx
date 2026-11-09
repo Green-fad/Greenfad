@@ -5,14 +5,14 @@ import { Hono, Context } from "hono";
 import { Env, ContentStatus, CONTENT_STATUSES } from "../types";
 import { q, q1, count } from "../db";
 import { adminLayout } from "../render/admin";
-import { esc, slugify, md, parseJSON, fmtDate, fmtBytes } from "../utils";
+import { esc, slugify, md, parseJSON, fmtDate, fmtBytes, mediaSrc } from "../utils";
 import { audit } from "../audit";
 import { can } from "../rbac";
 import { saveToR2 } from "../media";
 import { icon } from "../icons";
 import { validateBlocks, normalizeBlocksInput } from "../blocks";
 
-type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "list" | "kvlist" | "readonly" | "url" | "media_multi";
+type FieldType = "text" | "textarea" | "markdown" | "number" | "date" | "datetime" | "select" | "tags" | "image" | "file" | "relation" | "boolean" | "json" | "list" | "kvlist" | "readonly" | "url" | "media_multi" | "screenshots" | "downloads";
 
 export type Field = {
   name: string;
@@ -83,6 +83,8 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "state", label: "État du produit", type: "select", options: PRODUCT_STATES },
       { name: "image_key", label: "Image principale (couverture, bannière)", type: "image" },
       { name: "logo_key", label: "Logo du produit (affiché sur les cartes et l'accueil)", type: "image" },
+      { name: "screenshots_json", label: "Captures d'écran du produit (mobile & desktop)", type: "screenshots", form_span: true, help: "Téléversez d'abord vos captures via « Téléverser un média », puis cochez-les ici : choisissez Mobile ou Desktop et ajoutez une légende. Ordre = bibliothèque (plus récentes d'abord)." },
+      { name: "downloads_json", label: "Liens de téléchargement (App Store, Google Play, APK, Web…)", type: "downloads", form_span: true, help: "Une ligne par lien : Plateforme | https://adresse | Libellé — plateformes : ios, android, apk, web, windows, mac. Ex : android | https://play.google.com/store/apps/details?id=com.ferefad.connect | Google Play" },
       { name: "icon", label: "Icône (bibliothèque SVG)", type: "select", options: ICON_OPTIONS },
       { name: "description_md", label: "Présentation générale (markdown)", type: "markdown", form_span: true },
       { name: "problem_md", label: "Problème auquel le produit répond", type: "markdown", form_span: true },
@@ -370,7 +372,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
 };
 
 // ---------- Rendus de champs ----------
-function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { value: string; label: string }[], mediaItems: { id: number; title: string; kind: string; thumb: string }[] = []): string {
+function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { value: string; label: string }[], mediaItems: { id: number; title: string; kind: string; thumb: string }[] = [], mediaFiles: { id: number; r2_key: string; filename: string; alt: string }[] = []): string {
   const v = value == null ? "" : String(value);
   const full = f.form_span ? " full" : "";
   switch (f.type) {
@@ -414,7 +416,8 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
         <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
         </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
     case "json":
-      return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-json>${esc(typeof value === "string" ? v : JSON.stringify(value, null, 2))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
+      // value null → textarea vide (jamais « null » en clair, qui bloquait toute la sauvegarde du produit)
+      return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-json>${esc(value == null ? "" : typeof value === "string" ? v : JSON.stringify(value, null, 2))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
     case "list": {
       // Éditeur simple : un élément par ligne — converti en tableau JSON côté serveur
       const lines = Array.isArray(value) ? (value as unknown[]).map(String) : parseJSON<string[]>(typeof value === "string" ? value : "[]", []);
@@ -439,6 +442,27 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
       return `<div class="adm-field${full}" data-media-multi><span>${esc(f.label)}</span><p class="muted" style="font-size:.82rem">${esc(f.help || "")}</p><div class="media-multi-grid">${mediaItems
         .map((mi) => `<label class="media-multi-item"><input type="checkbox" name="${f.name}" value="${mi.id}" ${selected.has(String(mi.id)) ? "checked" : ""}>${mi.thumb ? `<img src="${esc(mi.thumb)}" alt="">` : `<span class="media-multi-item__icon">${icon("video")}</span>`}<span>${esc(mi.title)}<em>${esc(mi.kind)}</em></span></label>`)
         .join("")}</div></div>`;
+    }
+    case "screenshots": {
+      // Éditeur de captures : sélection dans la bibliothèque + type (mobile/desktop) + légende par image
+      const items = parseJSON<{ key: string; type?: string; alt?: string }[]>(typeof value === "string" && value.trim() ? value : "[]", []);
+      const byKey = new Map(items.map((it) => [String(it.key), it]));
+      return `<div class="adm-field${full}" data-screenshots><span>${esc(f.label)}</span>
+      <p class="muted" style="font-size:.82rem">${esc(f.help || "")}</p>
+      <div class="shot-editor">${mediaFiles
+        .map((mf) => { const sel = byKey.get(mf.r2_key); return `<div class="shot-row${sel ? " is-on" : ""}">
+        <label class="shot-row__pick"><input type="checkbox" name="scr_in_${mf.id}" ${sel ? "checked" : ""}><img src="${mediaSrc(mf.r2_key)}" alt="" loading="lazy"><span>${esc(mf.filename.slice(0, 34))}</span></label>
+        <div class="shot-row__cfg">
+          <select name="scr_type_${mf.id}" aria-label="Type de capture"><option value="mobile" ${!sel || sel.type !== "desktop" ? "selected" : ""}>Mobile</option><option value="desktop" ${sel?.type === "desktop" ? "selected" : ""}>Desktop</option></select>
+          <input name="scr_alt_${mf.id}" value="${esc(sel?.alt || mf.alt || "")}" placeholder="Légende affichée sous la capture" maxlength="140">
+        </div></div>`; }).join("") || `<em class="muted">Bibliothèque vide — téléversez d'abord vos captures avec « Téléverser un média ».</em>`}
+      </div></div>`;
+    }
+    case "downloads": {
+      // Éditeur de liens : une ligne « Plateforme | URL | Libellé » — converti en JSON côté serveur
+      const rows = parseJSON<{ platform?: string; url?: string; label?: string }[]>(typeof value === "string" && value.trim() ? value : "[]", []);
+      const lines = (rows || []).map((d) => [d.platform, d.url, d.label].filter(Boolean).join(" | "));
+      return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-list>${esc(lines.join("\n"))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
     }
     case "readonly":
       return v ? `<div class="adm-field"><span>${esc(f.label)}</span><p class="adm-static">${esc(v)}</p></div>` : "";
@@ -469,9 +493,14 @@ async function loadMediaOptions(db: D1Database): Promise<{ id: number; title: st
   const images = await q(db, "SELECT mi.id, mi.title, m.r2_key FROM media_items mi JOIN media m ON m.id = mi.media_id WHERE mi.type='image' AND mi.status='publie' ORDER BY mi.sort_order LIMIT 200");
   const videos = await q(db, "SELECT id, title, provider FROM media_items WHERE type='video' AND status='publie' ORDER BY sort_order LIMIT 50");
   return [
-    ...images.map((i) => ({ id: Number(i.id), title: String(i.title), kind: "image", thumb: `/media/${i.r2_key}` })),
+    ...images.map((i) => ({ id: Number(i.id), title: String(i.title), kind: "image", thumb: mediaSrc(String(i.r2_key)) })),
     ...videos.map((v) => ({ id: Number(v.id), title: String(v.title), kind: `vidéo ${String(v.provider || "")}`, thumb: "" })),
   ];
+}
+
+// Bibliothèque d'images brute (media) — pour l'éditeur de captures des produits
+async function loadMediaFiles(db: D1Database): Promise<{ id: number; r2_key: string; filename: string; alt: string }[]> {
+  return q(db, "SELECT id, r2_key, filename, COALESCE(alt,'') AS alt FROM media WHERE mime LIKE 'image/%' ORDER BY id DESC LIMIT 300");
 }
 
 async function loadSelectedRelations(db: D1Database, content_type: string, content_id: string): Promise<string> {
@@ -586,9 +615,10 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const relOpts: Record<string, { value: string; label: string }[]> = {};
     for (const f of relFields) relOpts[f.name] = await relationLabelOptions(c.env.DB, f);
     const mediaOpts = res.fields.some((f) => f.type === "media_multi") ? await loadMediaOptions(c.env.DB) : [];
+    const mediaFiles = res.fields.some((f) => f.type === "screenshots") ? await loadMediaFiles(c.env.DB) : [];
     const body = `<form method="post" action="/admin/${res.key}" class="adm-form" data-confirm-leave>
       <input type="hidden" name="_csrf" value="${user.csrf}">
-      ${res.fields.map((f) => fieldInput(f, "", user.csrf, relOpts[f.name], mediaOpts)).join("")}
+      ${res.fields.map((f) => fieldInput(f, "", user.csrf, relOpts[f.name], mediaOpts, mediaFiles)).join("")}
       <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Créer</button><a class="btn" href="/admin/${res.key}">Annuler</a></div>
     </form>`;
     return c.html(adminLayout(c, user, `Nouveau ${res.single}`, body, `/admin/${res.key}`));
@@ -626,9 +656,10 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
     const relOpts: Record<string, { value: string; label: string }[]> = {};
     for (const f of relFields) relOpts[f.name] = await relationLabelOptions(c.env.DB, f);
     const mediaOpts = res.fields.some((f) => f.type === "media_multi") ? await loadMediaOptions(c.env.DB) : [];
+    const mediaFiles = res.fields.some((f) => f.type === "screenshots") ? await loadMediaFiles(c.env.DB) : [];
     const selectedMedia = res.relationsKey ? await loadSelectedRelations(c.env.DB, res.relationsKey, c.req.param("id")) : "";
     const canEdit = can(user.role, res.perm, "edit");
-    const formFields = res.fields.map((f) => fieldInput(f, f.type === "media_multi" ? selectedMedia : row[f.name], user.csrf, relOpts[f.name], mediaOpts)).join("");
+    const formFields = res.fields.map((f) => fieldInput(f, f.type === "media_multi" ? selectedMedia : row[f.name], user.csrf, relOpts[f.name], mediaOpts, mediaFiles)).join("");
     const body = canEdit
       ? `<form method="post" action="/admin/${res.key}/${row.id}" class="adm-form" data-confirm-leave>
           <input type="hidden" name="_csrf" value="${user.csrf}">
@@ -680,6 +711,21 @@ async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, fo
     if (f.type === "readonly" || f.type === "file" || f.type === "media_multi") continue;
     const raw = form[f.name];
     if (f.required && (raw == null || String(raw).trim() === "")) return { data, error: `Le champ « ${f.label} » est obligatoire.` };
+    if (f.type === "screenshots") {
+      // Captures : champs scr_in_<id> / scr_type_<id> / scr_alt_<id> — reconstruction du JSON
+      const ids = Object.keys(form).filter((k) => k.startsWith("scr_in_") && form[k]).map((k) => Number(k.slice(7))).filter((n) => Number.isInteger(n) && n > 0).slice(0, 40);
+      const items: { key: string; type: string; alt: string }[] = [];
+      if (ids.length) {
+        const rows = await q<{ id: number; r2_key: string; alt: string }>(c.env.DB, `SELECT id, r2_key, COALESCE(alt,'') AS alt FROM media WHERE id IN (${ids.map(() => "?").join(",")}) ORDER BY id DESC`, ...ids);
+        for (const r of rows) {
+          const t = String(form["scr_type_" + r.id] || "mobile") === "desktop" ? "desktop" : "mobile";
+          const alt = String(form["scr_alt_" + r.id] || r.alt || "").trim().slice(0, 140);
+          items.push({ key: r.r2_key, type: t, alt });
+        }
+      }
+      data[f.name] = JSON.stringify(items);
+      continue;
+    }
     if (raw == null) {
       if (f.type === "boolean") data[f.name] = 0;
       continue;
@@ -714,13 +760,22 @@ async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, fo
         data[f.name] = JSON.stringify(shaped);
         break;
       }
+      case "downloads": {
+        // « Plateforme | URL | Libellé » par ligne → [{platform,url,label}] — l'admin n'écrit jamais de JSON
+        const rows = s
+          ? s.split("\n").map((l) => l.split("|").map((x) => x.trim())).filter((p) => p.length >= 2 && p[0] && /^https?:\/\//.test(p[1] || "")).slice(0, 12)
+          : [];
+        data[f.name] = JSON.stringify(rows.map((p) => ({ platform: p[0].toLowerCase(), url: p[1], ...(p.length > 2 ? { label: p.slice(2).join(" | ") } : {}) })));
+        break;
+      }
       case "json": {
-        if (s === "") {
-          data[f.name] = f.name === "features" || f.name === "gallery" || f.name === "links_json" || f.name === "versions_json" || f.name === "blocks" ? "[]" : "{}";
+        if (s === "" || s === "null") {
+          data[f.name] = f.name === "features" || f.name === "gallery" || f.name === "links_json" || f.name === "versions_json" || f.name === "blocks" || f.name === "screenshots_json" || f.name === "downloads_json" ? "[]" : "{}";
           break;
         }
         try {
           let parsed = JSON.parse(s);
+          if (parsed == null) parsed = f.name === "blocks" || f.name.endsWith("_json") ? [] : {};
           if (f.name === "blocks") {
             // Tolérance : {"blocks":[…]} déballé, bloc unique enveloppé — l'admin n'est plus bloqué
             parsed = normalizeBlocksInput(parsed);
