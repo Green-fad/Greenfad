@@ -18,6 +18,7 @@ INSERT INTO settings (key, value) VALUES ('logo_footer_key', '"/assets/images/gr
 INSERT INTO settings (key, value) VALUES ('og_default_image', '"/assets/images/hero-image-modern.jpg"');
 INSERT INTO settings (key, value) VALUES ('socials', '{"facebook": "https://web.facebook.com/100083594433530", "youtube": "https://youtube.com/@greenfad", "tiktok": "https://www.tiktok.com/@greenfad1"}');
 INSERT INTO settings (key, value) VALUES ('seo_defaults', '{"default_description": "GREEN FAD SARL — entreprise technologique africaine : conception de produits numériques propriétaires, ingénierie logicielle et transformation digitale des organisations, au Mali et à linternational."}');
+INSERT INTO settings (key, value) VALUES ('google_site_verification', '""');
 
 -- ---------- MENUS ----------
 INSERT INTO menus (location, items) VALUES ('header', '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Vidéos", "url": "/videos"}, {"label": "Blog", "url": "/blog"}, {"label": "Documents", "url": "/ressources"}, {"label": "Implantation", "url": "/implantation"}, {"label": "Contact", "url": "/contact"}]');

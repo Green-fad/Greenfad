@@ -924,6 +924,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
         <label class="adm-field"><span>Libellé du bouton d'entête (vide = masqué)</span><input name="header_cta_label" value="${v("header_cta_label")}"></label>
         <label class="adm-field"><span>Lien du bouton d'entête</span><input name="header_cta_url" value="${v("header_cta_url")}" placeholder="/contact"></label>
         <label class="adm-field full"><span>Zone géographique annoncée (données structurées Service, vide = omise)</span><input name="service_area" value="${v("service_area")}" placeholder="Afrique &amp; international"></label>
+        <label class="adm-field full"><span>Code de vérification Google Search Console (balise google-site-verification, vide = aucune balise)</span><input name="google_site_verification" value="${v("google_site_verification")}" placeholder="Ex. : XyZ…collée depuis Search Console"></label>
       </section>
       <section class="adm-panel full"><h3>Textes des pages publiques (JSON)</h3>
         <p class="muted" style="margin:0 0 .8rem">Tout le contenu éditorial structurel du site est ici — héros de chaque page, bandeaux d'appel à l'action, textes SEO, frise chronologique et badges du héros d'accueil. Structure attendue :</p>
@@ -969,7 +970,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     if (d) return d;
     const form = await c.req.parseBody();
     if (typeof form === "string") return c.redirect("/admin/settings");
-    const keys = ["site_name", "tagline", "logo_key", "logo_footer_key", "og_default_image", "contact_phone", "contact_email", "contact_address", "site_url", "header_cta_label", "header_cta_url", "service_area"];
+    const keys = ["site_name", "tagline", "logo_key", "logo_footer_key", "og_default_image", "contact_phone", "contact_email", "contact_address", "site_url", "header_cta_label", "header_cta_url", "service_area", "google_site_verification"];
     for (const k of keys) await setSetting(c.env.DB, k, String(form[k] || ""));
     const socials: Record<string, string> = {};
     for (const n of ["facebook", "youtube", "tiktok", "linkedin"]) if (form[`social_${n}`]) socials[n] = String(form[`social_${n}`]);

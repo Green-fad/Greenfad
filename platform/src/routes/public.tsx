@@ -86,12 +86,24 @@ function serviceAreaOf(site: { settings: Record<string, unknown> }): string | un
 // ---------- Helpers ----------
 async function getPageSEO(c: Context<{ Bindings: Env }>, seo: PageSEO): Promise<PageSEO> {
   const siteName = (await getSetting(c.env.DB, "site_name", "GREEN FAD")) as string;
-  const defaults = (await getSetting(c.env.DB, "seo_defaults", {})) as { default_description?: string };
+  const defaults = (await getSetting(c.env.DB, "seo_defaults", {})) as { default_description?: string; title_suffix?: string };
+  // Suffixe de titre : setting éditable au Dashboard (admin/seo) — repli « | GREEN FAD ».
+  const suffix = String(defaults.title_suffix || "").trim() || ` | ${String(siteName)}`;
   return {
     ...seo,
-    title: /green\s*fad/i.test(seo.title) ? seo.title : `${seo.title} | ${String(siteName)}`,
+    title: /green\s*fad/i.test(seo.title) ? seo.title : `${seo.title}${suffix}`,
     description: seo.description || defaults.default_description || undefined,
   };
+}
+
+/** Texte brut pour JSON-LD (JobPosting.description, VideoObject.description…) : markdown allégé + entités HTML retirées. */
+function plainText(mdText: string | null | undefined, max = 1200): string {
+  const raw = String(mdText || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/[#>*`\[\]()!_~-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return raw.length > max ? raw.slice(0, max - 1).replace(/\s\S*$/, "") + "…" : raw;
 }
 
 
@@ -351,7 +363,7 @@ publicRoutes.get("/expertises", async (c) => {
     .join("")}</div></section>
   ${ct ? ctaBandHTML(ct) : ""}`;
   const seo = await seoOf(c, site, "/expertises", "Expertises & services technologiques");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/expertises" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/expertises", crumbs: [{ label: "Accueil", url: "/" }, { label: "Expertises" }] }), body));
 });
 
 publicRoutes.get("/expertises/:slug", async (c) => {
@@ -464,7 +476,7 @@ publicRoutes.get("/produits", async (c) => {
   const seo = await seoOf(c, site, "/produits", "Produits technologiques");
   const base = String(site.settings.site_url || "");
   const itemListLd = [{ "@context": "https://schema.org", "@type": "ItemList", name: "Produits technologiques GREEN FAD", itemListElement: rows.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: String(p.name), url: `${base}/produits/${p.slug}` })) }];
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/produits", jsonLd: itemListLd }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/produits", jsonLd: itemListLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Produits" }] }), body));
 });
 
 // ---------- Fiche produit « style store » : héros, captures, téléchargements ----------
@@ -876,7 +888,7 @@ publicRoutes.get("/realisations", async (c) => {
   ${ct ? ctaBandHTML(ct) : ""}`;
   const seo = await seoOf(c, site, "/realisations", "Réalisations & études de cas");
   const histLd = histProducts.filter((h) => Number(h.n_milestones || 0)).map((h, i) => ({ "@type": "ListItem", position: i + 1, name: String(h.name), url: `${String(site.settings.site_url || "")}/produits/${h.slug}` }));
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/realisations", ...(histLd.length ? { jsonLd: [{ "@context": "https://schema.org", "@type": "ItemList", name: "Historique technologique des produits GREEN FAD", itemListElement: histLd }] } : {}) }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/realisations", crumbs: [{ label: "Accueil", url: "/" }, { label: "Réalisations" }], ...(histLd.length ? { jsonLd: [{ "@context": "https://schema.org", "@type": "ItemList", name: "Historique technologique des produits GREEN FAD", itemListElement: histLd }] } : {}) }), body));
 });
 
 publicRoutes.get("/realisations/:slug", async (c) => {
@@ -903,7 +915,18 @@ publicRoutes.get("/realisations/:slug", async (c) => {
   ${gallery.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Galerie</p><h2>Le projet en images</h2></header>
     <div class="gallery gallery--3 reveal" data-lightbox>${gallery.map((g) => { const src = mediaSrc(String(g.r2_key)); return `<figure data-full="${esc(src)}"><img src="${esc(src)}" alt="${esc(String(g.title || ""))}" loading="lazy">${g.caption ? `<figcaption>${esc(String(g.caption))}</figcaption>` : ""}</figure>`; }).join("")}</div></section>` : ""}
   ${blocks.length ? (await renderBlocks(blocks, c.env)) : ""}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(r.meta_title || r.title), description: String(r.meta_description || r.summary || ""), ogImage: String(r.og_image || mediaSrc(String(r.image_key))), canonicalPath: `/realisations/${r.slug}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Réalisations", url: "/realisations" }, { label: String(r.title) }] }), body));
+  const baseR = String(site.settings.site_url || "");
+  const workLd = [{
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: String(r.title),
+    ...(r.summary ? { description: plainText(String(r.summary), 400) } : {}),
+    ...(r.image_key ? { image: `${baseR}${mediaSrc(String(r.image_key))}` } : {}),
+    url: `${baseR}/realisations/${r.slug}`,
+    author: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), url: baseR },
+    inLanguage: "fr",
+  }];
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(r.meta_title || r.title), description: String(r.meta_description || r.summary || ""), ogImage: String(r.og_image || mediaSrc(String(r.image_key))), canonicalPath: `/realisations/${r.slug}`, jsonLd: workLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Réalisations", url: "/realisations" }, { label: String(r.title) }] }), body));
 });
 
 // ---------- Galerie multimédia ----------
@@ -929,7 +952,7 @@ publicRoutes.get("/galerie", async (c) => {
     <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></section>` : ""}
   ${!albums.length && !videos.length ? `<section class="container center"><div class="form-card" style="max-width:560px">${icon("image-off")}<h2 style="margin-top:1rem">Galerie en préparation</h2><p class="muted">Aucun média publié pour le moment. Les premiers albums arrivent bientôt.</p></div></section>` : ""}`;
   const seo = await seoOf(c, site, "/galerie", "Galerie multimédia");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/galerie" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/galerie", crumbs: [{ label: "Accueil", url: "/" }, { label: "Galerie" }] }), body));
 });
 
 publicRoutes.get("/galerie/album/:slug", async (c) => {
@@ -951,13 +974,33 @@ publicRoutes.get("/galerie/video/:id", async (c) => {
   const pv = parseVideo(String(v.source_url || ""));
   const others = await q(c.env.DB, "SELECT id, title, source_url FROM media_items WHERE type='video' AND status='publie' AND id != ? ORDER BY sort_order LIMIT 4", v.id);
   const site = await loadSiteData(c);
+  const base = String(site.settings.site_url || "");
+  // Miniature : celle de la plateforme (YouTube) — sinon image de marque du site (jamais d'URL inventée)
+  const thumb = pv.thumb || String(site.settings.og_default_image || "");
+  const absThumb = thumb.startsWith("http") ? thumb : base + thumb;
+  // Date ISO d'upload : date de publication de la vidéo sur le site (source réelle, jamais inventée)
+  const upRaw = String(v.published_at || v.created_at || "").trim();
+  const uploadDate = upRaw.length >= 19 ? upRaw.slice(0, 19).replace(" ", "T") + "Z" : upRaw;
+  // VideoObject : permet l'apparition dans Google Vidéo (résultats vidéo riches)
+  const videoLd = [{
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: String(v.title || ""),
+    description: plainText(String(v.description || ""), 600) || `Vidéo ${String(v.title || "Green FAD")} — ${String(site.settings.site_name || "GREEN FAD")}`,
+    thumbnailUrl: [absThumb],
+    ...(uploadDate ? { uploadDate } : {}),
+    embedUrl: pv.embed.startsWith("http") ? pv.embed : undefined,
+    contentUrl: String(v.source_url || "").startsWith("http") ? String(v.source_url) : undefined,
+    publisher: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), url: base, logo: { "@type": "ImageObject", url: base + String(site.settings.logo_key || "/assets/images/greenfad-logo.svg") } },
+    ...(String(v.credit || "") ? { creditText: String(v.credit) } : {}),
+  }];
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Vidéos", url: "/videos" }, { label: String(v.title) }])}<p class="eyebrow">Vidéo</p><h1>${esc(String(v.title))}</h1></div></section>
   <section class="container"><div class="video-wrap"><div class="video-embed"><iframe src="${esc(pv.embed)}" allowfullscreen title="${esc(String(v.title))}"></iframe></div>
   ${v.description ? `<div class="prose" style="margin-top:1.4rem">${esc(String(v.description))}</div>` : ""}
   ${v.credit ? `<p class="muted" style="margin-top:.6rem;font-size:.85rem">Source : ${esc(String(v.credit))}</p>` : ""}</div></section>
-  ${others.length ? `<section class="container"><header class="sec-head"><h2>Autres vidéos</h2></header><div class="video-grid reveal">${others.map((o) => { const pvo = parseVideo(String(o.source_url || "")); return `<a class="video-card" href="/galerie/video/${o.id}"><span class="video-card__thumb">${pvo.thumb ? `<img src="${esc(pvo.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pvo.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span><span class="video-card__body"><h3>${esc(String(o.title))}</h3></span></a>`; }).join("")}</div>
+  ${others.length ? `<section class="container"><header class="sec-head"><h2>Autres vidéos</h2></header><div class="video-grid reveal">${others.map((o) => { const pvo = parseVideo(String(o.source_url || "")); return `<a class="video-card" href="/galerie/video/${o.id}"><span class="video-card__thumb">${pvo.thumb ? `<img src="${esc(pvo.thumb)}" alt="Miniature : ${esc(String(o.title))}" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pvo.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span><span class="video-card__body"><h3>${esc(String(o.title))}</h3></span></a>`; }).join("")}</div>
   <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></section>` : ""}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(v.title), description: String(v.description || "Vidéo Green FAD"), canonicalPath: `/galerie/video/${v.id}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Vidéos", url: "/videos" }, { label: String(v.title) }] }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(v.title), description: plainText(String(v.description || ""), 155) || undefined, ogImage: absThumb, ogImageAlt: `Miniature vidéo : ${String(v.title)}`, ogType: "video.other", canonicalPath: `/galerie/video/${v.id}`, jsonLd: videoLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Vidéos", url: "/videos" }, { label: String(v.title) }] }), body));
 });
 
 // ---------- Vidéos : TOUTES les vidéos publiques (page « voir tout », 11/11/2026) ----------
@@ -969,14 +1012,38 @@ publicRoutes.get("/videos", async (c) => {
   const vids = await q<Record<string, unknown>>(c.env.DB, "SELECT id, title, description, category, source_url, provider, credit, published_at FROM media_items WHERE type='video' AND status = ? ORDER BY sort_order, id", PUBLIE);
   const site = await loadSiteData(c);
   const hero = heroOf(site, "/videos", "Vidéos");
+  const base = String(site.settings.site_url || "");
   // Catégories réellement présentes en base — aucune catégorie fictive
   const cats = new Map<string, number>();
   for (const v of vids) { const k = String(v.category || "").trim() || "Autres"; cats.set(k, (cats.get(k) || 0) + 1); }
+  // ItemList de VideoObject : alimente Google Vidéo pour l'ensemble de la vidéothèque
+  const videoLd = [{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Vidéos officielles GREEN FAD",
+    numberOfItems: vids.length,
+    itemListElement: vids.map((v, i) => {
+      const pv = parseVideo(String(v.source_url || ""));
+      const thumb = pv.thumb || String(site.settings.og_default_image || "");
+      return {
+        "@type": "ListItem", position: i + 1,
+        item: {
+          "@type": "VideoObject",
+          name: String(v.title || ""),
+          description: plainText(String(v.description || ""), 300) || `Vidéo ${String(v.title || "Green FAD")}`,
+          thumbnailUrl: thumb.startsWith("http") ? thumb : base + thumb,
+          ...(String(v.published_at || "") ? { uploadDate: String(v.published_at).slice(0, 19).replace(" ", "T") + "Z" } : {}),
+          embedUrl: pv.embed.startsWith("http") ? pv.embed : undefined,
+          url: `${base}/galerie/video/${v.id}`,
+        },
+      };
+    }),
+  }];
   const card = (v: Record<string, unknown>) => {
     const pv = parseVideo(String(v.source_url || ""));
     const cat = String(v.category || "").trim() || "Autres";
     return `<a class="video-card" data-cat="${esc(cat)}" href="/galerie/video/${v.id}">
-      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
+      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="Miniature : ${esc(String(v.title || ""))}" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
       <span class="video-card__body"><h3>${esc(String(v.title || ""))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}${String(v.description).length > 120 ? "…" : ""}</p>` : ""}${cat ? `<span class="tag">${esc(cat)}</span>` : ""}</span></a>`;
   };
   const chips = [...cats.entries()].map(([k, n]) => `<button type="button" class="chip" data-cat="${esc(k)}">${esc(k)} (${n})</button>`).join("");
@@ -990,7 +1057,7 @@ publicRoutes.get("/videos", async (c) => {
   <script>(function(){var b=document.querySelectorAll(".docs-filters .chip");var d=document.querySelectorAll(".video-card[data-cat]");if(!b.length)return;b.forEach(function(x){x.addEventListener("click",function(){b.forEach(function(y){y.classList.toggle("is-on",y===x);});var f=x.getAttribute("data-cat"),n=0;d.forEach(function(e){var s=!f||e.getAttribute("data-cat")===f;e.style.display=s?"":"none";if(s)n++;});var cc=document.querySelector("[data-vids-count]");if(cc)cc.textContent=n+(n>1?" vidéos publiées":" vidéo publiée");});});})();</script>`
   : `<section class="container center"><p class="muted">Les premières vidéos seront publiées prochainement.</p></section>`}`;
   const seo = await seoOf(c, site, "/videos", "Vidéos GREEN FAD");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/videos" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/videos", jsonLd: videoLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Vidéos" }] }), body));
 });
 
 // ---------- BLOG — média éditorial de l'entreprise ----------
@@ -1108,7 +1175,20 @@ publicRoutes.get("/blog", async (c) => {
     <div class="popular-list reveal">${popular.map((p, i) => `<a class="popular" href="/blog/${esc(String(p.slug))}"><span class="popular__rank">${i + 1}</span><span class="popular__body"><strong>${esc(String(p.title))}</strong><em>${fmtDate(p.published_at, "short")} · ${Number(p.views)} vue${Number(p.views) > 1 ? "s" : ""}</em></span>${icon("arrow-right", "popular__arrow")}</a>`).join("")}</div></section>` : ""}
   ${years.length ? `<section class="cta-band"><div class="container cta-band__inner reveal"><h2>Explorer par année</h2><p>Retrouvez tous nos articles dans les archives.</p><a class="btn btn--invert" href="/blog/archives">Archives ${years[0]} — ${years[years.length - 1]} ${icon("arrow-right")}</a></div></section>` : ""}`;
   const seo = await seoOf(c, site, "/blog", "Blog — Actualités, ingénierie et innovation");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/blog" }), body));
+  // Blog (CollectionPage) + liste des articles publiés : alimente Google pour « blog Greenfad »,
+  // les recherches par thème et les résultats enrichis de la section Actualités.
+  const baseBlog = String(site.settings.site_url || "");
+  const blogLd = [{
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: `Blog ${String(site.settings.site_name || "GREEN FAD")}`,
+    url: `${baseBlog}/blog`,
+    description: seo.description || "Actualités, lancements produits, analyses technologiques et retours d'expérience écrits par les équipes Green FAD.",
+    inLanguage: "fr",
+    publisher: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), logo: { "@type": "ImageObject", url: `${baseBlog}/assets/images/greenfad-logo.svg` } },
+    blogPost: all.map((p) => ({ "@type": "BlogPosting", headline: String(p.title), url: `${baseBlog}/blog/${p.slug}`, datePublished: String(p.published_at || ""), image: p.cover_key ? `${baseBlog}${mediaSrc(String(p.cover_key))}` : undefined })),
+  }];
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/blog", jsonLd: blogLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Blog" }] }), body));
 });
 
 publicRoutes.get("/blog/archives", async (c) => {
@@ -1204,7 +1284,7 @@ publicRoutes.get("/implantation", async (c) => {
     ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   <section class="container"><div class="countries countries--modern reveal" data-stagger>${countriesCardsHTML(countries)}</div></section>`;
   const seo = await seoOf(c, site, "/implantation", "Implantation & présence internationale");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/implantation" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/implantation", crumbs: [{ label: "Accueil", url: "/" }, { label: "Implantation" }] }), body));
 });
 
 publicRoutes.get("/implantation/:slug", async (c) => {
@@ -1265,7 +1345,7 @@ publicRoutes.get("/ressources", async (c) => {
   const seo = await seoOf(c, site, "/ressources", "Ressources & documentation");
   const base = String(site.settings.site_url || "");
   const itemListLd = [{ "@context": "https://schema.org", "@type": "ItemList", name: "Documents publics GREEN FAD", itemListElement: docs.filter((d) => String(d.file_key || "")).map((d, i) => ({ "@type": "ListItem", position: i + 1, name: String(d.title), url: `${base}${String(d.file_key).startsWith("/") ? d.file_key : `/media/${d.file_key}`}` })) }];
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources", jsonLd: itemListLd }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources", jsonLd: itemListLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Ressources" }] }), body));
 });
 
 // ---------- Presse ----------
@@ -1273,10 +1353,23 @@ publicRoutes.get("/presse/:slug", async (c) => {
   const pr = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM press_releases WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
   if (!pr) return c.notFound();
   const site = await loadSiteData(c);
+  const basePr = String(site.settings.site_url || "");
+  const articleLd = [{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: String(pr.title),
+    description: String(pr.summary || excerptFromMd(pr.content_md, 160)),
+    datePublished: String(pr.published_at || ""),
+    dateModified: String(pr.updated_at || pr.published_at || ""),
+    author: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD") },
+    publisher: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), logo: { "@type": "ImageObject", url: `${basePr}/assets/images/greenfad-logo.svg` } },
+    mainEntityOfPage: `${basePr}/presse/${pr.slug}`,
+    inLanguage: "fr",
+  }];
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Presse" }, { label: String(pr.title) }])}<p class="eyebrow">Communiqué</p><h1>${esc(String(pr.title))}</h1></div></section>
   <section class="container"><article class="article prose reveal">${md(pr.content_md)}
   ${pr.file_key ? `<p><a class="btn btn--outline" href="/media/${esc(String(pr.file_key))}" target="_blank" rel="noopener">${icon("download", "i--inline")} Télécharger le communiqué (PDF)</a></p>` : ""}</article></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(pr.title), description: String(pr.summary || ""), canonicalPath: `/presse/${pr.slug}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Presse" }, { label: String(pr.title) }] }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(pr.title), description: String(pr.summary || ""), canonicalPath: `/presse/${pr.slug}`, ogType: "article", jsonLd: articleLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Presse" }, { label: String(pr.title) }] }), body));
 });
 
 // ---------- Carrières ----------
@@ -1294,13 +1387,27 @@ publicRoutes.get("/carrieres", async (c) => {
       <span class="card__more">Voir l'offre ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>`
     : `<section class="container center"><div class="form-card" style="max-width:600px"><h2>Aucun poste ouvert actuellement</h2><p class="muted">Les prochaines opportunités seront publiées ici. Vous pouvez aussi nous envoyer une candidature spontanée via le formulaire de contact.</p><a class="btn btn--primary" href="/contact">Candidature spontanée ${icon("arrow-right")}</a></div></section>`}`;
   const seo = await seoOf(c, site, "/carrieres", "Carrières");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/carrieres" }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/carrieres", crumbs: [{ label: "Accueil", url: "/" }, { label: "Carrières" }] }), body));
 });
 
 publicRoutes.get("/carrieres/:slug", async (c) => {
   const j = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM jobs WHERE slug = ? AND status = ? AND is_open = 1", c.req.param("slug"), PUBLIE);
   if (!j) return c.notFound();
   const site = await loadSiteData(c);
+  const baseJob = String(site.settings.site_url || "");
+  // JobPosting : alimente Google Jobs — uniquement des données réelles de l'offre
+  const jobLd = [{
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: String(j.title),
+    description: plainText(String(j.description_md || ""), 2400),
+    datePosted: String(j.published_at || ""),
+    ...(j.deadline ? { validThrough: `${String(j.deadline).slice(0, 10)}T23:59:59Z` } : {}),
+    hiringOrganization: { "@type": "Organization", name: String(site.settings.site_name || "GREEN FAD"), url: baseJob, logo: { "@type": "ImageObject", url: `${baseJob}/assets/images/greenfad-logo.svg` } },
+    ...(j.location ? { jobLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: String(j.location), addressCountry: "ML" } } } : {}),
+    ...(j.contract_type ? { employmentType: String(j.contract_type) } : {}),
+    identifier: { "@type": "PropertyValue", name: String(site.settings.site_name || "GREEN FAD"), value: `carrieres-${String(j.slug)}` },
+  }];
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Carrières", url: "/carrieres" }, { label: String(j.title) }])}
     <p class="eyebrow">Offre d'emploi</p><h1>${esc(String(j.title))}</h1>
     <div class="post-meta" style="margin-top:1rem;color:rgba(255,255,255,.7)">${j.department ? `<span style="display:inline-flex;align-items:center;gap:5px">${icon("layers")} ${esc(String(j.department))}</span>` : ""}${j.location ? `<span style="display:inline-flex;align-items:center;gap:5px">${icon("map-pin")} ${esc(String(j.location))}</span>` : ""}${j.contract_type ? `<span style="display:inline-flex;align-items:center;gap:5px">${icon("briefcase")} ${esc(String(j.contract_type))}</span>` : ""}</div></div></section>
@@ -1319,7 +1426,7 @@ publicRoutes.get("/carrieres/:slug", async (c) => {
     </form>
     ${c.req.query("sent") === "1" ? `<div class="form-ok">${icon("check-circle")}<span>Candidature bien reçue. Notre équipe RH vous recontactera si votre profil correspond.</span></div>` : ""}
   </div></section>`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(j.title), description: excerptFromMd(j.description_md, 150), canonicalPath: `/carrieres/${j.slug}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Carrières", url: "/carrieres" }, { label: String(j.title) }] }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(j.title), description: excerptFromMd(j.description_md, 150), canonicalPath: `/carrieres/${j.slug}`, jsonLd: jobLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Carrières", url: "/carrieres" }, { label: String(j.title) }] }), body));
 });
 
 // ---------- FAQ ----------
@@ -1342,7 +1449,7 @@ publicRoutes.get("/faq", async (c) => {
     ${!rows.length ? `<p class="center muted">Aucune question publiée pour le moment.</p>` : ""}</section>`;
   const jsonLd = [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: rows.map((r) => ({ "@type": "Question", name: String(r.question), acceptedAnswer: { "@type": "Answer", text: String(r.answer).replace(/[#*>`]/g, "") } })) }];
   const seo = await seoOf(c, site, "/faq", "FAQ");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/faq", jsonLd }), body));
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/faq", jsonLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "FAQ" }] }), body));
 });
 
 // ---------- Contact / Devis (POST → base de données) ----------
@@ -1446,10 +1553,12 @@ publicRoutes.post("/carrieres/:slug/apply", async (c) => {
   return c.redirect(`/carrieres/${c.req.param("slug")}?sent=1#apply`);
 });
 
-// ---------- SEO : sitemap + robots + RSS ----------
+// ---------- SEO : sitemap + sitemap vidéo + sitemap images + robots + RSS ----------
+// Objectif : dispersion maximale dans Google — pages, vidéos (Google Vidéo) et
+// images (Google Images) chacune avec leur sitemap dédié, référencés dans robots.txt.
 publicRoutes.get("/sitemap.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
-  const [pages, posts, products, services, projects, countries, albums] = await Promise.all([
+  const [pages, posts, products, services, projects, countries, albums, press, jobs] = await Promise.all([
     q(c.env.DB, "SELECT slug, updated_at FROM pages WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM posts WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM products WHERE status = ?", PUBLIE),
@@ -1457,6 +1566,8 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     q(c.env.DB, "SELECT slug, updated_at FROM projects WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM countries WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM media_albums WHERE status = ?", PUBLIE),
+    q(c.env.DB, "SELECT slug, updated_at FROM press_releases WHERE status = ?", PUBLIE),
+    q(c.env.DB, "SELECT slug, updated_at FROM jobs WHERE status = ? AND is_open = 1", PUBLIE),
   ]);
   const today = new Date().toISOString().slice(0, 10);
   const urls: { loc: string; date: string; priority: string }[] = [
@@ -1479,18 +1590,73 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     { loc: "/contact", date: today, priority: "0.6" },
     { loc: "/ressources", date: today, priority: "0.5" },
     { loc: "/carrieres", date: today, priority: "0.5" },
+    ...jobs.map((j) => ({ loc: `/carrieres/${j.slug}`, date: String(j.updated_at).slice(0, 10), priority: "0.5" })),
+    ...press.map((pr) => ({ loc: `/presse/${pr.slug}`, date: String(pr.updated_at).slice(0, 10), priority: "0.6" })),
     { loc: "/faq", date: today, priority: "0.4" },
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map((u) => `<url><loc>${base}${u.loc}</loc><lastmod>${u.date}</lastmod><priority>${u.priority}</priority></url>`).join("\n")}
 </urlset>`;
-  return c.body(xml, 200, { "content-type": "application/xml; charset=utf-8" });
+  return c.body(xml, 200, { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" });
+});
+
+// Sitemap vidéo (format Google : http://www.google.com/schemas/sitemap-video/1.1)
+// → alimente directement Google Vidéo avec chaque page /galerie/video/:id.
+publicRoutes.get("/sitemap-videos.xml", async (c) => {
+  const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
+  const ogDefault = String((await getSetting(c.env.DB, "og_default_image", "/assets/images/hero-image-modern.jpg")) as string);
+  const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT id, title, description, source_url, provider, published_at FROM media_items WHERE type='video' AND status = ? ORDER BY id", PUBLIE);
+  const entries = rows.map((v) => {
+    const pv = parseVideo(String(v.source_url || ""));
+    const thumb = pv.thumb || ogDefault;
+    const up = String(v.published_at || "").slice(0, 19).replace(" ", "T") + "Z";
+    const player = pv.embed.startsWith("http") ? pv.embed : `${base}/galerie/video/${v.id}`;
+    return `<url><loc>${base}/galerie/video/${v.id}</loc><video:video><video:thumbnail_loc>${esc(thumb.startsWith("http") ? thumb : base + thumb)}</video:thumbnail_loc><video:title>${esc(String(v.title || "Vidéo Green FAD"))}</video:title><video:description>${esc(plainText(String(v.description || `Vidéo officielle Green FAD : ${String(v.title || "")}`), 600))}</video:description><video:content_loc>${esc(String(v.source_url || player))}</video:content_loc><video:player_loc>${esc(player)}</video:player_loc>${String(v.published_at || "") ? `<video:publication_date>${up}</video:publication_date>` : ""}<video:family_friendly>yes</video:family_friendly><video:live>no</video:live></video:video></url>`;
+  });
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+${entries.join("\n")}
+</urlset>`;
+  return c.body(xml, 200, { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" });
+});
+
+// Sitemap images (format Google : http://www.google.com/schemas/sitemap-image/1.1)
+// → alimente Google Images : images produits, couvertures d'articles, albums photo, expertises.
+publicRoutes.get("/sitemap-images.xml", async (c) => {
+  const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
+  const [products, posts, services, albums] = await Promise.all([
+    q(c.env.DB, "SELECT slug, name, image_key, updated_at FROM products WHERE status = ? AND image_key != ''", PUBLIE),
+    q(c.env.DB, "SELECT slug, title, cover_key, updated_at FROM posts WHERE status = ? AND cover_key != ''", PUBLIE),
+    q(c.env.DB, "SELECT slug, name, image_key, updated_at FROM services WHERE status = ? AND image_key != ''", PUBLIE),
+    q(c.env.DB, "SELECT a.slug, a.name, a.updated_at, m.r2_key, m.alt, mi.title FROM media_albums a JOIN media_items mi ON mi.album_id = a.id AND mi.type = 'image' AND mi.status = 'publie' JOIN media m ON m.id = mi.media_id WHERE a.status = ? ORDER BY a.sort_order, mi.sort_order", PUBLIE),
+  ]);
+  const imgSrc = (k: unknown) => { const s = String(k || ""); return s.startsWith("/") ? base + s : `${base}/media/${s}`; };
+  const imgBlock = (title: string, loc: string) => `<image:image><image:loc>${esc(loc)}</image:loc><image:title>${esc(title)}</image:title></image:image>`;
+  // Un <url> par page, toutes les images de l'album regroupées dans le même bloc
+  const albumImgs = new Map<string, { name: string; imgs: string[] }>();
+  for (const a of albums) {
+    const e = albumImgs.get(String(a.slug)) || { name: String(a.name), imgs: [] };
+    e.imgs.push(imgBlock(String(a.title || a.alt || a.name), imgSrc(a.r2_key)));
+    albumImgs.set(String(a.slug), e);
+  }
+  const urls: string[] = [
+    `<url><loc>${base}/</loc>${imgBlock("GREEN FAD SARL — Entreprise technologique africaine", imgSrc("/assets/images/greenfad-logo.svg"))}</url>`,
+    ...products.map((p) => `<url><loc>${base}/produits/${p.slug}</loc>${imgBlock(String(p.name), imgSrc(p.image_key))}</url>`),
+    ...services.map((s) => `<url><loc>${base}/expertises/${s.slug}</loc>${imgBlock(String(s.name), imgSrc(s.image_key))}</url>`),
+    ...posts.map((p) => `<url><loc>${base}/blog/${p.slug}</loc>${imgBlock(String(p.title), imgSrc(p.cover_key))}</url>`),
+    ...[...albumImgs.entries()].map(([slug, e]) => `<url><loc>${base}/galerie/album/${slug}</loc>${e.imgs.join("")}</url>`),
+  ];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${urls.join("\n")}
+</urlset>`;
+  return c.body(xml, 200, { "content-type": "application/xml; charset=utf-8", "cache-control": "public, max-age=3600" });
 });
 
 publicRoutes.get("/robots.txt", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
-  return c.body(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\nDisallow: /__preview\n\nSitemap: ${base}/sitemap.xml\n`, 200, { "content-type": "text/plain; charset=utf-8" });
+  return c.body(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\nDisallow: /__preview\n\nSitemap: ${base}/sitemap.xml\nSitemap: ${base}/sitemap-videos.xml\nSitemap: ${base}/sitemap-images.xml\n`, 200, { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600" });
 });
 
 publicRoutes.get("/rss.xml", async (c) => {

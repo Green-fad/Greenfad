@@ -377,7 +377,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
       return `<div class="container"><div class="video-wrap reveal">${p.title ? `<h3>${esc(p.title)}</h3>` : ""}<div class="video-embed"><iframe src="${esc(v.embed)}" allowfullscreen loading="lazy" title="${esc(p.title || "Vidéo Green FAD")}"></iframe></div></div></div>`;
     }
     case "video_playlist": {
-      const rows = await q(ctx.env.DB, "SELECT mi.title, mi.description, mi.source_url, mi.provider_id, mi.provider FROM media_items mi WHERE mi.type='video' AND mi.status='publie' AND (?1 = '' OR mi.category = ?1) ORDER BY mi.sort_order LIMIT ?2", p.category || "", p.limit);
+      const rows = await q(ctx.env.DB, "SELECT mi.id, mi.title, mi.description, mi.source_url, mi.provider_id, mi.provider FROM media_items mi WHERE mi.type='video' AND mi.status='publie' AND (?1 = '' OR mi.category = ?1) ORDER BY mi.sort_order LIMIT ?2", p.category || "", p.limit);
       if (!rows.length) return "";
       return `<div class="container"><div class="video-grid reveal">${rows
         .map((r) => {

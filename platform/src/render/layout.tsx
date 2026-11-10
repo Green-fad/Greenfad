@@ -99,7 +99,11 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
     contactPoint: phone ? { "@type": "ContactPoint", telephone: phone, contactType: "customer service", availableLanguage: ["fr", "en"] } : undefined,
     sameAs: Object.values(socials).filter(Boolean),
   };
-  const jsonLdHTML = [organizationLd, ...jsonLd].filter(Boolean).map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n");
+  const jsonLdHTML = [organizationLd, ...jsonLd].filter(Boolean).map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/<\/script/gi, "<\\/script")}</script>`).join("\n");
+
+  // Vérification propriétaire (Google Search Console) : setting « google_site_verification »
+  // modifiable depuis le Dashboard sans déploiement — vide → aucune balise émise.
+  const gsv = String(s.google_site_verification || "").trim();
 
   const socialIconMap: Record<string, string> = { facebook: "globe", youtube: "play", tiktok: "video", linkedin: "briefcase" };
   const socialLinks: string[] = [];
@@ -136,6 +140,8 @@ ${seo.description ? `<meta property="og:description" content="${esc(seo.descript
 ${ogImg ? `<meta property="og:image" content="${esc(ogImg.startsWith("http") ? ogImg : siteUrl + ogImg)}">` : ""}
 ${ogImg ? `<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(seo.title)}">${seo.description ? `<meta name="twitter:description" content="${esc(seo.description)}">` : ""}<meta name="twitter:image" content="${esc(ogImg.startsWith("http") ? ogImg : siteUrl + ogImg)}">` : `<meta name="twitter:card" content="summary">`}
 ${ogImg ? `<meta property="og:image:alt" content="${esc(seo.ogImageAlt || seo.title)}">` : ""}
+${gsv ? `<meta name="google-site-verification" content="${esc(gsv)}">` : ""}
+<link rel="alternate" type="application/rss+xml" title="${esc(siteName)} — Blog" href="/rss.xml">
 ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

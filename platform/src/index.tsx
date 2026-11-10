@@ -94,7 +94,7 @@ app.notFound(async (c) => {
   const { loadSiteData, layout } = await import("./render/layout");
   try {
     const site = await loadSiteData(c);
-    const seo = { title: "Page introuvable" };
+    const seo = { title: "Page introuvable", noindex: true } as const;
     const body = `<section class="error-page container"><p class="eyebrow">Erreur 404</p>
       <h1>Cette page n'existe pas ou a été déplacée</h1>
       <p class="page-head__text">Les anciennes URL du site sont redirigées automatiquement — si vous êtes venus d'un ancien lien, la redirection a peut-être besoin d'être ajoutée.</p>
