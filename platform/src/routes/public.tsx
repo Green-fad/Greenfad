@@ -1203,7 +1203,7 @@ publicRoutes.get("/ressources", async (c) => {
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Ressources" }])}<p class="eyebrow">Ressources</p>
     <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${docs.length ? `<section class="container"><div class="doc-list reveal">${docs
-    .map((d) => { const isPdf = /pdf$/.test(String(d.mime || "")); return `<a class="doc" href="/media/${esc(String(d.file_key))}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}</span><span class="doc__arrow">${icon("download")}</span></a>`; })
+    .map((d) => { const isPdf = /pdf$/.test(String(d.mime || "")); const fk = String(d.file_key || ""); const href = fk.startsWith("/") ? fk : `/media/${esc(fk)}`; return `<a class="doc" href="${href}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}</span><span class="doc__arrow">${icon("download")}</span></a>`; })
     .join("")}</div></section>` : `<section class="container center"><p class="muted">Les premiers documents seront publiés prochainement.</p></section>`}`;
   const seo = await seoOf(c, site, "/ressources", "Ressources & documentation");
   return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources" }), body));
