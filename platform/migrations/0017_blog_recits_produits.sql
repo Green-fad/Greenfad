@@ -506,30 +506,30 @@ WHERE product_slug = 'tile' AND title = 'Espace entreprise, Explorer, studio de 
 --    (projects.tech_stack / results_md), FAQ Tile, history_intro_md.
 --    REPLACE idempotent (no-op si le motif est absent) — style 0013.
 -- ---------------------------------------------------------------------------
-UPDATE projects SET tech_stack = REPLACE(tech_stack, 'infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD', 'infrastructure cloud opérée et supervisée par Green FAD') WHERE tech_stack LIKE '%infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD%';
+UPDATE projects SET tech_stack = REPLACE(tech_stack, 'infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD', 'infrastructure cloud opérée et supervisée par Green FAD') WHERE tech_stack LIKE '%Cloudflare%';
 
-UPDATE projects SET tech_stack = REPLACE(tech_stack, 'infrastructure Cloudflare opérée par Green FAD', 'infrastructure cloud opérée par Green FAD') WHERE tech_stack LIKE '%infrastructure Cloudflare opérée par Green FAD%';
+UPDATE projects SET tech_stack = REPLACE(tech_stack, 'infrastructure Cloudflare opérée par Green FAD', 'infrastructure cloud opérée par Green FAD') WHERE tech_stack LIKE '%Cloudflare%';
 
-UPDATE projects SET tech_stack = REPLACE(tech_stack, 'Next.js, TypeScript, React, intégrations IA (OpenAI, Google)', 'intégrations IA tierces') WHERE tech_stack LIKE '%Next.js, TypeScript, React, intégrations IA (OpenAI, Google)%';
+UPDATE projects SET tech_stack = REPLACE(tech_stack, 'Next.js, TypeScript, React, intégrations IA (OpenAI, Google)', 'intégrations IA tierces') WHERE tech_stack LIKE '%Next.js%';
 
 UPDATE projects SET tech_stack = REPLACE(tech_stack, '**Stack :**', '**Approche :**') WHERE tech_stack LIKE '%**Stack :**%';
 
 UPDATE projects SET tech_stack = REPLACE(tech_stack, 'App Check', 'protection anti-abus dédiée') WHERE tech_stack LIKE '%App Check%';
 
-UPDATE projects SET tech_stack = REPLACE(tech_stack, 'règles de base strictes', 'règles d''accès strictes') WHERE tech_stack LIKE '%règles de base strictes%';
+UPDATE projects SET tech_stack = REPLACE(tech_stack, 'règles de base strictes', 'règles d''accès strictes') WHERE tech_stack LIKE '%règles de base%';
 
-UPDATE projects SET results_md = REPLACE(results_md, 'base technique moderne (Next.js, TypeScript, React)', 'base technique moderne et éprouvée') WHERE results_md LIKE '%base technique moderne (Next.js, TypeScript, React)%';
+UPDATE projects SET results_md = REPLACE(results_md, 'base technique moderne (Next.js, TypeScript, React)', 'base technique moderne et éprouvée') WHERE results_md LIKE '%Next.js%';
 
-UPDATE faqs SET answer = REPLACE(answer, 'L''application est développée avec Flutter pour une expérience fluide sur tous les téléphones', 'Elle est pensée pour une expérience fluide sur tous les téléphones') WHERE answer LIKE '%L''application est développée avec Flutter pour une expérience fluide sur tous les téléphones%';
+UPDATE faqs SET answer = REPLACE(answer, 'L''application est développée avec Flutter pour une expérience fluide sur tous les téléphones', 'Elle est pensée pour une expérience fluide sur tous les téléphones') WHERE answer LIKE '%développée avec Flutter%';
 
-UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE history_intro_md LIKE '%une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React%';
+UPDATE products SET history_intro_md = REPLACE(history_intro_md, 'une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React', 'une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée') WHERE history_intro_md LIKE '%Flutter%';
 
-UPDATE posts SET content_md = REPLACE(content_md, 'L''architecture posée dès l''origine — **Flutter** pour Android, iOS et le Web/PWA, **Firebase** pour les fonctions et les données, **React** pour l''administration — n''a jamais été remplacée', 'L''architecture posée dès l''origine — une application multiplateforme pour Android, iOS et le Web/PWA, des services cloud pour les fonctions et les données, une console d''administration dédiée — n''a jamais été remplacée') WHERE content_md LIKE '%L''architecture posée dès l''origine — **Flutter** pour Android, iOS et le Web/PWA, **Firebase** pour les fonctions et les données, **React** pour l''administration — n''a jamais été remplacée%';
+UPDATE posts SET content_md = REPLACE(content_md, 'L''architecture posée dès l''origine — **Flutter** pour Android, iOS et le Web/PWA, **Firebase** pour les fonctions et les données, **React** pour l''administration — n''a jamais été remplacée', 'L''architecture posée dès l''origine — une application multiplateforme pour Android, iOS et le Web/PWA, des services cloud pour les fonctions et les données, une console d''administration dédiée — n''a jamais été remplacée') WHERE content_md LIKE '%Flutter%';
 
-UPDATE posts SET excerpt = REPLACE(excerpt, 'd''un chantier Flutter/Firebase démarré début 2025', 'd''un chantier d''ingénierie démarré début 2025') WHERE excerpt LIKE '%d''un chantier Flutter/Firebase démarré début 2025%';
+UPDATE posts SET excerpt = REPLACE(excerpt, 'd''un chantier Flutter/Firebase démarré début 2025', 'd''un chantier d''ingénierie démarré début 2025') WHERE excerpt LIKE '%Flutter/Firebase%';
 
-UPDATE posts SET meta_description = REPLACE(meta_description, 'de la conception Flutter/Firebase début 2025', 'de la conception d''ingénierie début 2025') WHERE meta_description LIKE '%de la conception Flutter/Firebase début 2025%';
+UPDATE posts SET meta_description = REPLACE(meta_description, 'de la conception Flutter/Firebase début 2025', 'de la conception d''ingénierie début 2025') WHERE meta_description LIKE '%Flutter/Firebase%';
 
-UPDATE product_versions SET features = REPLACE(features, 'Analyse Flutter : 0 erreur', 'Analyse statique : 0 erreur') WHERE features LIKE '%Analyse Flutter : 0 erreur%';
+UPDATE product_versions SET features = REPLACE(features, 'Analyse Flutter : 0 erreur', 'Analyse statique : 0 erreur') WHERE features LIKE '%Analyse Flutter%';
 
-UPDATE product_sources SET detail = REPLACE(detail, 'Application web Flutter — canal public direct du produit.', 'Application web — canal public direct du produit.') WHERE detail LIKE '%Application web Flutter — canal public direct du produit.%';
+UPDATE product_sources SET detail = REPLACE(detail, 'Application web Flutter — canal public direct du produit.', 'Application web — canal public direct du produit.') WHERE detail LIKE '%Application web Flutter%';
