@@ -49,10 +49,20 @@ export async function loadSettings(db: D1Database): Promise<Record<string, unkno
  *  Tolérant aux pannes : KV n'est qu'un cache — si une écriture échoue
  *  (quota gratuit dépassé, incident…), on renvoie simplement la valeur
  *  de la base au lieu de faire planter toute la plateforme. */
+/** Clé de cache versionnée par déploiement : chaque commitCF_PAGES_COMMIT_SHA
+ *  démarre avec des caches frais — plus d'anciennes valeurs servies jusqu'à
+ *  une heure après un changement de contenu. Hors Pages (local), le suffixe
+ *  est fixe (« dev »). */
+function cacheKey(env: { KV: KVNamespace }, key: string): string {
+  const sha = String((env as unknown as { CF_PAGES_COMMIT_SHA?: string }).CF_PAGES_COMMIT_SHA || 'dev').slice(0, 8);
+  return `cache:${key}:${sha}`;
+}
+
 export async function cached<T>(env: { KV: KVNamespace }, key: string, ttlSec: number, fn: () => Promise<T>): Promise<T> {
+  const k = cacheKey(env, key);
   let hit: string | null = null;
   try {
-    hit = await env.KV.get(`cache:${key}`);
+    hit = await env.KV.get(k);
   } catch (e) {
     console.warn(`cache:get ${key} indisponible`, (e as Error)?.message);
   }
@@ -65,7 +75,7 @@ export async function cached<T>(env: { KV: KVNamespace }, key: string, ttlSec: n
   }
   const value = await fn();
   try {
-    await env.KV.put(`cache:${key}`, JSON.stringify(value), { expirationTtl: ttlSec });
+    await env.KV.put(k, JSON.stringify(value), { expirationTtl: ttlSec });
   } catch (e) {
     console.warn(`cache:put ${key} indisponible`, (e as Error)?.message);
   }
@@ -73,5 +83,5 @@ export async function cached<T>(env: { KV: KVNamespace }, key: string, ttlSec: n
 }
 
 export function invalidateCache(env: { KV: KVNamespace }, keys: string[]): Promise<void> {
-  return Promise.all(keys.map((k) => env.KV.delete(`cache:${k}`).catch(() => undefined))).then(() => undefined);
+  return Promise.all(keys.map((k) => env.KV.delete(cacheKey(env, k)).catch(() => undefined))).then(() => undefined);
 }
