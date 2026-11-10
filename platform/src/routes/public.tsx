@@ -6,7 +6,7 @@ import { Env } from "../types";
 import { q, q1, count, getSetting } from "../db";
 import { layout, loadSiteData, PageSEO, crumbsHTML, Crumb } from "../render/layout";
 import { renderBlocks, renderBlock, Block, parseVideo, countriesCardsHTML } from "../blocks";
-import { md, esc, fmtDate, excerptFromMd, stripFirstH1, parseJSON, mediaSrc } from "../utils";
+import { md, esc, fmtDate, fmtBytes, excerptFromMd, stripFirstH1, parseJSON, mediaSrc } from "../utils";
 import { icon } from "../icons";
 import { audit } from "../audit";
 
@@ -1195,18 +1195,42 @@ publicRoutes.get("/implantation/:slug", async (c) => {
   return c.html(await layout(c, site, await getPageSEO(c, { title: `Green FAD au ${co.name === "RDC Congo" ? "Congo" : String(co.name)}`, description: `Présence, bureaux et projets de Green FAD en ${co.name}.`, canonicalPath: `/implantation/${co.slug}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Implantation", url: "/implantation" }, { label: String(co.name) }] }), body));
 });
 
-// ---------- Ressources ----------
+// ---------- Ressources : TOUS les documents publics (page « voir tout », 10/11/2026) ----------
+// Filtre par catégorie côté client (aucun rechargement), poids et date affichés,
+// fichier manquant → tuile « en préparation » au lieu d'un lien cassé.
 publicRoutes.get("/ressources", async (c) => {
-  const docs = await q(c.env.DB, "SELECT id, title, description, category, file_key, mime, size FROM documents WHERE status = 'publie' AND is_public = 1 ORDER BY id DESC LIMIT 40");
+  const docs = await q<Record<string, unknown>>(c.env.DB, "SELECT id, title, description, category, file_key, file_name, mime, size, published_at FROM documents WHERE status = 'publie' AND is_public = 1 ORDER BY id DESC LIMIT 200");
   const site = await loadSiteData(c);
   const hero = heroOf(site, "/ressources", "Ressources");
+  // Catégories réellement présentes en base — aucune catégorie fictive
+  const cats = new Map<string, number>();
+  for (const d of docs) { const k = String(d.category || "").trim() || "Autres"; cats.set(k, (cats.get(k) || 0) + 1); }
+  const docCard = (d: Record<string, unknown>) => {
+    const fk = String(d.file_key || "");
+    const isPdf = /pdf$/i.test(String(d.mime || "")) || /\.pdf$/i.test(fk);
+    const cat = String(d.category || "").trim() || "Autres";
+    const size = Number(d.size || 0);
+    const meta = [size ? fmtBytes(size) : "", d.published_at ? fmtDate(String(d.published_at), "short") : ""].filter(Boolean) as string[];
+    const metaHTML = (meta.length || !fk) ? `<span class="doc__meta">${meta.map((m) => `<small>${esc(m)}</small>`).join("")}${!fk ? `<span class="tag">Fichier en préparation</span>` : ""}</span>` : "";
+    if (!fk) {
+      return `<div class="doc doc--soon" title="Fichier en préparation"><span class="doc__icon">${icon("file-text")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}${metaHTML}</span></div>`;
+    }
+    const href = fk.startsWith("/") ? fk : `/media/${esc(fk)}`;
+    return `<a class="doc" data-cat="${esc(cat)}" href="${href}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}${metaHTML}</span><span class="doc__arrow">${icon("download")}</span></a>`;
+  };
+  const chips = [...cats.entries()].map(([k, n]) => `<button type="button" class="chip" data-cat="${esc(k)}">${esc(k)} (${n})</button>`).join("");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Ressources" }])}<p class="eyebrow">Ressources</p>
     <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
-  ${docs.length ? `<section class="container"><div class="doc-list reveal">${docs
-    .map((d) => { const isPdf = /pdf$/.test(String(d.mime || "")); const fk = String(d.file_key || ""); const href = fk.startsWith("/") ? fk : `/media/${esc(fk)}`; return `<a class="doc" href="${href}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(String(d.title))}</strong>${d.description ? `<em>${esc(String(d.description))}</em>` : ""}</span><span class="doc__arrow">${icon("download")}</span></a>`; })
-    .join("")}</div></section>` : `<section class="container center"><p class="muted">Les premiers documents seront publiés prochainement.</p></section>`}`;
+  ${docs.length ? `<section class="container">
+    <p class="docs-count" data-docs-count>${docs.length} document${docs.length > 1 ? "s" : ""} public${docs.length > 1 ? "s" : ""} — librement téléchargeables</p>
+    ${cats.size > 1 ? `<div class="chips docs-filters" role="group" aria-label="Filtrer par catégorie"><button type="button" class="chip is-on" data-cat="">Tous (${docs.length})</button>${chips}</div>` : ""}
+    <div class="doc-list reveal" data-docs-list>${docs.map(docCard).join("")}</div>
+  </section>
+  <script>(function(){var b=document.querySelectorAll(".docs-filters .chip");var d=document.querySelectorAll(".doc[data-cat]");if(!b.length)return;b.forEach(function(x){x.addEventListener("click",function(){b.forEach(function(y){y.classList.toggle("is-on",y===x);});var f=x.getAttribute("data-cat"),n=0;d.forEach(function(e){var s=!f||e.getAttribute("data-cat")===f;e.style.display=s?"":"none";if(s)n++;});var c=document.querySelector("[data-docs-count]");if(c)c.textContent=n+(n>1?" documents publics":" document public");});});})();</script>` : `<section class="container center"><p class="muted">Les premiers documents seront publiés prochainement.</p></section>`}`;
   const seo = await seoOf(c, site, "/ressources", "Ressources & documentation");
-  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources" }), body));
+  const base = String(site.settings.site_url || "");
+  const itemListLd = [{ "@context": "https://schema.org", "@type": "ItemList", name: "Documents publics GREEN FAD", itemListElement: docs.filter((d) => String(d.file_key || "")).map((d, i) => ({ "@type": "ListItem", position: i + 1, name: String(d.title), url: `${base}${String(d.file_key).startsWith("/") ? d.file_key : `/media/${d.file_key}`}` })) }];
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/ressources", jsonLd: itemListLd }), body));
 });
 
 // ---------- Presse ----------

@@ -525,13 +525,19 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "document_list": {
       const rows = await q(ctx.env.DB, "SELECT id, title, description, category, file_key, file_name, mime FROM documents WHERE status='publie' AND is_public=1 AND (?1 = '' OR category = ?1) ORDER BY id DESC LIMIT ?2", p.category || "", p.limit);
       if (!rows.length) return "";
+      // Fichier manquant → tuile « en préparation » (jamais de lien cassé) ;
+      // bouton « Tous les documents » → /ressources (comme le bloc posts → /blog).
       return `<section class="container"><div class="doc-list reveal">${rows
         .map((r) => {
-          const isPdf = /pdf$/.test(String(r.mime || ""));
-          const href = String(r.file_key).startsWith("/") ? r.file_key : `/media/${r.file_key}`;
+          const fk = String(r.file_key || "");
+          const isPdf = /pdf$/.test(String(r.mime || "")) || /\.pdf$/i.test(fk);
+          if (!fk) {
+            return `<div class="doc doc--soon" title="Fichier en préparation"><span class="doc__icon">${icon("file-text")}</span><span><strong>${esc(r.title)}</strong>${r.description ? `<em>${esc(r.description)}</em>` : ""}</span><span class="doc__meta"><span class="tag">Bientôt disponible</span></span></div>`;
+          }
+          const href = fk.startsWith("/") ? fk : `/media/${fk}`;
           return `<a class="doc" href="${esc(href)}"${isPdf ? ' target="_blank" rel="noopener"' : ""}><span class="doc__icon">${icon(isPdf ? "file-text" : "folder")}</span><span><strong>${esc(r.title)}</strong>${r.description ? `<em>${esc(r.description)}</em>` : ""}</span><span class="doc__arrow">${icon("download")}</span></a>`;
         })
-        .join("")}</div></section>`;
+        .join("")}</div><p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/ressources">${icon("folder", "i--inline")} Tous les documents</a></p></section>`;
     }
     case "embed":
       return `<section class="container">${p.code}</section>`; // réservé super_admin/admin, validé côté serveur

@@ -400,7 +400,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
   documents: {
     key: "documents", table: "documents", title: "Documents", single: "document", perm: "documents", statusable: true,
     order: "id DESC", searchable: ["title"],
-    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "is_public", label: "Public", type: "boolean", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    columns: [{ name: "title", label: "Titre", type: "text", list: true }, { name: "file_name", label: "Fichier", type: "readonly", list: true }, { name: "category", label: "Catégorie", type: "text", list: true }, { name: "is_public", label: "Public", type: "boolean", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "title", label: "Titre", type: "text", required: true },
       { name: "description", label: "Description", type: "textarea" },
@@ -587,7 +587,12 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
         <button type="button" class="btn btn--sm" data-media-open>Choisir</button>
         <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
         </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
-    case "file":
+    case "file": {
+      // Aperçu du fichier actuel (correction 10/11/2026 : l'admin voyait la clé
+      // technique sans jamais savoir quel fichier était réellement attaché)
+      const fv = String(v || "");
+      const furl = fv ? (fv.startsWith("/") ? fv : `/media/${fv}`) : "";
+      const fname = fv ? decodeURIComponent(fv.split("/").pop() || "") : "";
       return `<div class="adm-field adm-field--media${full}" data-media-field data-doc>
         <span>${esc(f.label)}</span>
         <div class="media-pick"><div class="media-pick__main"><input name="${f.name}" value="${esc(v)}" placeholder="Téléversez un document depuis votre appareil, ou choisissez dans la bibliothèque" data-media-input>
@@ -595,7 +600,10 @@ function fieldInput(f: Field, value: unknown, csrf: string, relationOptions?: { 
         <button type="button" class="btn btn--sm btn--primary" data-media-upload data-doc>${icon("upload")} Téléverser</button>
         <button type="button" class="btn btn--sm" data-media-open data-doc>Choisir</button>
         <button type="button" class="btn btn--sm" data-media-clear>Retirer</button>
-        </div></div></div>${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
+        </div></div></div>
+        ${fv ? `<small>Fichier actuel : <a href="${esc(furl)}" target="_blank" rel="noopener">${esc(fname)}</a> — téléversez ou choisissez un autre fichier, puis enregistrez pour le remplacer.</small>` : `<small>Aucun fichier attaché pour l'instant.</small>`}
+        ${f.help ? `<small>${esc(f.help)}</small>` : ""}</div>`;
+    }
     case "json":
       // value null → textarea vide (jamais « null » en clair, qui bloquait toute la sauvegarde du produit)
       return `<label class="adm-field${full}"><span>${esc(f.label)}</span><textarea name="${f.name}" rows="4" data-json>${esc(value == null ? "" : typeof value === "string" ? v : JSON.stringify(value, null, 2))}</textarea>${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`;
@@ -885,11 +893,54 @@ export function crudRouter(): Hono<{ Bindings: Env }> {
   return r;
 }
 
+// Type MIME déduit de l'extension — utilisé pour les fichiers statiques
+// (/assets/docs/…) absents de la médiathèque R2
+function mimeFromKey(key: string): string {
+  const ext = (key.split(".").pop() || "").toLowerCase();
+  const map: Record<string, string> = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    txt: "text/plain",
+    csv: "text/csv",
+    zip: "application/zip",
+  };
+  return map[ext] || "application/octet-stream";
+}
+
 // Collecte + validation serveur des champs
 async function collectFields(c: Context<{ Bindings: Env }>, res: ResourceDef, form: Record<string, unknown>, id: string | null): Promise<{ data: Record<string, unknown>; error?: string }> {
   const data: Record<string, unknown> = {};
   for (const f of res.fields) {
-    if (f.type === "readonly" || f.type === "file" || f.type === "media_multi") continue;
+    if (f.type === "readonly" || f.type === "media_multi") continue;
+    if (f.type === "file") {
+      // Fichier (documents, presse) : la valeur du champ est la clé R2 ou le
+      // chemin /assets/… posé par le téléversement ou le sélecteur.
+      // Correction du 10/11/2026 : ce type était ignoré ici — la clé n'était
+      // donc JAMAIS enregistrée (création sans fichier, remplacement impossible).
+      const rawFile = form[f.name];
+      const fk = String(rawFile == null ? "" : rawFile).trim().slice(0, 300);
+      if (!fk) {
+        if (f.required && !id) return { data, error: `Le champ « ${f.label} » est obligatoire.` };
+        continue; // mise à jour sans nouveau fichier → conserver le fichier actuel
+      }
+      data[f.name] = fk;
+      if (res.table === "documents") {
+        // Synchronisation des colonnes descriptives (nom affiché, type MIME, poids).
+        // Fichier R2 → métadonnées exactes ; fichier statique (/assets/…) absent
+        // de la médiathèque → nom + MIME déduits, et la taille existante est
+        // PRÉSERVÉE (ne jamais remplacer une taille connue par « null »).
+        const m = await q1<{ filename: string; mime: string; size: number | null }>(c.env.DB, "SELECT filename, mime, size FROM media WHERE r2_key = ?", fk);
+        data["file_name"] = (m ? m.filename : fk.split("/").pop() || fk).slice(0, 200);
+        data["mime"] = m ? m.mime : mimeFromKey(fk);
+        if (m) data["size"] = m.size;
+      }
+      continue;
+    }
     const raw = form[f.name];
     if (f.required && (raw == null || String(raw).trim() === "")) return { data, error: `Le champ « ${f.label} » est obligatoire.` };
     if (f.type === "screenshots") {
