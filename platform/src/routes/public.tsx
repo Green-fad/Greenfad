@@ -1060,6 +1060,115 @@ publicRoutes.get("/videos", async (c) => {
   return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/videos", jsonLd: videoLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Vidéos" }] }), body));
 });
 
+// ---------- RÉFÉRENCES — clients & partenaires qui nous font confiance ----------
+// Demande du fondateur (11/11/2026) : « Fais aussi pour la page références
+// (RÉFÉRENCES — Ils nous font confiance) avec voir tous nos références, dans le
+// menu, la page détail de chaque, et une gestion admin améliorée. »
+// Données 100 % base (table partners) — aucun texte inventé : les champs laissés
+// vides par l'administration ne s'affichent simplement pas.
+publicRoutes.get("/references", async (c) => {
+  const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT name, slug, sector, description, logo_key, url FROM partners WHERE status = ? AND slug IS NOT NULL AND slug != '' ORDER BY sort_order, name", PUBLIE);
+  const site = await loadSiteData(c);
+  const hero = heroOf(site, "/references", "Références");
+  const base = String(site.settings.site_url || "");
+  // ItemList d'organisations : alimente Google pour « références / clients Greenfad »
+  const refLd = [{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Références clients & partenaires GREEN FAD",
+    numberOfItems: rows.length,
+    itemListElement: rows.map((r, i) => ({
+      "@type": "ListItem", position: i + 1,
+      item: {
+        "@type": "Organization",
+        name: String(r.name),
+        url: `${base}/references/${r.slug}`,
+        ...(r.logo_key ? { logo: { "@type": "ImageObject", url: `${base}${mediaSrc(String(r.logo_key))}` } } : {}),
+        ...(r.sector ? { knowsAbout: String(r.sector) } : {}),
+      },
+    })),
+  }];
+  const card = (r: Record<string, unknown>) => {
+    const logo = String(r.logo_key || "").startsWith("/") ? String(r.logo_key) : `/media/${r.logo_key}`;
+    const desc = String(r.description || "").trim();
+    return `<a class="ref-card" href="/references/${esc(String(r.slug))}">
+      <span class="ref-card__logo">${r.logo_key ? `<img src="${esc(logo)}" alt="${esc(String(r.name))}" loading="lazy" decoding="async" width="320" height="200">` : `<span>${esc(String(r.name))}</span>`}</span>
+      <span class="ref-card__body">
+        <strong>${esc(String(r.name))}</strong>
+        ${r.sector ? `<span class="tag">${esc(String(r.sector))}</span>` : ""}
+        ${desc ? `<p>${esc(desc.slice(0, 140))}${desc.length > 140 ? "…" : ""}</p>` : ""}
+        <span class="card__more">Voir la référence ${icon("arrow-right")}</span>
+      </span></a>`;
+  };
+  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Références" }])}<p class="eyebrow">Ils nous font confiance</p>
+    <h1>${heroTitleHTML(hero)}</h1>
+    ${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : `<p class="page-hero__text">Entreprises, institutions et organisations qui travaillent avec GREEN FAD — des collaborations réelles, menées du Mali vers l'international.</p>`}</div></section>
+  ${rows.length ? `<section class="container">
+    <p class="docs-count" data-refs-count>${rows.length} référence${rows.length > 1 ? "s" : ""} — clients, partenaires et institutions</p>
+    <div class="ref-grid reveal" data-stagger>${rows.map(card).join("")}</div>
+  </section>
+  <section class="cta-band"><div class="container cta-band__inner reveal"><h2>Envie de rejoindre nos références ?</h2><p>Parlons de votre projet — nous répondons rapidement.</p><a class="btn btn--invert" href="/contact">${icon("arrow-right")} Démarrer la conversation</a></div></section>`
+  : `<section class="container center"><p class="muted">Les premières références seront publiées prochainement.</p></section>`}`;
+  const seo = await seoOf(c, site, "/references", "Références — Ils nous font confiance");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description || "Les clients, partenaires et institutions qui font confiance à GREEN FAD — références réelles et collaborations vérifiables.", canonicalPath: "/references", jsonLd: refLd, crumbs: [{ label: "Accueil", url: "/" }, { label: "Références" }] }), body));
+});
+
+publicRoutes.get("/references/:slug", async (c) => {
+  const r = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM partners WHERE slug = ? AND status = ?", c.req.param("slug"), PUBLIE);
+  if (!r || !String(r.slug || "")) return c.notFound();
+  const site = await loadSiteData(c);
+  const base = String(site.settings.site_url || "");
+  const others = await q(c.env.DB, "SELECT name, slug, sector, logo_key FROM partners WHERE status = ? AND slug IS NOT NULL AND slug != '' AND id != ? ORDER BY sort_order, name LIMIT 12", PUBLIE, r.id);
+  const logo = String(r.logo_key || "").startsWith("/") ? String(r.logo_key) : (r.logo_key ? `/media/${r.logo_key}` : "");
+  const desc = String(r.description || "").trim();
+  const sector = String(r.sector || "").trim();
+  const refUrl = `${base}/references/${r.slug}`;
+  const ld = [{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: String(r.name),
+    url: refUrl,
+    ...(r.logo_key ? { logo: { "@type": "ImageObject", url: `${base}${mediaSrc(String(r.logo_key))}` } } : {}),
+    ...(sector ? { knowsAbout: sector } : {}),
+    ...(r.url ? { sameAs: [String(r.url)] } : {}),
+    description: desc || `${String(r.name)} figure parmi les références qui font confiance à GREEN FAD.`,
+  }];
+  const body = `<section class="page-hero ref-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Références", url: "/references" }, { label: String(r.name) }])}<p class="eyebrow">Référence client & partenaire</p>
+    <div class="ref-hero__row">
+      ${logo ? `<span class="ref-hero__logo"><img src="${esc(logo)}" alt="Logo ${esc(String(r.name))}" width="320" height="200"></span>` : ""}
+      <div><h1>${esc(String(r.name))}</h1>
+      ${sector ? `<p class="ref-hero__sector"><span class="tag">${esc(sector)}</span></p>` : ""}</div>
+    </div></div></section>
+  <section class="container"><div class="article-grid">
+    <article class="article prose reveal">
+      ${desc ? md(desc) : `<p>${esc(String(r.name))} figure parmi les organisations qui nous font confiance. GREEN FAD accompagne ses partenaires avec la même exigence : des solutions numériques pensées pour les réalités du terrain africain.</p>`}
+      ${r.url ? `<p><a class="btn btn--outline btn--sm" href="${esc(String(r.url))}" target="_blank" rel="noopener">${icon("external-link", "i--inline")} Site officiel de ${esc(String(r.name))}</a></p>` : ""}
+    </article>
+    <aside class="article-side">
+      <div class="article-side__block"><h3>${icon("briefcase", "i--inline")} Travailler avec nous</h3><p class="muted">Vous souhaitez rejoindre nos références ou lancer votre projet ?</p><a class="btn btn--primary btn--sm" href="/contact">Nous contacter ${icon("arrow-right")}</a></div>
+      <div class="article-side__block"><h3>${icon("share", "i--inline")} Partager</h3>${shareHTML(String(r.name), refUrl)}</div>
+    </aside>
+  </div></section>
+  ${others.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Références</p><h2>Autres organisations qui nous font confiance</h2></header>
+    <div class="partners reveal" data-stagger>${others.map((o) => {
+      const oSlug = String(o.slug || "");
+      const oLogo = String(o.logo_key || "").startsWith("/") ? String(o.logo_key) : (o.logo_key ? `/media/${o.logo_key}` : "");
+      const inner = oLogo ? `<img src="${esc(oLogo)}" alt="${esc(String(o.name))}" loading="lazy" decoding="async" width="320" height="200">` : `<span>${esc(String(o.name))}</span>`;
+      return `<a class="partner" href="/references/${esc(oSlug)}" title="${esc(String(o.name))} — voir la référence">${inner}</a>`;
+    }).join("")}</div>
+    <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/references">Voir toutes nos références ${icon("arrow-right")}</a></p></section>` : ""}`;
+  const seo = await seoOf(c, site, `/references/${r.slug}`, `${String(r.name)} — Référence GREEN FAD`);
+  return c.html(await layout(c, site, await getPageSEO(c, {
+    title: seo.title,
+    description: plainText(desc, 155) || `${String(r.name)} fait partie des références qui font confiance à GREEN FAD.`,
+    ogImage: logo ? mediaSrc(logo) : undefined,
+    ogImageAlt: logo ? `Logo ${String(r.name)}` : undefined,
+    canonicalPath: `/references/${r.slug}`,
+    jsonLd: ld,
+    crumbs: [{ label: "Accueil", url: "/" }, { label: "Références", url: "/references" }, { label: String(r.name) }],
+  }), body));
+});
+
 // ---------- BLOG — média éditorial de l'entreprise ----------
 function readingTime(mdText: string | null | undefined): number {
   const words = String(mdText || "").replace(/[#>*`\-\[\]()!]/g, " ").split(/\s+/).filter(Boolean).length;
@@ -1558,7 +1667,7 @@ publicRoutes.post("/carrieres/:slug/apply", async (c) => {
 // images (Google Images) chacune avec leur sitemap dédié, référencés dans robots.txt.
 publicRoutes.get("/sitemap.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
-  const [pages, posts, products, services, projects, countries, albums, press, jobs] = await Promise.all([
+  const [pages, posts, products, services, projects, countries, albums, press, jobs, partners] = await Promise.all([
     // is_home = 0 : la page « accueil » sert la homepage sur « / » — /p/accueil n'existe pas (404), on ne la soumet jamais
     q(c.env.DB, "SELECT slug, updated_at FROM pages WHERE status = ? AND is_home = 0", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM posts WHERE status = ?", PUBLIE),
@@ -1569,6 +1678,7 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     q(c.env.DB, "SELECT slug, updated_at FROM media_albums WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM press_releases WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM jobs WHERE status = ? AND is_open = 1", PUBLIE),
+    q(c.env.DB, "SELECT slug, updated_at FROM partners WHERE status = ? AND slug IS NOT NULL AND slug != ''", PUBLIE),
   ]);
   const today = new Date().toISOString().slice(0, 10);
   const urls: { loc: string; date: string; priority: string }[] = [
@@ -1583,6 +1693,8 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     { loc: "/galerie", date: today, priority: "0.7" },
     { loc: "/videos", date: today, priority: "0.7" },
     ...albums.map((a) => ({ loc: `/galerie/album/${a.slug}`, date: String(a.updated_at).slice(0, 10), priority: "0.5" })),
+    { loc: "/references", date: today, priority: "0.7" },
+    ...partners.map((r) => ({ loc: `/references/${r.slug}`, date: String(r.updated_at).slice(0, 10), priority: "0.6" })),
     // /blog/archives volontairement absente : page utilitaire noindex,nofollow — soumettre une URL noindex génère
     // des erreurs « Submitted URL marked 'noindex' » dans Search Console
     { loc: "/blog", date: today, priority: "0.9" },
@@ -1627,11 +1739,12 @@ ${entries.join("\n")}
 // → alimente Google Images : images produits, couvertures d'articles, albums photo, expertises.
 publicRoutes.get("/sitemap-images.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
-  const [products, posts, services, albums] = await Promise.all([
+  const [products, posts, services, albums, partners] = await Promise.all([
     q(c.env.DB, "SELECT slug, name, image_key, updated_at FROM products WHERE status = ? AND image_key != ''", PUBLIE),
     q(c.env.DB, "SELECT slug, title, cover_key, updated_at FROM posts WHERE status = ? AND cover_key != ''", PUBLIE),
     q(c.env.DB, "SELECT slug, name, image_key, updated_at FROM services WHERE status = ? AND image_key != ''", PUBLIE),
     q(c.env.DB, "SELECT a.slug, a.name, a.updated_at, m.r2_key, m.alt, mi.title FROM media_albums a JOIN media_items mi ON mi.album_id = a.id AND mi.type = 'image' AND mi.status = 'publie' JOIN media m ON m.id = mi.media_id WHERE a.status = ? ORDER BY a.sort_order, mi.sort_order", PUBLIE),
+    q(c.env.DB, "SELECT slug, name, logo_key FROM partners WHERE status = ? AND slug IS NOT NULL AND slug != '' AND logo_key != ''", PUBLIE),
   ]);
   const imgSrc = (k: unknown) => { const s = String(k || ""); return s.startsWith("/") ? base + s : `${base}/media/${s}`; };
   const imgBlock = (title: string, loc: string) => `<image:image><image:loc>${esc(loc)}</image:loc><image:title>${esc(title)}</image:title></image:image>`;
@@ -1647,6 +1760,7 @@ publicRoutes.get("/sitemap-images.xml", async (c) => {
     ...products.map((p) => `<url><loc>${base}/produits/${p.slug}</loc>${imgBlock(String(p.name), imgSrc(p.image_key))}</url>`),
     ...services.map((s) => `<url><loc>${base}/expertises/${s.slug}</loc>${imgBlock(String(s.name), imgSrc(s.image_key))}</url>`),
     ...posts.map((p) => `<url><loc>${base}/blog/${p.slug}</loc>${imgBlock(String(p.title), imgSrc(p.cover_key))}</url>`),
+    ...partners.map((r) => `<url><loc>${base}/references/${r.slug}</loc>${imgBlock(`${r.name} — référence GREEN FAD`, imgSrc(r.logo_key))}</url>`),
     ...[...albumImgs.entries()].map(([slug, e]) => `<url><loc>${base}/galerie/album/${slug}</loc>${e.imgs.join("")}</url>`),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

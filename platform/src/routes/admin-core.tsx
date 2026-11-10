@@ -1,7 +1,7 @@
 // GREEN FAD — Dashboard : modules système (auth, accueil, médias R2, utilisateurs, menus, SEO, paramètres, audit)
 import { Hono, Context } from "hono";
 import { Env, ROLES, Role } from "../types";
-import { q, q1, count, loadSettings, setSetting, invalidateCache } from "../db";
+import { q, q1, count, getSetting, loadSettings, setSetting, invalidateCache } from "../db";
 import { adminLayout, ADMIN_NAV } from "../render/admin";
 import { hashPassword, verifyPassword, createSession, destroySession, rateLimit, resetRateLimit, clientIp } from "../auth";
 import { can } from "../rbac";
@@ -602,6 +602,205 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     await c.env.DB.prepare("DELETE FROM media_items WHERE id = ? AND type='video'").bind(c.req.param("id")).run();
     await audit(c, "suppression_video", "media_items", c.req.param("id"));
     return c.redirect("/admin/media/videos");
+  });
+
+  // ---------- BANNIÈRE D'ENTÊTE (0024) — diapositives image/vidéo administrables ----------
+  // Demande du fondateur (11/11/2026) : « l'image de bannière dans l'entête doit
+  // être remplaçable par l'admin, jusqu'à 3 qui défilent avec 3 modèles de
+  // défilement, plus si possible une vidéo de 5 secondes en boucle. »
+  // Plus aucune image à remplacer dans le code à chaque saison ou campagne :
+  // les diapositives vivent en base (hero_slides), les médias dans R2.
+  const HERO_EFFECTS = [
+    { value: "fondu", label: "Fondu enchaîné", desc: "Chaque visuel se fond doucement dans le suivant — élégant et discret." },
+    { value: "glisse", label: "Glissé horizontal", desc: "Les visuels poussent latéralement — effet vitrine dynamique." },
+    { value: "zoom", label: "Zoom lent (Ken Burns)", desc: "Chaque visuel avance en zoomant légèrement — idéal campagne ou saison." },
+  ];
+
+  function slideMediaSrc(k: string): string {
+    return k.startsWith("/") ? k : "/media/" + k;
+  }
+
+  function slideForm(s: Record<string, unknown> | null, csrf: string, action: string): string {
+    const val = (k: string) => esc(String(s?.[k] ?? ""));
+    const isVideo = String(s?.media_type || "") === "video";
+    const preview = s
+      ? (isVideo
+        ? `<video src="${esc(slideMediaSrc(String(s.media_key)))}" muted loop playsinline controls style="max-width:280px;border-radius:10px"></video>`
+        : `<img src="${esc(slideMediaSrc(String(s.media_key)))}" alt="" style="max-width:280px;border-radius:10px">`)
+      : "";
+    return `${preview}<form method="post" action="${action}" enctype="multipart/form-data" class="adm-form" data-confirm-leave>
+      <input type="hidden" name="_csrf" value="${csrf}">
+      <label class="adm-field"><span>Type de visuel *</span><select name="media_type">
+        <option value="image" ${isVideo ? "" : "selected"}>Image (saison, campagne, visuel de marque)</option>
+        <option value="video" ${isVideo ? "selected" : ""}>Vidéo courte en boucle (≈ 5 s, muette, lecture automatique)</option>
+      </select></label>
+      ${mediaPicker("media_key", "Image depuis la bibliothèque (ou téléversement direct)", s?.media_key ?? "")}
+      <label class="adm-field full"><span>Vidéo courte — MP4 ou WebM (max 20 Mo, ≈ 5 s)</span><input type="file" name="video_file" accept="video/mp4,video/webm" style="padding:8px">
+      <small>Si une vidéo est téléversée, elle remplace l'image et le type devient « vidéo » — jouée en boucle, sans son.</small></label>
+      <label class="adm-field full"><span>Texte alternatif (accessibilité & SEO)</span><input name="alt" value="${val("alt")}" maxlength="300" placeholder="Ex. : campagne Ramadan 2026 — produits Green FAD"></label>
+      <label class="adm-field"><span>Ordre</span><input type="number" name="sort_order" value="${val("sort_order") || "0"}"></label>
+      <label class="adm-field"><span>Statut</span><select name="status">${["brouillon", "publie", "depublie"].map((st) => `<option ${val("status") === st ? "selected" : ""}>${st}</option>`).join("")}</select></label>
+      <p class="muted">Rappel : seules les 3 premières diapositives « publie » tournent dans la bannière. Le texte, les boutons et les badges du héros s'éditent dans Pages &amp; Page Builder (bloc « Bannière principale »).</p>
+      <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer</button><a class="btn" href="/admin/banniere">Retour</a></div></form>`;
+  }
+
+  r.get("/banniere", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const slides = await q(c.env.DB, "SELECT * FROM hero_slides ORDER BY sort_order, id");
+    const effect = String(await getSetting(c.env.DB, "hero_effect", "fondu"));
+    const interval = Number(await getSetting(c.env.DB, "hero_interval", 5000)) || 5000;
+    const canEdit = can(user.role, "media", "create");
+    const effectRadios = HERO_EFFECTS.map((e) => `<label class="adm-field"><span style="display:flex;gap:8px;align-items:center"><input type="radio" name="hero_effect" value="${e.value}" ${effect === e.value ? "checked" : ""}> <strong>${e.label}</strong></span><small>${e.desc}</small></label>`).join("");
+    const rows = slides.map((s) => {
+      const src = slideMediaSrc(String(s.media_key));
+      const preview = s.media_type === "video"
+        ? `<video src="${esc(src)}" muted loop playsinline preload="metadata" style="max-height:56px;border-radius:8px"></video>`
+        : `<img src="${esc(src)}" alt="" style="max-height:56px;border-radius:8px">`;
+      return `<tr><td>${s.id}</td><td>${preview}</td>
+      <td><span class="pill">${esc(String(s.media_type))}</span><br><code class="muted">${esc(String(s.media_key).slice(0, 42))}</code></td>
+      <td class="muted">${esc(String(s.alt || "").slice(0, 60))}</td>
+      <td><span class="pill ${s.status === "publie" ? "ok" : ""}">${esc(String(s.status))}</span></td>
+      <td class="adm-actions">
+        ${canEdit ? `<a class="btn btn--sm" href="/admin/banniere/${s.id}">${icon("edit")} Modifier</a>
+        <form method="post" action="/admin/banniere/${s.id}/move" style="display:inline-flex;gap:4px"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm" name="dir" value="up" aria-label="Monter">${icon("arrow-up")}</button><button class="btn btn--sm" name="dir" value="down" aria-label="Descendre">${icon("arrow-down")}</button></form>` : ""}
+        ${can(user.role, "media", "delete") ? `<form method="post" action="/admin/banniere/${s.id}/delete" data-confirm="Retirer cette diapositive de la bannière ?"><input type="hidden" name="_csrf" value="${user.csrf}"><button class="btn btn--sm btn--danger">Suppr.</button></form>` : ""}
+      </td></tr>`;
+    }).join("");
+    const full = slides.length >= 3;
+    const body = `<section class="adm-panel"><h3>Comment fonctionne la bannière ?</h3>
+      <p class="muted">La bannière d'entête de l'accueil tourne avec <strong>jusqu'à 3 visuels publiés</strong> — images de saison ou vidéo courte en boucle. Le modèle de défilement et la vitesse se règlent ci-dessous : <strong>plus rien à remplacer dans le code</strong> à chaque campagne. Sans diapositive publiée, la bannière conserve son dégradé actuel. Le texte et les boutons du héros restent éditables dans Pages &amp; Page Builder.</p></section>
+    ${canEdit ? `<section class="adm-panel"><h3>Modèle de défilement &amp; vitesse</h3>
+      <form method="post" action="/admin/banniere/reglages" class="adm-form">
+        <input type="hidden" name="_csrf" value="${user.csrf}">
+        ${effectRadios}
+        <label class="adm-field"><span>Durée d'affichage de chaque diapositive (ms — 3 000 à 15 000)</span><input type="number" name="hero_interval" min="3000" max="15000" step="500" value="${interval}"><small>5 000 ms par défaut — calé sur une vidéo de 5 secondes en boucle.</small></label>
+        <div class="adm-form__actions"><button class="btn btn--primary" type="submit">Enregistrer le modèle</button></div>
+      </form></section>` : ""}
+    <div class="adm-toolbar"><span class="muted">${slides.length} diapositive${slides.length > 1 ? "s" : ""} enregistrée${slides.length > 1 ? "s" : ""} (3 tournantes maximum)${full ? " — limite atteinte : supprimez ou dépubliez pour en ajouter." : ""}</span>
+      ${canEdit && !full ? `<a class="btn btn--primary adm-new" href="/admin/banniere/new">${icon("plus")} Ajouter une diapositive</a>` : ""}</div>
+    ${slides.length ? `<table class="adm-table"><thead><tr><th>#</th><th>Aperçu</th><th>Type / fichier</th><th>Texte alternatif</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="adm-empty">Aucune diapositive — la bannière utilise son dégradé actuel. Ajoutez la première image ou vidéo.</div>`}`;
+    return c.html(adminLayout(c, user, "Bannière d'entête", body, "/admin/banniere"));
+  });
+
+  r.get("/banniere/new", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const n = await count(c.env.DB, "hero_slides");
+    if (n >= 3) return c.html(adminLayout(c, user, "Bannière d'entête", `<div class="adm-alert adm-alert--error">Limite de 3 diapositives atteinte — retirez-en une avant d'en ajouter.</div><a class="btn" href="/admin/banniere">Retour</a>`), 400);
+    return c.html(adminLayout(c, user, "Nouvelle diapositive", slideForm(null, user.csrf, "/admin/banniere"), "/admin/banniere"));
+  });
+
+  r.post("/banniere", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "create");
+    if (d) return d;
+    const form = (await c.req.parseBody({ all: true }).catch(() => ({}))) as Record<string, unknown>;
+    if (typeof form === "string") return c.redirect("/admin/banniere/new");
+    const n = await count(c.env.DB, "hero_slides");
+    if (n >= 3) return c.html(adminLayout(c, user, "Bannière d'entête", `<div class="adm-alert adm-alert--error">Limite de 3 diapositives atteinte.</div><a class="btn" href="/admin/banniere">Retour</a>`), 400);
+    let mediaKey = String(form.media_key || "").trim();
+    let mediaType = String(form.media_type || "image") === "video" ? "video" : "image";
+    const vf = form.video_file;
+    if (vf instanceof File && vf.size > 0) {
+      const key = await saveToR2(c, vf, "banniere");
+      if (!key) return c.html(adminLayout(c, user, "Bannière d'entête", `<div class="adm-alert adm-alert--error">Vidéo refusée — format MP4/WebM requis, 20 Mo maximum.</div><a class="btn" href="/admin/banniere/new">Retour</a>`), 400);
+      mediaKey = key;
+      mediaType = "video";
+    }
+    if (!mediaKey) return c.html(adminLayout(c, user, "Bannière d'entête", `<div class="adm-alert adm-alert--error">Choisissez une image dans la bibliothèque ou téléversez une vidéo courte.</div><a class="btn" href="/admin/banniere/new">Retour</a>`), 400);
+    await c.env.DB.prepare("INSERT INTO hero_slides (media_key, media_type, alt, sort_order, status, published_at, created_at, updated_at) VALUES (?1,?2,?3,?4,?5,CASE WHEN ?5='publie' THEN datetime('now') END,datetime('now'),datetime('now'))")
+      .bind(mediaKey.slice(0, 300), mediaType, String(form.alt || "").slice(0, 300), Math.max(0, Number(form.sort_order) || 0), ["publie", "brouillon", "depublie"].includes(String(form.status)) ? String(form.status) : "brouillon")
+      .run();
+    await audit(c, "creation_diapositive_banniere", "hero_slides", null, { type: mediaType });
+    await invalidateCache(c.env, ["settings"]);
+    return c.redirect("/admin/banniere");
+  });
+
+  r.get("/banniere/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "view");
+    if (d) return d;
+    const s = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM hero_slides WHERE id = ?", c.req.param("id"));
+    if (!s) return c.notFound();
+    return c.html(adminLayout(c, user, `Diapositive #${s.id}`, slideForm(s, user.csrf, `/admin/banniere/${s.id}`), "/admin/banniere"));
+  });
+
+  // NB : route littérale enregistrée AVANT /banniere/:id — sinon « reglages »
+  // serait capturé comme :id (ordre critique documenté dans index.tsx).
+
+  r.post("/banniere/reglages", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    if (typeof form === "string") return c.redirect("/admin/banniere");
+    const effect = HERO_EFFECTS.some((e) => e.value === String(form.hero_effect)) ? String(form.hero_effect) : "fondu";
+    const interval = Math.min(Math.max(Number(form.hero_interval) || 5000, 3000), 15000);
+    await setSetting(c.env.DB, "hero_effect", effect);
+    await setSetting(c.env.DB, "hero_interval", interval);
+    await invalidateCache(c.env, ["settings"]);
+    await audit(c, "modification_modele_defilement", "settings", null, { effect, interval });
+    return c.redirect("/admin/banniere");
+  });
+  r.post("/banniere/:id", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = (await c.req.parseBody({ all: true }).catch(() => ({}))) as Record<string, unknown>;
+    if (typeof form === "string") return c.redirect("/admin/banniere");
+    const s = await q1<{ media_key: string; media_type: string }>(c.env.DB, "SELECT media_key, media_type FROM hero_slides WHERE id = ?", c.req.param("id"));
+    if (!s) return c.notFound();
+    let mediaKey = String(form.media_key || "").trim() || s.media_key;
+    let mediaType = String(form.media_type || "image") === "video" ? "video" : "image";
+    const vf = form.video_file;
+    if (vf instanceof File && vf.size > 0) {
+      const key = await saveToR2(c, vf, "banniere");
+      if (!key) return c.html(adminLayout(c, user, "Bannière d'entête", `<div class="adm-alert adm-alert--error">Vidéo refusée — format MP4/WebM requis, 20 Mo maximum.</div><a class="btn" href="/admin/banniere/${c.req.param("id")}">Retour</a>`), 400);
+      mediaKey = key;
+      mediaType = "video";
+    }
+    await c.env.DB.prepare("UPDATE hero_slides SET media_key=?1, media_type=?2, alt=?3, sort_order=?4, status=?5, published_at=CASE WHEN ?5='publie' AND published_at IS NULL THEN datetime('now') ELSE published_at END, updated_at=datetime('now') WHERE id=?6")
+      .bind(mediaKey.slice(0, 300), mediaType, String(form.alt || "").slice(0, 300), Math.max(0, Number(form.sort_order) || 0), ["publie", "brouillon", "depublie"].includes(String(form.status)) ? String(form.status) : "brouillon", c.req.param("id"))
+      .run();
+    await audit(c, "modification_diapositive_banniere", "hero_slides", c.req.param("id"));
+    await invalidateCache(c.env, ["settings"]);
+    return c.redirect("/admin/banniere");
+  });
+
+
+  r.post("/banniere/:id/move", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "edit");
+    if (d) return d;
+    const form = await c.req.parseBody();
+    const dir = typeof form !== "string" && form.dir === "down" ? "down" : "up";
+    const it = await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM hero_slides WHERE id = ?", c.req.param("id"));
+    if (!it) return c.redirect("/admin/banniere");
+    const target = dir === "up"
+      ? await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM hero_slides WHERE sort_order < ? ORDER BY sort_order DESC LIMIT 1", it.sort_order)
+      : await q1<{ id: number; sort_order: number }>(c.env.DB, "SELECT id, sort_order FROM hero_slides WHERE sort_order > ? ORDER BY sort_order ASC LIMIT 1", it.sort_order);
+    if (target) {
+      await c.env.DB.batch([
+        c.env.DB.prepare("UPDATE hero_slides SET sort_order = ? WHERE id = ?").bind(target.sort_order, it.id),
+        c.env.DB.prepare("UPDATE hero_slides SET sort_order = ? WHERE id = ?").bind(it.sort_order, target.id),
+      ]);
+      await audit(c, "reordonnancement_banniere", "hero_slides", it.id, { dir });
+    }
+    return c.redirect("/admin/banniere");
+  });
+
+  r.post("/banniere/:id/delete", async (c) => {
+    const user = c.get("user")!;
+    const d = deny(c, "media", "delete");
+    if (d) return d;
+    const s = await q1<{ media_key: string }>(c.env.DB, "SELECT media_key FROM hero_slides WHERE id = ?", c.req.param("id"));
+    if (s && !String(s.media_key).startsWith("/")) await deleteMedia(c, s.media_key).catch(() => {});
+    await c.env.DB.prepare("DELETE FROM hero_slides WHERE id = ?").bind(c.req.param("id")).run();
+    await audit(c, "suppression_diapositive_banniere", "hero_slides", c.req.param("id"));
+    return c.redirect("/admin/banniere");
   });
 
   // ---------- MESSAGES ----------

@@ -40,6 +40,7 @@ export const ADMIN_NAV: { group: string; items: AdminNavItem[] }[] = [
     group: "Media Center",
     items: [
       { label: "Bibliothèque (R2)", url: "/admin/media", icon: "image" },
+      { label: "Bannière d'entête", url: "/admin/banniere", icon: "layout" },
       { label: "Albums & galeries", url: "/admin/media/albums", icon: "folder" },
       { label: "Vidéos (URL)", url: "/admin/media/videos", icon: "video" },
       { label: "Documents", url: "/admin/documents", icon: "file-text" },

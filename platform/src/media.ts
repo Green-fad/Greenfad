@@ -5,10 +5,12 @@ import { ulid, slugify } from "./utils";
 
 const ALLOWED_IMAGE = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml", "image/avif"];
 const ALLOWED_DOC = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "application/zip"];
+// Vidéos courtes de bannière (mp4/webm) — utilisées par le module « Bannière d'entête »
+const ALLOWED_VIDEO = ["video/mp4", "video/webm"];
 const MAX_SIZE = 20 * 1024 * 1024; // 20 Mo
 
 export function isAllowedMime(mime: string): boolean {
-  return ALLOWED_IMAGE.includes(mime) || ALLOWED_DOC.includes(mime);
+  return ALLOWED_IMAGE.includes(mime) || ALLOWED_DOC.includes(mime) || ALLOWED_VIDEO.includes(mime);
 }
 
 export function extFromMime(mime: string, filename: string): string {
@@ -23,6 +25,8 @@ export function extFromMime(mime: string, filename: string): string {
     "text/plain": ".txt",
     "text/csv": ".csv",
     "application/zip": ".zip",
+    "video/mp4": ".mp4",
+    "video/webm": ".webm",
   };
   if (map[mime]) return map[mime];
   const m = /\.(\w{1,5})$/.exec(filename);

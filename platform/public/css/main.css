@@ -117,6 +117,30 @@ h4{font-size:1rem;font-weight:600}
 .hero__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hero__media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(13,26,56,.92),rgba(13,26,56,.12) 55%)}
 
+/* ---------- Bannière d'entête administrable (0024) — 3 modèles de défilement ----------
+   fondu  = fondu enchaîné (transition d'opacité)
+   glisse = translation horizontale (sortie à gauche, entrée par la droite)
+   zoom   = zoom lent type Ken Burns sur le visuel actif
+   Sans diapositive publiée : aucun de ces styles ne s'applique (rendu historique). */
+.hero--banner{isolation:isolate}
+.hero__slides{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero__slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .9s ease,transform .9s ease;will-change:opacity,transform}
+.hero__slide img,.hero__slide video{width:100%;height:100%;object-fit:cover;display:block}
+.hero__slide.is-active{opacity:1;visibility:visible;z-index:1}
+.hero__slide.is-prev{opacity:0;visibility:visible;z-index:0}
+.hero__veil{position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,rgba(10,19,43,.84),rgba(10,19,43,.5) 55%,rgba(10,19,43,.28))}
+.hero--fx-glisse .hero__slide{transform:translateX(7%)}
+.hero--fx-glisse .hero__slide.is-active{transform:translateX(0)}
+.hero--fx-glisse .hero__slide.is-prev{transform:translateX(-7%)}
+.hero--fx-zoom .hero__slide.is-active img,.hero--fx-zoom .hero__slide.is-active video{animation:heroKenburns 9s ease-out forwards}
+@keyframes heroKenburns{from{transform:scale(1.02)}to{transform:scale(1.14)}}
+.hero__dots{position:absolute;left:0;right:0;bottom:20px;display:flex;gap:8px;justify-content:center;z-index:3;padding:0 16px}
+.hero__dot{width:10px;height:10px;border-radius:99px;border:0;background:rgba(255,255,255,.38);cursor:pointer;padding:0;transition:width .25s ease,background .25s ease}
+.hero__dot.is-on{width:28px;background:var(--teal-400)}
+.hero__dot:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media (max-width:760px){.hero__veil{background:linear-gradient(180deg,rgba(10,19,43,.4),rgba(10,19,43,.88))}.hero__dots{bottom:12px}}
+@media (prefers-reduced-motion:reduce){.hero__slide{transition:none}.hero--fx-glisse .hero__slide{transform:none}.hero--fx-zoom .hero__slide.is-active img,.hero--fx-zoom .hero__slide.is-active video{animation:none;transform:none}}
+
 /* ---------- Sections ---------- */
 section{padding:86px 0}
 section.flush{padding:0}
@@ -275,6 +299,22 @@ section.flush{padding:0}
 .partner img{max-height:58px;max-width:82%;width:auto;height:auto;object-fit:contain}
 .partner span{font-family:var(--font-head);font-weight:600;font-size:.9rem;color:var(--ink-2)}
 .partner:hover{filter:none;opacity:1;transform:translateY(-3px);border-color:rgba(70,146,155,.4);box-shadow:var(--sh)}
+
+/* ---------- Page Références (0024) — liste + fiche détaillée ---------- */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.ref-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-decoration:none;color:inherit;transition:.28s ease}
+.ref-card__logo{display:flex;align-items:center;justify-content:center;min-height:150px;padding:20px;background:linear-gradient(135deg,#f4f8f9,#e9f1f3);border-bottom:1px solid var(--line)}
+.ref-card__logo img{max-height:84px;max-width:72%;width:auto;height:auto;object-fit:contain}
+.ref-card__logo > span{font-family:var(--font-head);font-weight:600;font-size:1.05rem;color:var(--ink-2)}
+.ref-card__body{display:flex;flex-direction:column;gap:8px;padding:18px;flex:1}
+.ref-card__body strong{font-size:1.02rem;color:var(--ink)}
+.ref-card__body p{margin:0;font-size:.9rem;color:var(--muted);line-height:1.55}
+.ref-card:hover{transform:translateY(-4px);border-color:rgba(70,146,155,.45);box-shadow:var(--sh);color:inherit}
+.ref-hero__row{display:flex;align-items:center;gap:18px;margin-top:10px;flex-wrap:wrap}
+.ref-hero__logo{background:var(--paper);border-radius:var(--r-sm);padding:12px;display:inline-flex;align-items:center;justify-content:center;min-width:124px;min-height:86px}
+.ref-hero__logo img{max-height:58px;max-width:100px;object-fit:contain}
+.ref-hero__sector{margin-top:6px}
+@media (max-width:560px){.ref-hero__row{gap:12px}}
 .quote{padding:26px}
 .quote p{font-size:1.02rem;color:var(--ink);flex:1;line-height:1.7}
 .quote footer{color:var(--muted);font-size:.87rem;margin-top:1rem}

@@ -3038,5 +3038,55 @@ INSERT INTO media_items (type, source_url, provider, provider_id, title, descrip
 INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug='paygfad'), mi.id, 0 FROM media_items mi WHERE mi.type='video' AND mi.provider_id='d2XY1csuELw' AND EXISTS (SELECT 1 FROM products WHERE slug='paygfad') AND NOT EXISTS (SELECT 1 FROM content_relations cr WHERE cr.content_type='product' AND cr.content_id=(SELECT id FROM products WHERE slug='paygfad') AND cr.media_item_id=mi.id);
 INSERT INTO content_relations (content_type, content_id, media_item_id, sort_order) SELECT 'product', (SELECT id FROM products WHERE slug='qrfad'), mi.id, 0 FROM media_items mi WHERE mi.type='video' AND mi.provider_id='3uNcno1QbXo' AND EXISTS (SELECT 1 FROM products WHERE slug='qrfad') AND NOT EXISTS (SELECT 1 FROM content_relations cr WHERE cr.content_type='product' AND cr.content_id=(SELECT id FROM products WHERE slug='qrfad') AND cr.media_item_id=mi.id);
 
+-- 9quater) RÉFÉRENCES (pages publiques + slugs) + BANNIÈRE D'ENTÊTE ADMINISTRABLE
+--          (demande du fondateur, 11/11/2026) — identique à la migration 0024,
+--          re-seed safe. Les colonnes partners.slug/sector et la table
+--          hero_slides sont créées par la migration 0024 (toujours exécutée
+--          AVANT ce fichier par la CI) — ici uniquement des UPDATE/INSERT gardés.
+--          Aucune donnée métier inventée : secteurs et descriptions restent
+--          vides jusqu'à saisie au Dashboard.
+UPDATE partners SET slug = 'afric-immo'                 WHERE name = 'Afric-Immo'                  AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'artifyfad'                  WHERE name = 'ArtifyFad'                   AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'casa-des-delices'           WHERE name = 'Casa des Délices'            AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'cours-africa'               WHERE name = 'Cours Africa'                AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'efb-entreprise'             WHERE name = 'EFB Entreprise'              AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'massaley-hotel'             WHERE name = 'Massaley Hôtel'              AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'pharmacie-hopital-du-mali'  WHERE name = 'Pharmacie hôpital du Mali'   AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'eurodecor'                  WHERE name = 'Eurodecor'                   AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'justice-mali'               WHERE name = 'Justice Mali'                AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'le-baobab-hotel'            WHERE name = 'Le Baobab Hôtel'             AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'nature-attitude'            WHERE name = 'Nature Attitude'             AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'sky-buffet'                 WHERE name = 'Sky Buffet'                  AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'greenfad'                   WHERE name = 'Greenfad'                    AND (slug IS NULL OR slug = '');
+UPDATE partners SET slug = 'greenfad-2'                 WHERE name = 'Greenfad 2'                  AND (slug IS NULL OR slug = '');
+-- Nettoyage : jamais de tiret final dans un slug (ex. « Nom ! » → « nom »)
+UPDATE partners SET slug = RTRIM(slug, '-') WHERE slug LIKE '%-' AND slug != '-';
+
+UPDATE partners SET slug = slug || '-' || id
+WHERE slug != '' AND id NOT IN (SELECT MIN(id) FROM partners GROUP BY slug);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_partners_slug ON partners(slug) WHERE slug IS NOT NULL AND slug != '';
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  media_key TEXT NOT NULL,
+  media_type TEXT NOT NULL DEFAULT 'image' CHECK (media_type IN ('image','video')),
+  alt TEXT NOT NULL DEFAULT '',
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'brouillon',
+  published_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_hero_slides_status ON hero_slides(status, sort_order);
+INSERT INTO settings (key, value, updated_at) SELECT 'hero_effect', '"fondu"', datetime('now')
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key = 'hero_effect');
+INSERT INTO settings (key, value, updated_at) SELECT 'hero_interval', '5000', datetime('now')
+WHERE NOT EXISTS (SELECT 1 FROM settings WHERE key = 'hero_interval');
+UPDATE menus SET items = '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Vidéos", "url": "/videos"}, {"label": "Références", "url": "/references"}, {"label": "Blog", "url": "/blog"}, {"label": "Documents", "url": "/ressources"}, {"label": "Implantation", "url": "/implantation"}, {"label": "Contact", "url": "/contact"}]', updated_at = datetime('now')
+WHERE location = 'header' AND items = '[{"label": "Entreprise", "url": "/p/entreprise"}, {"label": "Expertises", "url": "/expertises"}, {"label": "Produits", "url": "/produits"}, {"label": "Réalisations", "url": "/realisations"}, {"label": "Galerie", "url": "/galerie"}, {"label": "Vidéos", "url": "/videos"}, {"label": "Blog", "url": "/blog"}, {"label": "Documents", "url": "/ressources"}, {"label": "Implantation", "url": "/implantation"}, {"label": "Contact", "url": "/contact"}]';
+UPDATE menus SET items = json_insert(items, '$[#]', json_object('label', 'Références', 'url', '/references')), updated_at = datetime('now')
+WHERE location = 'header' AND items NOT LIKE '%/references%';
+UPDATE footer_sections SET content = json_insert(content, '$.items[' || json_array_length(content, '$.items') || ']', json_object('label', 'Références', 'url', '/references')), updated_at = datetime('now')
+WHERE section_key = 'liens' AND content NOT LIKE '%/references%';
+
 -- 10) Version du contenu
-UPDATE settings SET value = '16' WHERE key = 'content_version';
+UPDATE settings SET value = '17' WHERE key = 'content_version';

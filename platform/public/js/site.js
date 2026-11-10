@@ -198,4 +198,42 @@
       }
     });
   });
+
+  // Bannière d'entête administrable (0024) : rotation des diapositives publiées.
+  // Le modèle visuel (fondu / glissé / zoom) est entièrement en CSS ; ce script
+  // ne fait que commuter les classes .is-active / .is-prev et les puces.
+  var banner = document.querySelector(".hero--banner");
+  var bannerSlides = banner ? banner.querySelectorAll(".hero__slide") : [];
+  var bannerDots = banner ? banner.querySelectorAll(".hero__dot") : [];
+  if (banner && bannerSlides.length > 1) {
+    var intervalMs = parseInt(banner.getAttribute("data-hero-interval") || "5000", 10) || 5000;
+    var current = 0;
+    var timer = null;
+    var show = function (next) {
+      if (next === current) return;
+      bannerSlides[current].classList.remove("is-active");
+      bannerSlides[current].classList.add("is-prev");
+      bannerSlides[next].classList.remove("is-prev");
+      bannerSlides[next].classList.add("is-active");
+      bannerDots.forEach(function (d, i) { d.classList.toggle("is-on", i === next); });
+      current = next;
+    };
+    var start = function () {
+      if (timer || reduceMotion) return;
+      timer = setInterval(function () { show((current + 1) % bannerSlides.length); }, intervalMs);
+    };
+    var stop = function () { if (timer) { clearInterval(timer); timer = null; } };
+    bannerDots.forEach(function (d) {
+      d.addEventListener("click", function () {
+        stop();
+        show(parseInt(d.getAttribute("data-slide") || "0", 10));
+        start();
+      });
+    });
+    // Pause au survol et quand l'onglet est masqué — reprise propre ensuite
+    banner.addEventListener("mouseenter", stop);
+    banner.addEventListener("mouseleave", start);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); else start(); });
+    start();
+  }
 })();

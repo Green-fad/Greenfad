@@ -108,6 +108,8 @@ export const blockSchemas = {
   }),
   partners: z.object({
     limit: z.number().int().min(1).max(24).default(12),
+    view_all_label: z.string().max(80).optional().or(z.literal("")),
+    view_all_url: urlish,
   }),
   countries_map: z.object({
     eyebrow: z.string().max(80).optional().or(z.literal("")),
@@ -166,7 +168,7 @@ export const BLOCK_LABELS: Record<BlockType, { label: string; group: string; des
   team: { label: "Équipe", group: "Écosystème", desc: "Membres publiés du module Équipe" },
   posts: { label: "Aperçus du blog", group: "Contenu", desc: "Dernières publications réelles : couverture, type, date, résumé, lien vers l'article" },
   logo_marquee: { label: "Bandeau de logos animé", group: "Écosystème", desc: "Défilement continu des logos produits ou partenaires" },
-  partners: { label: "Partenaires", group: "Écosystème", desc: "Logos et liens des partenaires publiés" },
+  partners: { label: "Références & partenaires", group: "Écosystème", desc: "Logos cliquables vers la fiche détaillée de chaque référence + lien « Voir toutes nos références »" },
   testimonials: { label: "Témoignages clients", group: "Écosystème", desc: "Témoignages réels validés par l'administration" },
   countries_map: { label: "Implantation internationale", group: "Écosystème", desc: "Carte des pays actifs et leurs bureaux" },
   document_list: { label: "Documents", group: "Contenu", desc: "Liste de documents publics par catégorie" },
@@ -321,6 +323,31 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "hero": {
       const isImg = p.variant === "image" && p.image_key;
       const style = isImg ? `background-image:linear-gradient(rgba(10,19,43,.78),rgba(14,27,58,.9)),url('${esc(p.image_key.startsWith("/") ? p.image_key : "/media/" + p.image_key)}')` : "";
+      // Bannière d'entête administrable (0024) : diapositives image/vidéo publiées
+      // depuis la table hero_slides — jusqu'à 3, ordonnées. Modèle de défilement
+      // choisi au Dashboard (fondu | glisse | zoom), intervalle éditable (défaut
+      // 5 000 ms, calé sur la vidéo de 5 s en boucle). AUCUNE diapositive →
+      // rendu historique strictement identique (zéro régression).
+      const slides = await q<{ media_key: string; media_type: string; alt: string }>(ctx.env.DB, "SELECT media_key, media_type, alt FROM hero_slides WHERE status='publie' ORDER BY sort_order, id LIMIT 3");
+      const effectRaw = String(await getSetting(ctx.env.DB, "hero_effect", "fondu"));
+      const heroEffect = (["fondu", "glisse", "zoom"].includes(effectRaw) ? effectRaw : "fondu") as "fondu" | "glisse" | "zoom";
+      const heroInterval = Math.min(Math.max(Number(await getSetting(ctx.env.DB, "hero_interval", 5000)) || 5000, 3000), 15000);
+      const slideSrc = (k: string) => (k.startsWith("/") ? k : `/media/${k}`);
+      const slidesHTML = slides.length
+        ? `<div class="hero__slides" aria-hidden="true">${slides
+            .map((s, i) => {
+              const media = s.media_type === "video"
+                ? `<video muted loop autoplay playsinline preload="metadata" src="${esc(slideSrc(String(s.media_key)))}"></video>`
+                : `<img src="${esc(slideSrc(String(s.media_key)))}" alt="${esc(String(s.alt || ""))}"${i === 0 ? ` fetchpriority="high"` : ` loading="lazy" decoding="async"`}>`;
+              return `<div class="hero__slide${i === 0 ? " is-active" : ""}">${media}</div>`;
+            })
+            .join("")}<span class="hero__veil" aria-hidden="true"></span></div>`
+        : "";
+      const dotsHTML = slides.length > 1
+        ? `<nav class="hero__dots" aria-label="Diapositives de la bannière">${slides
+            .map((_s, i) => `<button type="button" class="hero__dot${i === 0 ? " is-on" : ""}" data-slide="${i}" aria-label="Afficher la diapositive ${i + 1}"></button>`)
+            .join("")}</nav>`
+        : "";
       // Badges du héros : 100 % pilotés par la base (settings → « hero_badges », JSON).
       // Aucun texte figé dans le code : si le setting est vide, la rangée ne s'affiche pas.
       // getSetting renvoie déjà la valeur parsée (tableau) — on accepte aussi une chaîne JSON.
@@ -333,7 +360,8 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
             .map((bd, i) => `<span style="--d:${i * 110}ms">${icon(bd.icon || "shield")} ${esc(bd.label)}</span>`)
             .join("")}</div>`
         : "";
-      return `<section class="hero hero--${esc(p.variant)}" ${style ? `style="${style}"` : ""}>
+      return `<section class="hero hero--${esc(p.variant)}${slides.length ? ` hero--banner hero--fx-${heroEffect}` : ""}"${slides.length ? ` data-hero-interval="${heroInterval}"` : ""} ${style ? `style="${style}"` : ""}>
+        ${slidesHTML}
         <span class="hero__mark" aria-hidden="true"><svg viewBox="0 0 114 96" fill="none"><rect x="0" y="0" width="41.5" height="96" fill="currentColor" opacity=".55"/><g stroke="currentColor" stroke-width="2"><path d="M 14.6 1 H 112.5 V 96"/><path d="M 23.1 9.6 H 104.1 V 96"/><path d="M 31.2 17.5 H 95.4 V 96"/><path d="M 39.7 26.1 H 86.8 V 96"/><path d="M 14.6 1 V 55.7"/><path d="M 23.1 9.6 V 55.7"/><path d="M 31.2 17.5 V 55.7"/><path d="M 39.7 26.1 V 55.7"/><path d="M 48.9 55.7 V 34.5 H 78.7 V 96"/><path d="M 14.6 55.7 H 78.7"/><path d="M 14.6 64.6 H 78.7"/><path d="M 14.6 72.6 H 78.7"/><path d="M 14.6 81 H 78.7"/><path d="M 14.6 89.6 H 78.7"/></g></svg></span>
         <div class="container hero__inner reveal">
           ${p.eyebrow ? `<p class="eyebrow">${esc(p.eyebrow)}</p>` : ""}
@@ -342,6 +370,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
           ${(p.cta_label || p.cta2_label) ? `<div class="hero__cta">${p.cta_label ? `<a class="btn btn--primary" href="${esc(p.cta_url || "/contact")}">${p.cta_label} ${icon("arrow-right")}</a>` : ""}${p.cta2_label ? `<a class="btn btn--ghost" href="${esc(p.cta2_url || "#")}">${esc(p.cta2_label)}</a>` : ""}</div>` : ""}
           ${badges}
         </div>
+        ${dotsHTML}
         <button class="hero__scroll" type="button" aria-label="Défiler vers le contenu">${icon("chevron-down")}</button>
       </section>`;
     }
@@ -467,13 +496,23 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
         .join("")}</div></section>`;
     }
     case "partners": {
-      const rows = await q(ctx.env.DB, "SELECT name, logo_key, url FROM partners WHERE status='publie' ORDER BY sort_order LIMIT ?", p.limit);
+      const rows = await q<{ name: string; slug: string; logo_key: string; url: string }>(ctx.env.DB, "SELECT name, slug, logo_key, url FROM partners WHERE status='publie' ORDER BY sort_order LIMIT ?", p.limit);
       if (!rows.length) return "";
       // Perf (demande fondateur 10/11/2026) : logos optimisés WebP 320×200 côté migration 0020 —
-      // chargement différé (lazy) + décodage asynchrone + dimensions intrinsèques (0 décalage de mise en page).
+      // chargement différé (lazy) + décodage asynchrone + dimensions intrinsèques (0 décalage).
+      // Références (0024) : chaque logo renvoie vers la fiche détaillée /references/<slug>
+      // lorsqu'un slug existe ; lien « Voir toutes nos références » vers la page complète.
       return `<section class="container"><div class="partners reveal" data-stagger>${rows
-        .map((r) => `<div class="partner">${r.logo_key ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy" decoding="async" width="320" height="200">` : `<span>${esc(r.name)}</span>`}</div>`)
-        .join("")}</div></section>`;
+        .map((r) => {
+          const inner = r.logo_key
+            ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy" decoding="async" width="320" height="200">`
+            : `<span>${esc(r.name)}</span>`;
+          return r.slug
+            ? `<a class="partner" href="/references/${esc(String(r.slug))}" title="${esc(r.name)} — voir la référence">${inner}</a>`
+            : `<div class="partner">${inner}</div>`;
+        })
+        .join("")}</div>
+      <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="${esc(p.view_all_url || "/references")}">${esc(p.view_all_label || "Voir toutes nos références")} ${icon("arrow-right")}</a></p></section>`;
     }
     case "posts": {
       const rows = await q(ctx.env.DB, "SELECT slug, title, excerpt, cover_key, kind, category, author, published_at FROM posts WHERE status='publie' AND (?1 = '' OR category = ?1) ORDER BY published_at DESC LIMIT ?2", p.category || "", p.limit);
