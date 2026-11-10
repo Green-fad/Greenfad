@@ -231,7 +231,7 @@ TILE donne toute leur place aux réalités africaines : interface disponible en 
   'Un réseau social où la communauté, les médias certifiés, les créateurs et les commerces africains avancent ensemble — en français, en anglais, en bambara — avec la confiance comme règle : comptes vérifiés, modération humaine, zéro revente de données.',
   'TILE est développé par les équipes de Green FAD SARL à Bamako. Lancé en 2026, il s''appuie sur cinq ans d''expérience produit de l''entreprise et sur son infrastructure maîtrisée de bout en bout. Il est présent au Mali, au Congo, au Burkina Faso et au Niger.',
   'Médias, réseaux sociaux et vie communautaire', 'Citoyens, créateurs, médias certifiés, entreprises et boutiques locales',
-  '["Vidéos courtes jusqu''à 20 Mo, messages vocaux et stories de 24 heures", "Trois flux : Réseau (communauté), Certifié (médias vérifiés), Pour toi (recommandations)", "Flux Certifié : l''information institutionnelle et médiatique se distingue d''un coup d''œil", "Explorer & tendances : recherche, hashtags et recommandations", "Messagerie privée avec contrôle de qui peut vous écrire", "Comptes privés réels : publications réservées aux abonnés acceptés, règle vérifiée côté serveur", "Profils Entreprises & boutiques : catalogue jusqu''à 100 produits ou services, rôles d''équipe", "Défis & récompenses : thèmes créatifs, classements, récompenses exclusives", "Interface en français, anglais et bambara", "Web (PWA), Android et iOS — chiffrement HTTPS/TLS, App Check anti-abus, sauvegardes chiffrées"]',
+  '["Vidéos courtes jusqu''à 20 Mo, messages vocaux et stories de 24 heures", "Trois flux : Réseau (communauté), Certifié (médias vérifiés), Pour toi (recommandations)", "Flux Certifié : l''information institutionnelle et médiatique se distingue d''un coup d''œil", "Explorer & tendances : recherche, hashtags et recommandations", "Messagerie privée avec contrôle de qui peut vous écrire", "Comptes privés réels : publications réservées aux abonnés acceptés, règle vérifiée côté serveur", "Profils Entreprises & boutiques : catalogue jusqu''à 100 produits ou services, rôles d''équipe", "Défis & récompenses : thèmes créatifs, classements, récompenses exclusives", "Interface en français, anglais et bambara", "Web (PWA), Android et iOS — chiffrement HTTPS/TLS, protection anti-abus dédiée anti-abus, sauvegardes chiffrées"]',
   '**Quatre univers, un réseau :**
 
 - **Créateurs** — vidéos, vocaux, stories et défis
@@ -374,7 +374,7 @@ En 2021, à Bamako, les établissements de restauration fonctionnent avec des me
 
 Chaque cycle de trois mois a apporté une brique : catégories et QR téléchargeables (2021), multi-établissements (2022), commandes depuis le menu (2023), intégration WhatsApp puis module hôtelier (2023-2024), caisse POS (2025), et en 2026 le portail public qrfad.com où tout le monde peut explorer les établissements partenaires et leurs menus.',
   '/assets/images/portfolio/qrfad.jpg', '2026-05-20', 0, 'publie', datetime('now'),
-  'Les restaurateurs perdaient du temps et de l''argent sur les menus papier, perdaient des commandes entre la salle et la cuisine, et n''avaient aucun outil abordable pour la caisse ou les chambres d''hôtel.', 'Une évolution produit trimestrielle guidée par le terrain : chaque fonctionnalité (commandes WhatsApp, POS, hôtellerie) part des difficultés réelles rapportées par les établissements équipés, puis est livrée, testée et documentée.', 'Une plateforme unique couvrant menu QR sans application, commandes WhatsApp sur place / à emporter / livraison, caisse POS (remises, taxes, paiements, dépenses), gestion hôtelière (chambres, réservations, conciergerie) et portail public avec recherche.', '9 établissements publient leur menu sur qrfad.com, au Congo Kinshasa, au Mali, au Niger et en Côte d''Ivoire. Les mises à jour de menu sont immédiates sur les QR codes imprimés, et les commandes arrivent directement sur le WhatsApp des établissements.', '**Stack :** application web mobile-first, QR codes statiques imprimables, intégration WhatsApp, module POS, infrastructure Cloudflare (pages, Workers, D1) opérée par Green FAD.',
+  'Les restaurateurs perdaient du temps et de l''argent sur les menus papier, perdaient des commandes entre la salle et la cuisine, et n''avaient aucun outil abordable pour la caisse ou les chambres d''hôtel.', 'Une évolution produit trimestrielle guidée par le terrain : chaque fonctionnalité (commandes WhatsApp, POS, hôtellerie) part des difficultés réelles rapportées par les établissements équipés, puis est livrée, testée et documentée.', 'Une plateforme unique couvrant menu QR sans application, commandes WhatsApp sur place / à emporter / livraison, caisse POS (remises, taxes, paiements, dépenses), gestion hôtelière (chambres, réservations, conciergerie) et portail public avec recherche.', '9 établissements publient leur menu sur qrfad.com, au Congo Kinshasa, au Mali, au Niger et en Côte d''Ivoire. Les mises à jour de menu sont immédiates sur les QR codes imprimés, et les commandes arrivent directement sur le WhatsApp des établissements.', '**Approche :** application web mobile-first, QR codes statiques imprimables, intégration WhatsApp, module POS, infrastructure cloud opérée et supervisée par Green FAD.',
   (SELECT id FROM services WHERE slug = 'developpement-web'), 'QRFAD — étude de cas : 5 ans de digitalisation de la restauration | Green FAD', 'Comment QRFAD est passé du menu par QR code (2021) à la plateforme complète — commandes WhatsApp, caisse POS, hôtellerie — avec 9 établissements dans 4 pays.', '/assets/images/portfolio/qrfad.jpg');
 INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
   'fadcard-plateforme-six-applications', 'FAD CARD — d''une carte NFC à une plateforme six-en-un', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
@@ -391,7 +391,7 @@ Plutôt que d''ajouter des fonctions en vrac, FadCard a construit des **applicat
 
 153 designs premium, cartes NFC physiques, analytique temps réel, validation de numéro dans 66 pays, plus de 40 devises, PWA installable : la plateforme sert aussi bien le consultant que le commerçant, l''organisateur d''événements ou l''association.',
   '/assets/images/portfolio/fadcard.jpg', '2026-03-12', 1, 'publie', datetime('now'),
-  'Les professionnels africains gèrent leur identité, leurs ventes, leurs événements et leurs paiements dans des outils séparés, coûteux et mal adaptés au terrain.', 'Architecture multi-applications avec identité partagée et données isolées — un rythme trimestriel : chaque application a été livrée entière avant d''ouvrir la suivante.', 'Six applications (vCard, Market, Tickets, Fund, Vote, FadCard Pay) derrière un compte unique, avec analytique temps réel, 153 designs, cartes NFC, 40+ devises et validation téléphonique dans 66 pays.', 'Un écosystème professionnel complet, du freelance à l''association, avec une tarification en XOF (Starter gratuit, Pro 15 000 XOF/mois, Business 45 000 XOF/mois) et une PWA installable partout.', '**Stack :** PWA mobile-first, NFC, QR codes uniques anti-double scan, comptabilité en partie double pour FadCard Pay, infrastructure Cloudflare opérée par Green FAD.',
+  'Les professionnels africains gèrent leur identité, leurs ventes, leurs événements et leurs paiements dans des outils séparés, coûteux et mal adaptés au terrain.', 'Architecture multi-applications avec identité partagée et données isolées — un rythme trimestriel : chaque application a été livrée entière avant d''ouvrir la suivante.', 'Six applications (vCard, Market, Tickets, Fund, Vote, FadCard Pay) derrière un compte unique, avec analytique temps réel, 153 designs, cartes NFC, 40+ devises et validation téléphonique dans 66 pays.', 'Un écosystème professionnel complet, du freelance à l''association, avec une tarification en XOF (Starter gratuit, Pro 15 000 XOF/mois, Business 45 000 XOF/mois) et une PWA installable partout.', '**Approche :** PWA mobile-first, NFC, QR codes uniques anti-double scan, comptabilité en partie double pour FadCard Pay, infrastructure cloud opérée par Green FAD.',
   (SELECT id FROM services WHERE slug = 'developpement-web'), 'FadCard — étude de cas : la plateforme 6-en-1 | Green FAD', 'De la carte NFC de 2021 à la plateforme six applications (vCard, Market, Tickets, Fund, Vote, Pay) : le parcours produit de FadCard.', '/assets/images/portfolio/fadcard.jpg');
 INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
   'tile-reseau-social-africain', 'TILE — un réseau social conçu en Afrique, pour l''Afrique', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
@@ -406,9 +406,9 @@ Les plateformes globales ignorent les langues africaines, noient les médias loc
 
 ## La confiance par l''architecture
 
-Pas de publicité tierce, pas de revente de données, modération humaine des signalements, App Check anti-abus et sauvegardes chiffrées. L''interface existe en français, en anglais et en bambara.',
+Pas de publicité tierce, pas de revente de données, modération humaine des signalements, protection anti-abus dédiée anti-abus et sauvegardes chiffrées. L''interface existe en français, en anglais et en bambara.',
   '/assets/images/portfolio/tile.jpg', '2026-06-17', 2, 'publie', datetime('now'),
-  'Créateurs, médias et boutiques africains manquent d''un espace qui valorise leurs langues, certifie l''information et fait exister le commerce local.', 'Conception mobile-first éprouvée sur les plateformes précédentes de Green FAD, langues africaines d''abord, modération humaine intégrée dès la conception.', 'Un réseau social complet : trois flux distincts, médias certifiés, entreprises et boutiques, défis et récompenses, disponible en PWA, Android et iOS.', 'TILE est en ligne sur tileofficiel.com avec des communautés au Mali, au Congo, au Burkina Faso et au Niger, et une feuille de route trimestrielle assumée.', '**Stack :** PWA + applications Android/iOS, HTTPS/TLS, App Check, règles de base strictes et sauvegardes chiffrées.',
+  'Créateurs, médias et boutiques africains manquent d''un espace qui valorise leurs langues, certifie l''information et fait exister le commerce local.', 'Conception mobile-first éprouvée sur les plateformes précédentes de Green FAD, langues africaines d''abord, modération humaine intégrée dès la conception.', 'Un réseau social complet : trois flux distincts, médias certifiés, entreprises et boutiques, défis et récompenses, disponible en PWA, Android et iOS.', 'TILE est en ligne sur tileofficiel.com avec des communautés au Mali, au Congo, au Burkina Faso et au Niger, et une feuille de route trimestrielle assumée.', '**Approche :** PWA + applications Android/iOS, HTTPS/TLS, protection anti-abus dédiée, règles d''accès strictes et sauvegardes chiffrées.',
   (SELECT id FROM services WHERE slug = 'applications-mobiles'), 'Tile — étude de cas : le réseau social du progrès | Green FAD', 'TILE, réseau social de Green FAD : vidéos, stories, flux Certifié, boutiques, trilingue FR/EN/bambara, sans publicité tierce ni revente de données.', '/assets/images/portfolio/tile.jpg');
 INSERT OR IGNORE INTO projects (slug, title, client, category, summary, content_md, image_key, completed_at, sort_order, status, published_at, need_md, approach_md, solution_md, results_md, tech_stack, related_service_id, meta_title, meta_description, og_image) VALUES (
   'cloudaf-plateforme-nocode-ia', 'CLOUDAf — la plateforme no-code + IA qui déploie en un clic', 'GREEN FAD SARL — produit propriétaire', 'Produit propriétaire',
@@ -425,7 +425,7 @@ L''Agent CloudAf ne se contente pas de suggérer : il discute du projet, le comp
 
 Le CloudAf Store permet d''acheter des templates en crédits et de vendre les siens — les offres Free, Pro (29 €/mois) et Enterprise (99 €/mois) suivent la croissance des projets.',
   '/assets/images/portfolio/cloudaf.jpg', '2026-10-08', 3, 'publie', datetime('now'),
-  'Créer une application web professionnelle suppose de maîtriser hébergement, certificats, CDN, sécurité et déploiements — ou d''y consacrer une équipe.', 'Capitaliser sur l''exploitation réelle des plateformes Green FAD (QRFAD, FadCard, Tile) pour outiller la chaîne complète : création, déploiement, supervision.', 'Une plateforme de création d''applications : éditeur dual, Agent IA audité, Studio Builder, déploiement un clic (SSL, CDN, DNS automatique), sécurité native, Store et monitoring.', 'Trois offres publiques (Free, Pro 29 €/mois, Enterprise 99 €/mois), six familles de templates prêtes à l''emploi, et une base technique moderne (Next.js, TypeScript, React).', '**Stack :** Next.js, TypeScript, React, intégrations IA (OpenAI, Google), infrastructure Cloudflare opérée par Green FAD.',
+  'Créer une application web professionnelle suppose de maîtriser hébergement, certificats, CDN, sécurité et déploiements — ou d''y consacrer une équipe.', 'Capitaliser sur l''exploitation réelle des plateformes Green FAD (QRFAD, FadCard, Tile) pour outiller la chaîne complète : création, déploiement, supervision.', 'Une plateforme de création d''applications : éditeur dual, Agent IA audité, Studio Builder, déploiement un clic (SSL, CDN, DNS automatique), sécurité native, Store et monitoring.', 'Trois offres publiques (Free, Pro 29 €/mois, Enterprise 99 €/mois), six familles de templates prêtes à l''emploi, et une base technique moderne et éprouvée.', '**Approche :** intégrations IA tierces, infrastructure cloud opérée par Green FAD.',
   (SELECT id FROM services WHERE slug = 'developpement-web'), 'CloudAf — étude de cas : no-code + IA, déploiement un clic | Green FAD', 'CloudAf de Green FAD : double éditeur no-code + code, Agent IA aux outils audités, Studio Builder, Store et monitoring. Créez, déployez, scalez.', '/assets/images/portfolio/cloudaf.jpg');
 
 -- ============ BLOG v4 — le parcours des plateformes, articles datés ============
@@ -820,7 +820,7 @@ Pourquoi séparer ? Parce que l''information sérieuse et le divertissement n''o
 
 ## Les applications natives
 
-L''application web (PWA) reste là — Android et iOS apportent le confort des notifications, des partages et des performances natives. Chiffrement HTTPS/TLS, App Check anti-abus, règles de base strictes et sauvegardes chiffrées : la barre technique est haute, comme sur toutes nos plateformes.
+L''application web (PWA) reste là — Android et iOS apportent le confort des notifications, des partages et des performances natives. Chiffrement HTTPS/TLS, protection anti-abus dédiée anti-abus, règles d''accès strictes et sauvegardes chiffrées : la barre technique est haute, comme sur toutes nos plateformes.
 
 ## Le rythme s''installe
 
@@ -1834,7 +1834,7 @@ INSERT INTO faqs (question, answer, category, sort_order, status) VALUES
 ('QRFAD convient-il aux hôtels ?', 'Oui : au-delà des menus, QRFAD gère les services en chambre, les réservations et la caisse (POS) des restaurants d''hôtel, multi-établissements. Le portail public permet aussi d''explorer les établissements partenaires en ligne.', 'produit:qrfad', 2, 'publie'),
 ('Que se passe-t-il si Internet tombe pendant le service ?', 'Les QR codes continuent d''afficher le menu (page légère, rechargement automatique). La prise de commande hors-ligne et la caisse sont conçues pour les réalités de connectivité du terrain.', 'produit:qrfad', 3, 'publie'),
 ('Qu''est-ce que Tile, le Réseau du Progrès ?', 'Tile est le réseau social panafricain de Green FAD : flux vidéo courts (Pour toi, Réseau, Certifié), Explorer, chat, stories et un portefeuille créateur — la communauté africaine qui progresse ensemble, depuis Bamako.', 'produit:tile', 0, 'publie'),
-('Sur quels appareils Tile est-il disponible ?', 'Tile est disponible sur Android (Google Play et APK signé) et sur iOS, avec une version web installable. L''application est développée avec Flutter pour une expérience fluide sur tous les téléphones.', 'produit:tile', 1, 'publie'),
+('Sur quels appareils Tile est-il disponible ?', 'Tile est disponible sur Android (Google Play et APK signé) et sur iOS, avec une version web installable. Elle est pensée pour une expérience fluide sur tous les téléphones.', 'produit:tile', 1, 'publie'),
 ('Comment les créateurs gagnent-ils sur Tile ?', 'Chaque créateur dispose d''un portefeuille : gains d''engagement, cadeaux de la communauté, abonnements d''abonnés et retraits encadrés. Les paiements passent par des fournisseurs vérifiés (Stripe, CinetPay, FedaPay, PayPal) selon votre pays.', 'produit:tile', 2, 'publie'),
 ('Qu''est-ce que CloudAf ?', 'CloudAf est la plateforme cloud africaine de Green FAD : créez, déployez et faites évoluer vos applications sans vous soucier de l''infrastructure — serveurs, sécurité et mise à l''échelle sont gérés, vous restez concentré sur votre produit.', 'produit:cloudaf', 0, 'publie'),
 ('Qu''est-ce que l''Agent CloudAf ?', 'L''Agent CloudAf est l''assistant intégré à l''IA qui construit votre projet avec vous : il comprend votre besoin, génère l''application et vous accompagne du premier écran au déploiement — en français, sans être développeur.', 'produit:cloudaf', 1, 'publie'),
@@ -2396,6 +2396,320 @@ Contactez l''équipe Green FAD depuis la **page contact** du site ou via la fich
   '9 novembre 2026 : WARIPAY ouvre sa phase de test — console complète, sandbox, Android v1.0.3, WooCommerce v1.0.0. Lancement commercial attendu après conformités et partenariats financiers. Appel à partenaires.',
   '/assets/images/blog/waripay-phase-de-test.jpg', 'waripay', (SELECT id FROM products WHERE slug = 'waripay'));
 
+-- 9ter) Articles produits — le blog raconte le début et la fin de tous les
+--        produits (demande du fondateur, 10/11/2026) : identiques à la
+--        migration 0017, re-seed safe (le DELETE FROM posts en tête de ce
+--        fichier efface tout ; ces INSERT garantissent la survie)
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'tile-origine-bamako', 'Tile : pourquoi nous construisons un réseau social depuis Bamako', 'Mars 2025 : Green FAD ouvre le chantier Tile. Un réseau social conçu en Afrique, pour l''Afrique — parce que la créativité du continent mérite une maison à elle.',
+  '# Tile : pourquoi nous construisons un réseau social depuis Bamako
+
+Mars 2025 : Green FAD ouvre un nouveau chantier, le plus ambitieux de son histoire — **Tile**, un réseau social conçu en Afrique, pour l''Afrique. Pourquoi ? Parce que le constat s''imposait à nous, produit après produit.
+
+## Le constat
+
+En exploitant QRFAD et FadCard, nous parlons tous les jours avec des créateurs, des commerçants, des artistes. La même frustration revient : les grandes plateformes ne sont pas pensées pour eux. Données mobiles chères, contenus locaux noyés, monétisation absente, modération lointaine. L''Afrique consomme les réseaux sociaux des autres — elle mérite le sien.
+
+## L''idée
+
+Et si un réseau social partait de trois principes simples ?
+
+- **Léger par construction** : utilisable avec une connexion modeste, pas avec la fibre
+- **Local par défaut** : ce qui se passe à Bamako, Ouagadougou ou Niamey se voit d''abord ici
+- **Honnête par design** : trois flux clairs — Certifié pour l''information vérifiée, Global pour la communauté, Vidéo pour la création
+
+Nous l''avons appelé **Tile** — « le Réseau du Progrès ».
+
+## Le chemin devant nous
+
+Nous savons ce que construire veut dire : FadCard et QRFAD ont demandé des années de discipline. Tile suivra la même règle — **publier quand c''est solide**, pas avant. Le chantier démarre ce mois-ci ; la première étape sera publique quand elle sera prête.
+
+Treize mois plus tard, Tile serait lancée publiquement. Vingt mois plus tard, elle serait sur les stores. Mais cela, nous ne le savions pas encore. Ce que nous savions : la décision était prise, et elle était juste.',
+  '/assets/images/blog/tile-origine-bamako.jpg', 'Produits', '["Tile", "Origine", "Réseau social"]', 'Green FAD — Équipe produit', 'article', 0, '2025-03-12 09:00:00', 'publie',
+  'Tile : pourquoi nous construisons un réseau social depuis Bamako | Blog Green FAD', 'Mars 2025 : naissance du projet Tile, le réseau social conçu à Bamako par Green FAD — léger par construction, local par défaut, honnête par design.', '/assets/images/blog/tile-origine-bamako.jpg', 'tile', (SELECT id FROM products WHERE slug = 'tile'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'tile-stores-1-0-6', 'Tile 1.0.6 arrive sur les stores : Android et iOS officiels', '2 novembre 2026 : après un an et huit mois d''ingénierie et une release 1.0 verrouillée en juillet, Tile est publiée sur les canaux officiels Android et iOS. La version 1.0.6+724 marque l''aboutissement.',
+  '# Tile 1.0.6 arrive sur les stores : Android et iOS officiels
+
+Le **2 novembre 2026**, Tile franchit la dernière marche : la version **1.0.6+724** est publiée sur les canaux officiels Android et iOS. Ce jalon conclut un chantier ouvert en mars 2025 — un an et huit mois d''ingénierie, racontés pas à pas dans nos articles.
+
+## Ce qui était prêt avant les stores
+
+- **Avril 2026** : lancement public du Réseau du Progrès, d''abord en web app
+- **Juin 2026** : parité Android et iOS, trois flux (Certifié, Global, Vidéo)
+- **Juillet 2026** : release 1.0 verrouillée — analyse statique sans erreur, trois fils validés, backend gelé
+- **Septembre-octobre 2026** : mise à l''échelle, audits, espace entreprise, Explorer, studio de création, authentification sécurisée, parité complète des canaux
+
+## Ce que la publication change
+
+Pour les utilisateurs : plus besoin de passer par le navigateur — Tile s''installe comme les grandes applications, avec notifications natives, mises à jour automatiques et la confiance des canaux officiels. La **PWA reste disponible** : deux portes, une seule maison.
+
+## La suite
+
+La 1.0.6 n''est pas une fin : c''est un socle. Le rythme Tile continue — des mises à jour régulières, documentées ici, comme depuis le premier jour. Le Réseau du Progrès ne fait que commencer.',
+  '/assets/images/blog/tile-stores-1-0-6.jpg', 'Produits', '["Tile", "Android", "iOS", "Publication"]', 'Green FAD — Équipe produit', 'article', 0, '2026-11-02 09:00:00', 'publie',
+  'Tile 1.0.6 arrive sur les stores : Android et iOS officiels | Blog Green FAD', '2 novembre 2026 : Tile 1.0.6+724 publiée sur les canaux officiels Android et iOS — aboutissement d''un an et huit mois d''ingénierie. La PWA reste disponible.', '/assets/images/blog/tile-stores-1-0-6.jpg', 'tile', (SELECT id FROM products WHERE slug = 'tile'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'fadcard-origine-idee', 'FAD CARD : l''idée qui a lancé Green FAD', 'Février 2021 : après deux ans de réflexion née d''une frustration quotidienne à Bamako, Green FAD officialise la création de FAD CARD — la carte de visite numérique qui doit tout changer.',
+  '# FAD CARD : l''idée qui a lancé Green FAD
+
+Février 2021 : Green FAD officialise la création de **FAD CARD**, son premier produit grand public. Derrière ce lancement de chantier, il y a deux années d''observation et une frustration aussi banale qu''universelle.
+
+## La frustration de départ
+
+Tout commence en 2019 à Bamako. Des rencontres professionnelles qui finissent en tas de cartes papier — perdues, oubliées, jamais numérisées. Des coordonnées qui changent et rendent des centaines de cartes obsolètes d''un coup. Un constat simple : **la carte de visite papier n''a pas évolué depuis des décennies**, alors que tout le monde a un smartphone en poche.
+
+## L''idée
+
+Et si la carte de visite devenait **numérique et vivante** ? Un profil en ligne, toujours à jour, partagé par simple contact ou par QR code — sans application à installer pour celui qui le reçoit. Le nom s''impose de lui-même : **FAD CARD**, la carte de visite numérique made in Green FAD.
+
+## Trois ans de gestation
+
+De 2019 à 2021, l''idée mûrit : cadrage du projet, définition des objectifs, développement patient. Nous appliquons une règle que nous ne quitterons plus : **publier quand c''est solide**, pas avant.
+
+## La promesse
+
+FAD CARD sera lancée à Bamako dans les semaines qui viennent. Un produit simple, utile dès le premier jour, pensé pour les professionnels d''ici — et conçu pour grandir. Nous ne le savons pas encore, mais ce petit produit ouvrira la voie à toute la suite : Market, Tickets, Fund, Vote, Pay.
+
+L''aventure commence.',
+  '/assets/images/blog/fadcard-origine-idee.jpg', 'Produits', '["FAD CARD", "Origine", "vCard"]', 'Green FAD — Équipe produit', 'article', 0, '2021-02-18 09:00:00', 'publie',
+  'FAD CARD : l''idée qui a lancé Green FAD | Blog Green FAD', 'Février 2021 : création de FAD CARD officialisée par Green FAD — une carte de visite numérique et vivante, partagée par simple contact ou QR code.', '/assets/images/blog/fadcard-origine-idee.jpg', 'fad-card', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'fadcard-aujourdhui', 'FadCard fin 2026 : six applications, 66 pays — et la suite', 'Novembre 2026 : cinq ans et demi après le lancement de la vCard à Bamako, FadCard est devenue une plateforme six-en-un explorée dans 66 pays. Récit d''une trajectoire — et cap sur la suite.',
+  '# FadCard fin 2026 : six applications, 66 pays — et la suite
+
+Novembre 2026. Cinq ans et demi après le lancement de la vCard numérique à Bamako, FadCard est devenue autre chose qu''une carte de visite : **une plateforme six applications** explorée dans **66 pays**. L''occasion de reprendre le fil — et de dire où nous allons.
+
+## Le chemin parcouru
+
+- **Mai 2021** : la vCard numérique — partage des coordonnées par simple contact
+- **Juillet 2022** : Market — vendre en ligne depuis sa carte
+- **Février 2023** : Tickets — la billetterie par QR code, sans contrefaçon possible
+- **Octobre 2023** : Fund — des collectes transparentes, suivies en temps réel
+- **Mai 2024** : Vote — sondages et compétitions, un vote par personne
+- **Décembre 2024** : Pay — un compte, six applications, un encaissement centralisé
+- **Août 2025** : 153 designs et cartes physiques NFC
+- **Mars 2026** : analytics temps réel, 66 pays, 40+ devises
+
+## Ce que FadCard est devenue
+
+Un professionnel crée sa carte en quelques minutes, vend ses produits, vend ses tickets, collecte des fonds, organise ses votes et encaisse — partout — depuis **un seul compte**. C''est exactement la promesse de départ : rendre simple ce qui était compliqué.
+
+## Cap sur la suite
+
+La règle ne change pas : des mises à jour régulières, documentées, sans surprises. FadCard continue de grandir avec ses utilisateurs — artisans, commerçants, artistes, écoles, associations — et reste le produit pionnier qui guide tous les choix de Green FAD. Le meilleur reste à écrire.',
+  '/assets/images/blog/fadcard-aujourdhui.jpg', 'Produits', '["FAD CARD", "Bilan", "Écosystème"]', 'Green FAD — Équipe produit', 'article', 0, '2026-11-06 09:00:00', 'publie',
+  'FadCard fin 2026 : six applications, 66 pays — et la suite | Blog Green FAD', 'Novembre 2026 : FadCard en bilan — de la vCard de 2021 à la plateforme six applications, 66 pays, 40+ devises. Et la suite : mises à jour régulières, toujours documentées.', '/assets/images/blog/fadcard-aujourdhui.jpg', 'fad-card', (SELECT id FROM products WHERE slug = 'fad-card'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'qrfad-origine-constat', 'QRFAD : avant le QR code, il y avait le constat', 'Novembre 2020 : à Bamako, des restaurants pleins, des menus fatigués, des clients équipés de smartphones. Green FAD décide de construire la réponse la plus simple : un QR code. Le chantier QRFAD démarre.',
+  '# QRFAD : avant le QR code, il y avait le constat
+
+Novembre 2020 : Green FAD lance le chantier **QRFAD**. Comme toujours chez nous, tout est parti du terrain — pas d''une mode.
+
+## Le constat
+
+À Bamako, les établissements ne manquent pas de clients : ils manquent d''outils. Des menus papier fatigués, à réimprimer à chaque prix qui change. Des plats qui s''affichent mal. Des clients équipés de smartphones — et d''un menu qui ne sait pas en profiter. Chaque réimpression coûte de l''argent ; chaque menu obsolète en coûte encore plus.
+
+## L''idée la plus simple
+
+Nous avons exploré des pistes complexes — applications à télécharger, bornes, gadgets — avant de comprendre que la réponse tenait dans **un carré imprimé** : un QR code. Le client scanne, le menu s''ouvre dans son navigateur, à jour, avec photos et prix. Rien à installer pour lui. Rien à réimprimer dix fois par an pour l''établissement.
+
+## Un chantier patient
+
+De ce constat à la première mise en service, il nous faudra quelques mois de construction — et des années de réflexion en amont pour savoir exactement quoi construire. Le lancement public est prévu pour mars 2021, à Bamako.
+
+Nous ne le savons pas encore, mais QRFAD deviendra bien plus qu''un menu numérique : commandes, WhatsApp, hôtels, caisse, multi-établissements, portail public. Tout partira de là.',
+  '/assets/images/blog/qrfad-origine-constat.jpg', 'Produits', '["QRFAD", "Origine", "Restauration"]', 'Green FAD — Équipe produit', 'article', 0, '2020-11-17 09:00:00', 'publie',
+  'QRFAD : avant le QR code, il y avait le constat | Blog Green FAD', 'Novembre 2020 : naissance du projet QRFAD — le constat des menus papier à Bamako et l''idée la plus simple : un QR code, un menu à jour, rien à installer.', '/assets/images/blog/qrfad-origine-constat.jpg', 'qrfad', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'qrfad-cinq-ans-terrain', 'QRFAD 2026 : cinq ans de terrain, du menu au portail public', 'Novembre 2026 : cinq ans après le premier menu numérique à Bamako, QRFAD est une plateforme complète de gestion pour la restauration et l''hôtellerie. Retour sur la trajectoire — et sur la suite.',
+  '# QRFAD 2026 : cinq ans de terrain, du menu au portail public
+
+Novembre 2026. Cinq ans que le premier QR code QRFAD est collé sur une table à Bamako. Depuis, le produit n''a cessé de grandir — toujours à l''écoute des établissements. Retour sur la trajectoire.
+
+## D''un menu à une plateforme
+
+- **Mars 2021** : le menu numérique par QR code — le début de l''aventure
+- **Juin 2022** : multi-établissements — les groupes gèrent tous leurs sites d''un seul compte
+- **Mars 2023** : commandes depuis le menu — la salle connectée à la cuisine
+- **Novembre 2023** : WhatsApp — la commande arrive sur le numéro du restaurant
+- **Septembre 2024** : hôtels — chambres, réservations et conciergerie
+- **Juin 2025** : caisse intégrée — QRFAD devient un outil complet de gestion
+- **Mai 2026** : portail public — **9 établissements** explorable en ligne
+
+## Ce que QRFAD est devenue
+
+Un établissement gère aujourd''hui son menu, ses commandes, sa caisse, ses chambres et sa visibilité en ligne depuis une seule interface — et ses clients commandent, réservent et explorent **sans rien installer**. Chaque fonctionnalité est née d''un besoin exprimé sur le terrain, pas d''une intuition de bureau.
+
+## Cap sur la suite
+
+Le rythme reste le même : des évolutions régulières, pensées pour les connexions et les usages d''ici. Les restaurants, hôtels et établissements qui veulent rejoindre la plateforme ont un portail qui les attend. L''histoire continue.',
+  '/assets/images/blog/qrfad-cinq-ans-terrain.jpg', 'Produits', '["QRFAD", "Bilan", "Restauration"]', 'Green FAD — Équipe produit', 'article', 0, '2026-11-05 09:00:00', 'publie',
+  'QRFAD 2026 : cinq ans de terrain, du menu au portail public | Blog Green FAD', 'Novembre 2026 : QRFAD en bilan — du menu QR de 2021 au portail public de 9 établissements, en passant par la caisse, WhatsApp et les hôtels. La suite, documentée comme toujours.', '/assets/images/blog/qrfad-cinq-ans-terrain.jpg', 'qrfad', (SELECT id FROM products WHERE slug = 'qrfad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'ferefad-telimani-2-2-0', 'FEREFAD 2.2.0 : Telimani au cœur de la super-app', '20 octobre 2026 : FEREFAD passe en version 2.2.0. Telimani — taxi, taxi-moto et livraison — s''intègre au cœur de la plateforme, et les chauffeurs gagnent un espace professionnel dédié.',
+  '# FEREFAD 2.2.0 : Telimani au cœur de la super-app
+
+Le **20 octobre 2026**, FEREFAD publie sa version **2.2.0** — la plus importante de son histoire récente : **Telimani** s''installe au cœur de la plateforme.
+
+## Telimani : la mobilité intégrée
+
+Avec la 2.2.0, FEREFAD réunit la marketplace et la mobilité dans une seule application :
+
+- **Taxi et taxi-moto** : commander une course en quelques gestes
+- **Livraison** : faire acheminer les achats de la marketplace
+- **Espace chauffeur professionnel** : les chauffeurs disposent de leur propre espace pour gérer leurs courses et leur activité
+
+Une seule application pour vendre, acheter, se déplacer et livrer — c''est la promesse de la super-app africaine que FEREFAD construit pas à pas.
+
+## Trois canaux publics
+
+La version 2.2.0 est accessible sur les trois canaux publics de FEREFAD. L''optimisation pour les connexions à faible débit reste une règle de fabrication : la plateforme est pensée pour les réalités du réseau d''ici.
+
+## La suite
+
+Chaque version documente son chemin : la 2.2.0 confirme la direction — une marketplace inclusive et transparente où le commerce numérique et la mobilité se renforcent mutuellement. Les prochaines étapes suivront la même boussole : plus d''autonomie pour la jeunesse africaine, plus de visibilité pour les vendeurs, plus de simplicité pour les acheteurs.',
+  '/assets/images/blog/ferefad-telimani-2-2-0.jpg', 'Produits', '["FEREFAD", "Telimani", "Version 2.2.0"]', 'Green FAD — Équipe produit', 'article', 0, '2026-10-20 09:00:00', 'publie',
+  'FEREFAD 2.2.0 : Telimani au cœur de la super-app | Blog Green FAD', '20 octobre 2026 : FEREFAD 2.2.0 — Telimani (taxi, taxi-moto, livraison) au cœur de la super-app, espace chauffeur professionnel, trois canaux publics.', '/assets/images/blog/ferefad-telimani-2-2-0.jpg', 'ferefad', (SELECT id FROM products WHERE slug = 'ferefad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'ferefad-marketplace-afrique', 'FEREFAD : une marketplace pensée pour l''Afrique, portée par Oumar Ballo', 'À l''origine de FEREFAD, il y a la vision d''Oumar Ballo : autonomiser la jeunesse africaine par le commerce numérique. Green FAD en assure la conception technique, le développement et l''exploitation. Récit d''un projet à deux voix.',
+  '# FEREFAD : une marketplace pensée pour l''Afrique, portée par Oumar Ballo
+
+Certains produits naissent d''une étude, d''autres d''une frustration. **FEREFAD** est né d''une conviction — celle d''**Oumar Ballo**, qui a imaginé une plateforme pour **autonomiser la jeunesse africaine via le commerce numérique**.
+
+## Un projet à deux voix
+
+Concrétiser une vision demande des bras et des années d''expérience : c''est là que Green FAD est entré dans l''histoire. Conformément à son rôle depuis le début, **Green FAD assure la conception technique, le développement et l''exploitation** de FEREFAD ; la direction du projet reste fidèle à l''intuition d''origine — **une marketplace inclusive et transparente**, pensée pour les réalités du continent.
+
+## Ce que FEREFAD propose déjà
+
+- **Publication d''annonces simple et guidée** — vendre en ligne ne doit pas être un privilège
+- **Recherche et filtres** par catégorie et localisation
+- **Messagerie interne** entre acheteurs et vendeurs
+- **Profils vendeurs** pour renforcer la confiance
+- **Optimisation pour le mobile et les connexions à faible débit**
+- Et depuis le 20 octobre 2026, **Telimani** : taxi, taxi-moto et livraison intégrés — version 2.2.0
+
+## Une histoire documentée avec honnêteté
+
+Nous appliquons à FEREFAD la même règle qu''aux autres produits : **ne jamais transformer une estimation en date certaine**. Les jalons précis de la genèse sont en cours d''archivage et seront publiés au fur et à mesure — la transparence fait partie du produit.
+
+Le meilleur moyen de suivre cette histoire : la vivre. La marketplace vous attend.',
+  '/assets/images/blog/ferefad-marketplace-afrique.jpg', 'Produits', '["FEREFAD", "Récit", "Origine"]', 'Green FAD — Équipe produit', 'recit', 0, '2026-11-04 09:00:00', 'publie',
+  'FEREFAD : une marketplace pensée pour l''Afrique, portée par Oumar Ballo | Blog Green FAD', 'Le récit FEREFAD : la vision d''Oumar Ballo, le partenariat technique Green FAD, une marketplace inclusive et transparente — et la version 2.2.0 avec Telimani.', '/assets/images/blog/ferefad-marketplace-afrique.jpg', 'ferefad', (SELECT id FROM products WHERE slug = 'ferefad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'paygfad-origine-paiements', 'PayGfad : penser les paiements du quotidien dès 2023', 'Septembre 2023 : Green FAD lance le chantier PayGfad — une suite de gestion pensée pour les coopératives, écoles, institutions financières et opérateurs d''énergie du Mali et de la sous-région.',
+  '# PayGfad : penser les paiements du quotidien dès 2023
+
+Septembre 2023 : Green FAD lance le chantier **PayGfad**, sa suite de gestion pour les entreprises et institutions d''Afrique. Pas une application de plus : une réponse construite **au contact direct du terrain**.
+
+## Le constat
+
+Écoles qui suivent les scolarités sur des cahiers, coopératives qui comptent leurs membres à la main, institutions financières qui gèrent prêts et épargne sur des tableurs dispersés, opérateurs d''énergie solaire qui traquent leurs activations : les outils existants ignorent les réalités d''ici — connectivité limitée, smartphones plutôt qu''ordinateurs, paiement mobile avant tout.
+
+## L''idée : une suite par métiers
+
+Plutôt qu''un logiciel générique, PayGfad sera **une suite par métiers** — un socle commun (tableau de bord, clients, stocks, factures, paiements **PAYG** — Pay As You Go —, journal d''audit) et des modules dédiés : **ERP, Finance, Energy, Agro, School**. Une seule plateforme cloud, utilisable depuis le navigateur d''un smartphone, sans application à installer.
+
+## La construction
+
+En 2024, la suite est mise en ligne — sa présence attestée dès cette année-là. Le module **Scool**, pensé avec et pour des établissements scolaires, deviendra son fer de lance en production.
+
+Nous ne le savons pas encore, mais PayGfad couvrira bientôt sept pays et cinq modules. Le chantier commence.',
+  '/assets/images/blog/paygfad-origine-paiements.jpg', 'Produits', '["PAYGFAD", "Origine", "SaaS"]', 'Green FAD — Équipe produit', 'article', 0, '2023-09-14 09:00:00', 'publie',
+  'PayGfad : penser les paiements du quotidien dès 2023 | Blog Green FAD', 'Septembre 2023 : naissance du projet PayGfad — une suite de gestion par métiers (ERP, Finance, Energy, Agro, School) pensée pour les réalités africaines.', '/assets/images/blog/paygfad-origine-paiements.jpg', 'paygfad', (SELECT id FROM products WHERE slug = 'paygfad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'paygfad-scool', 'PayGfad Scool : les paiements scolaires, enfin simples', 'Mars 2026 : le module Scool devient le fer de lance de PayGfad en production. Élèves, notes, bulletins, présences et scolarités — dans le navigateur du téléphone du directeur.',
+  '# PayGfad Scool : les paiements scolaires, enfin simples
+
+Mars 2026 : **Scool**, le module scolaire de PayGfad, devient **le module principal en production**. Un jalon qui résume tout ce pourquoi la suite existe.
+
+## Ce que Scool change pour les établissements
+
+Avant Scool, la vie d''un établissement tenait dans des cahiers et des tableurs : listes d''élèves, reçus de scolarité, moyennes recalculées à la main, présences estimées. Avec Scool, tout vit dans une seule interface :
+
+- **Élèves, notes, bulletins, présences et scolarités** réunis au même endroit
+- **Encaissement Mobile Money** — Orange Money, Wave, MTN, Moov — plus espèces et crédit
+- **Paiements PAYG** : chaque établissement avance à son rythme
+- Un accès par simple navigateur, **optimisé smartphone** — sans application à installer
+
+## Pensé avec le terrain
+
+Scool n''est pas né dans une tour d''ivoire : il a été construit **au contact des écoles** — leurs contraintes réelles, rythmes de paiement étalés, connectivité, personnel déjà très sollicité, dictant chaque choix.
+
+## La suite
+
+Scool est la tête de pont de PayGfad : ERP, Finance, Energy et Agro suivent la même route, vers les sept pays couverts par la suite. Les établissements qui veulent essayer ont un essai gratuit de 30 jours qui les attend.',
+  '/assets/images/blog/paygfad-scool.jpg', 'Produits', '["PAYGFAD", "Scool", "Éducation"]', 'Green FAD — Équipe produit', 'article', 0, '2026-03-10 09:00:00', 'publie',
+  'PayGfad Scool : les paiements scolaires, enfin simples | Blog Green FAD', 'Mars 2026 : PayGfad Scool en production — élèves, notes, bulletins, présences, scolarités et encaissement Mobile Money dans une seule interface smartphone.', '/assets/images/blog/paygfad-scool.jpg', 'paygfad', (SELECT id FROM products WHERE slug = 'paygfad'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'cloudaf-v1-1-agent', 'CloudAf v1.1 : l''Agent entre dans l''atelier', 'Août 2026 : deux mois après le lancement, CloudAf publie sa version 1.1 — l''Agent CloudAf avec ses outils audités (code, builds, déploiements) et le Studio Builder complet.',
+  '# CloudAf v1.1 : l''Agent entre dans l''atelier
+
+Août 2026 : deux mois après son lancement public, **CloudAf** publie sa **version 1.1**. Au programme : l''arrivée de l''**Agent CloudAf** et l''achèvement du **Studio Builder**.
+
+## L''Agent CloudAf
+
+Notre conviction depuis le début : l''IA ne doit pas seulement suggérer, elle doit **agir avec vous**. La v1.1 pose les fondations de l''Agent : il discute du projet, le comprend et opère de **véritables outils audités** — code, builds, déploiements. Chaque action passe par des outils visibles et vérifiables : rien ne se fait dans l''ombre.
+
+## Le Studio Builder se complète
+
+Le Studio Builder atteint son format définitif : **blocs, canvas glisser-déposer, inspecteur, thèmes**. On commence visuellement, on descend au code quand on le décide — le double éditeur no-code + code, synchronisé, tient sa promesse.
+
+## Le rythme tient
+
+v1.0 en juin, v1.1 en août : la cadence trimestrielle annoncée au lancement n''est pas un slogan. La prochaine étape est déjà en préparation — et elle ouvrira CloudAf à une nouvelle économie. Rendez-vous en octobre.',
+  '/assets/images/blog/cloudaf-v1-1-agent.jpg', 'Produits', '["CloudAf", "v1.1", "Studio Builder"]', 'Green FAD — Équipe produit', 'article', 0, '2026-08-14 09:00:00', 'publie',
+  'CloudAf v1.1 : l''Agent entre dans l''atelier | Blog Green FAD', 'Août 2026 : CloudAf v1.1 — l''Agent CloudAf et ses outils audités (code, builds, déploiements) entrent dans la plateforme, et le Studio Builder se complète.', '/assets/images/blog/cloudaf-v1-1-agent.jpg', 'cloudaf', (SELECT id FROM products WHERE slug = 'cloudaf'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'cloudaf-novembre-2026', 'CloudAf en novembre : cap sur la consolidation', 'Début novembre 2026 : après trois mises à jour majeures en cinq mois (v1.0 à v1.2), CloudAf entre dans une phase de consolidation — maintenance, améliorations continues et préparation de la suite.',
+  '# CloudAf en novembre : cap sur la consolidation
+
+Début novembre 2026, CloudAf franchit un cap discret mais important : après **trois mises à jour majeures en cinq mois**, la plateforme entre dans une phase de **consolidation**.
+
+## La trajectoire, pour mémoire
+
+- **Juin 2026 (v1.0)** : lancement public — double éditeur no-code + code, IA intégrée, déploiement en un clic avec SSL et CDN
+- **Août 2026 (v1.1)** : Agent CloudAf aux outils audités et Studio Builder complet
+- **Octobre 2026 (v1.2)** : CloudAf Store — templates en crédits, revente de projets — et monitoring temps réel avec alertes
+
+## Pourquoi la consolidation est une bonne nouvelle
+
+Une plateforme qui encaisse trois mises à jour majeures doit aussi **prendre le temps de consolider** : maintenance, améliorations continues, durcissement des parcours que les créateurs empruntent chaque jour — du premier projet au déploiement. C''est la même discipline qui guide tous les produits Green FAD : **publier quand c''est solide, renforcer avant d''étendre**.
+
+## La suite
+
+Les prochaines évolutions suivront la cadence documentée qui fait notre réputation. Les créateurs, eux, continuent de construire — et le Store continue de prouver que créer sur CloudAf peut devenir une source de revenus.',
+  '/assets/images/blog/cloudaf-novembre-2026.jpg', 'Produits', '["CloudAf", "Bilan", "Monitoring"]', 'Green FAD — Équipe produit', 'article', 0, '2026-11-03 09:00:00', 'publie',
+  'CloudAf en novembre : cap sur la consolidation | Blog Green FAD', 'Début novembre 2026 : CloudAf consolide — v1.0, v1.1 et v1.2 publiées en cinq mois, maintenance et améliorations continues avant la suite.', '/assets/images/blog/cloudaf-novembre-2026.jpg', 'cloudaf', (SELECT id FROM products WHERE slug = 'cloudaf'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'greenfad-nouvelles-routes', 'L''Amitié Fad, NIAFAD, SARAPAY, Carte Santé : les nouvelles routes de Green FAD', 'Au-delà de ses plateformes phares, Green FAD cultive une nouvelle génération de produits : l''hôtellerie connectée, l''ERP africain, le paiement mobile et le dossier médical numérique. Tour d''horizon.',
+  '# L''Amitié Fad, NIAFAD, SARAPAY, Carte Santé : les nouvelles routes de Green FAD
+
+Green FAD, ce sont des plateformes que vous connaissez — QRFAD, FadCard, Tile, CloudAf, PayGfad, FEREFAD, WARIPAY. Mais le laboratoire ne dort jamais : voici **quatre nouvelles routes** ouvertes par nos équipes.
+
+## L''Amitié Fad — l''hôtellerie connectée
+
+Conçu à partir des **besoins exprimés par les acteurs de l''hôtellerie malienne**, L''Amitié Fad simplifie la communication en hôtel : un **QR code dans la chambre**, et le client demande ménage, taxi ou restauration depuis son smartphone. Le personnel reçoit, suit, traite ; la direction mesure volumes et délais. Un service connecté clé en main, déployé avec les établissements.
+
+## NIAFAD — l''ERP conçu pour l''Afrique
+
+Ventes, stocks, finances, ressources humaines : **NIAFAD** réunit la gestion d''entreprise dans un environnement unique et sécurisé — devis, factures, caisse, paie, rôles et tableaux de bord. Né de nos **accompagnements d''entreprises locales**, il applique à la gestion ce que nos plateformes appliquent au commerce : la simplicité d''abord.
+
+## SARAPAY — le paiement pensé pour le marché africain
+
+**SARAPAY** est notre solution de paiement mobile : transactions sécurisées, traçabilité complète, notifications en temps réel, intégration aux plateformes Green FAD et aux systèmes clients. Elle naît au sein de notre **laboratoire d''innovation**, en réponse aux besoins concrets de nos propres produits.
+
+## Carte Santé — le dossier médical qui vous suit partout
+
+Prolongement naturel de l''expertise cartes connectées de FAD CARD, la **Carte Santé** met le dossier médical personnel dans la poche : historique, traitements, informations d''urgence — **allergies, groupe sanguin, contacts** — accessibles au cabinet comme aux urgences. Le patient décide **qui consulte son dossier** : la confiance par la conception.
+
+## Une même boussole
+
+Quatre produits, quatre secteurs, une même règle : partir des besoins du terrain, publier quand c''est solide, documenter chaque étape. Ces nouvelles routes ne remplacent rien — elles prolongent tout. Et elles ne demandent qu''à grandir avec leurs premiers utilisateurs.',
+  '/assets/images/blog/greenfad-nouvelles-routes.jpg', 'Produits', '["Green FAD", "Portefeuille", "Innovation"]', 'Green FAD — Équipe produit', 'recit', 0, '2026-11-07 09:00:00', 'publie',
+  'L''Amitié Fad, NIAFAD, SARAPAY, Carte Santé : les nouvelles routes de Green FAD | Blog Green FAD', 'L''Amitié Fad (hôtellerie connectée), NIAFAD (ERP africain), SARAPAY (paiement mobile), Carte Santé (dossier médical) : les nouvelles routes de Green FAD.', '/assets/images/blog/greenfad-nouvelles-routes.jpg', NULL, NULL);
+
 -- 10) Version du contenu
 UPDATE settings SET value = '14' WHERE key = 'content_version';
 
@@ -2474,17 +2788,17 @@ Cette chronologie est reconstituée avec le fondateur ; les dates approximatives
 UPDATE products SET history_intro_md = 'CLOUDaf suit son propre chemin : pensé il y a environ trois ans, mis en production il y a environ huit mois, et mis à jour début novembre 2026. La plateforme vit au rythme de ses déploiements.
 
 Cette chronologie est reconstituée avec le fondateur — aucune date n''est présentée comme certaine si elle ne l''est pas.' WHERE slug = 'cloudaf' AND (history_intro_md IS NULL OR history_intro_md = '');
-UPDATE products SET history_intro_md = 'Tile est né d''un chantier d''ingénierie d''environ un an et huit mois : une application Flutter (Android, iOS, Web/PWA) adossée à Firebase et à une administration React. D''abord exploitée en Progressive Web App, la plateforme a franchi deux jalons distincts : la mise en production PWA (mai 2026 environ), puis la publication sur les stores (fin octobre 2026 environ).
+UPDATE products SET history_intro_md = 'Tile est né d''un chantier d''ingénierie d''environ un an et huit mois : une application multiplateforme (Android, iOS, Web/PWA) adossée à des services cloud et à une console d''administration dédiée. D''abord exploitée en Progressive Web App, la plateforme a franchi deux jalons distincts : la mise en production PWA (mai 2026 environ), puis la publication sur les stores (fin octobre 2026 environ).
 
 Le parcours ci-dessous s''appuie sur plus d''une centaine de rapports de missions datés conservés dans les archives internes (septembre 2026 → novembre 2026) ainsi que sur les informations du fondateur. Les deux types de sources sont distingués pour chaque jalon.' WHERE slug = 'tile' AND (history_intro_md IS NULL OR history_intro_md = '');
 
 -- 2) JALONS — TILE (ordre chronologique, sources mixtes fondateur/archives)
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'conception', 'Naissance de l''idée Tile', 'Le développement de Tile a duré environ un an et huit mois selon le fondateur : le chantier démarre donc début 2025. La conception initiale pose les fondations de ce qui restera la stack du produit jusqu''à aujourd''hui.', '2025-03', 'approximative', NULL, NULL, '[]', 'Fondateur — mission CTO N°2, 10/11/2026 (« environ 1 an et 8 mois de développement »)', 'moyenne', 1, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Naissance de l''idée Tile');
-INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'developpement', 'Début du développement Flutter / Firebase', 'L''architecture posée dès l''origine : application Flutter (Android, iOS, Web/PWA), fonctions et règles Firebase, administration React. Cette architecture a été conservée et enrichie, jamais remplacée.', '2025-03', 'approximative', NULL, NULL, '[]', 'Fondateur — mission CTO N°2, 10/11/2026 · Archives : BILAN_EVOLUTION_TILE.md (stack conservée)', 'moyenne', 2, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Début du développement Flutter / Firebase');
+INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'developpement', 'Début du développement : une application pensée pour les trois canaux', 'L''architecture posée dès l''origine : une application unique déployée sur Android, iOS et le web (PWA), des services et des règles côté serveur, une administration dédiée. Cette architecture a été conservée et enrichie, jamais remplacée.', '2025-03', 'approximative', NULL, NULL, '[]', 'Fondateur — mission CTO N°2, 10/11/2026 · Archives : Archives internes du projet Tile', 'moyenne', 2, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Début du développement : une application pensée pour les trois canaux');
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'premiere_production', 'Mise en production de la PWA', 'Selon le fondateur, Tile est exploité en production sous forme de Progressive Web App depuis environ six mois, soit vers mai 2026. Ce jalon est volontairement distingué de la publication ultérieure sur les stores : deux canaux de distribution, deux dates.', '2026-05', 'approximative', NULL, NULL, '[]', 'Fondateur — mission CTO N°2, 10/11/2026 (« en production en PWA depuis environ 6 mois »)', 'moyenne', 3, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Mise en production de la PWA');
-INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'mise_a_jour', 'Verrouillage de la release Tile 1.0', 'Le « FINAL RELEASE REPORT (V1.0 LOCK) » du 17 juillet 2026 atteste tous les critères de fin : analyse Flutter sans erreur, build d''administration compilé, composants UI dédoublonnés (avatars, sources utilisateur), trois fils validés (Certifié, Global, Vidéo), backend gelé. Cinq commits, 333 lignes nettes supprimées.', '2026-07-17', 'exacte', '1.0', 'tile-parcours-pwa-stores', '[]', 'Archives : TILE_FINAL_RELEASE_REPORT.md, 17/07/2026', 'haute', 4, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Verrouillage de la release Tile 1.0');
+INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'mise_a_jour', 'Verrouillage de la release Tile 1.0', 'Le « FINAL RELEASE REPORT (V1.0 LOCK) » du 17 juillet 2026 atteste tous les critères de fin : analyse statique sans erreur, build d''administration compilé, composants UI dédoublonnés (avatars, sources utilisateur), trois fils validés (Certifié, Global, Vidéo), backend gelé. Cinq commits, 333 lignes nettes supprimées.', '2026-07-17', 'exacte', '1.0', 'tile-parcours-pwa-stores', '[]', 'Archives : TILE_FINAL_RELEASE_REPORT.md, 17/07/2026', 'haute', 4, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Verrouillage de la release Tile 1.0');
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'mise_a_jour', 'Campagne de mise à l''échelle et d''audits', 'Septembre 2026 : audits des trois fils (11 septembre), audit du feed Explorer (17 septembre), missions de performance P1/P2/P3 (23-24 septembre), mise à l''échelle CTO (23 septembre), domaine officiel (26 septembre), stabilisation zéro erreur (25 septembre) et passe de cohérence (28 septembre). Une vingtaine de rapports datés atteste ce chantier.', '2026-09', 'archives', NULL, NULL, '[]', 'Archives : dossier tile/audits — rapports datés 2026-09-11 → 2026-09-28', 'haute', 5, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Campagne de mise à l''échelle et d''audits');
-INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'implementation', 'Espace entreprise, Explorer, studio de création, authentification', 'Octobre 2026 : consolidation de l''espace entreprise et de l''Explorer knowledge (4 octobre), activation de l''authentification Firebase Cloud (10 octobre), studio de création avancé (11 octobre), parité PWA/Android/iOS (4 octobre), préparation du dossier App Store (5-10 octobre).', '2026-10', 'archives', NULL, NULL, '[]', 'Archives : MISSION-2-ESPACE-ENTREPRISE, MISSION-3-EXPLORER-KNOWLEDGE, MISSION-AUTH-ACTIVATION-2026-10-10, MISSION-STUDIO-AVANCE-RAPPORT-2026-10-11', 'haute', 6, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Espace entreprise, Explorer, studio de création, authentification');
+INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'implementation', 'Espace entreprise, Explorer, studio de création, authentification', 'Octobre 2026 : consolidation de l''espace entreprise et de l''Explorer knowledge (4 octobre), activation de l''authentification sécurisée (10 octobre), studio de création avancé (11 octobre), parité PWA/Android/iOS (4 octobre), préparation du dossier App Store (5-10 octobre).', '2026-10', 'archives', NULL, NULL, '[]', 'Archives : MISSION-2-ESPACE-ENTREPRISE, MISSION-3-EXPLORER-KNOWLEDGE, MISSION-AUTH-ACTIVATION-2026-10-10, MISSION-STUDIO-AVANCE-RAPPORT-2026-10-11', 'haute', 6, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Espace entreprise, Explorer, studio de création, authentification');
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'tests', 'Préparation de la publication : Play readiness + pré-soumission', 'Fin octobre 2026 : documents PLAY-READINESS (26) et PRESUBMIT (27) — vérification de la préparation du Play Store et du dossier de pré-soumission. Le même jour : sauvegardes Firestore et drill complet de restauration.', '2026-10-27', 'exacte', NULL, NULL, '[]', 'Archives : PLAY-READINESS-2026-10-26.md, PRESUBMIT-2026-10-27.md, SAUVEGARDES-FIRESTORE-COUT-MINIMAL-2026-10-27.md', 'haute', 7, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Préparation de la publication : Play readiness + pré-soumission');
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'mise_a_jour', 'Publication finale — Tile 1.0.6+724 sur les canaux', 'Rapport de livraison du 2 novembre 2026 : stabilisation multiplateforme iOS + Android (APK/AAB) + PWA, publication finale (MÉDIA/AUTRE, vocal, texte long), flux Certifié consolidé. Corrections livrées : menu de création réduit aux deux entrées canoniques, borne de publication 10 000 caractères avec garde serveur, crash du fil Certifié corrigé.', '2026-11-02', 'exacte', '1.0.6+724', 'tile-parcours-pwa-stores', '[]', 'Archives : MISSION-PUBLICATION-FINALE-RAPPORT-2026-11-02.md', 'haute', 8, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Publication finale — Tile 1.0.6+724 sur les canaux');
 INSERT INTO product_milestones (product_slug, kind, title, description_md, occurred_on, date_precision, version_ref, article_slug, media_json, source_label, confidence, sort_order, status) SELECT 'tile', 'tests', 'Matrice de tests consolidée', 'Consolidation de la couverture de tests le 4 novembre 2026 (matrice dédiée) ; lors de la mission CTO prioritaire, la suite complète passe avec 615 tests réussis.', '2026-11-04', 'exacte', NULL, NULL, '[]', 'Archives : MATRICE_TESTS_2026-11-04.md, MISSION_CTO_2026-11-04.md', 'haute', 9, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_milestones WHERE product_slug = 'tile' AND title = 'Matrice de tests consolidée');
@@ -2531,7 +2845,7 @@ INSERT INTO product_milestones (product_slug, kind, title, description_md, occur
 
 
 -- 7) JOURNAL DES VERSIONS (uniquement des versions vérifiables, avec leur source)
-INSERT INTO product_versions (product_slug, version, released_on, date_precision, kind, summary, features, improvements, fixes, tech_notes, article_slug, media_json, sort_order, status) SELECT 'tile', '1.0', '2026-07-17', 'exacte', 'production', 'Release V1.0 — verrouillage final (« V1.0 LOCK »). Tous les critères de fin validés : analyse Flutter sans erreur, build d''administration compilé, dédoublonnage des composants UI, trois fils validés.', '["Analyse Flutter : 0 erreur","Build d''administration compilé avec succès","Composants UI dédoublonnés — source unique (avatars, suivi utilisateur)","Trois fils validés : Certifié, Global, Vidéo"]', NULL, NULL, 'Backend gelé pendant la mission de verrouillage — 5 commits, 333 lignes nettes supprimées.', 'tile-parcours-pwa-stores', '[]', 1, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_versions WHERE product_slug = 'tile' AND version = '1.0');
+INSERT INTO product_versions (product_slug, version, released_on, date_precision, kind, summary, features, improvements, fixes, tech_notes, article_slug, media_json, sort_order, status) SELECT 'tile', '1.0', '2026-07-17', 'exacte', 'production', 'Release V1.0 — verrouillage final (« V1.0 LOCK »). Tous les critères de fin validés : analyse statique sans erreur, build d''administration compilé, dédoublonnage des composants UI, trois fils validés.', '["Analyse statique : 0 erreur","Build d''administration compilé avec succès","Composants UI dédoublonnés — source unique (avatars, suivi utilisateur)","Trois fils validés : Certifié, Global, Vidéo"]', NULL, NULL, 'Backend gelé pendant la mission de verrouillage — 5 commits, 333 lignes nettes supprimées.', 'tile-parcours-pwa-stores', '[]', 1, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_versions WHERE product_slug = 'tile' AND version = '1.0');
 INSERT INTO product_versions (product_slug, version, released_on, date_precision, kind, summary, features, improvements, fixes, tech_notes, article_slug, media_json, sort_order, status) SELECT 'tile', '1.0.6+724', '2026-11-02', 'exacte', 'production', 'Publication finale multiplateforme : iOS + Android (APK/AAB) + PWA. Publication finale (MÉDIA/AUTRE, vocal, texte long) et flux Certifié consolidé.', '["Publication finale : MÉDIA/AUTRE avec vocal et texte long","Flux Certifié consolidé","Parité iOS / Android / PWA","Borne de publication 10 000 caractères vérifiée côté serveur"]', NULL, '["Menu de création : entrées redondantes supprimées","Crash du fil Certifié corrigé (build 723)","Limite de saisie 500 caractères supprimée au profit d''une borne de publication contrôlée"]', 'TestFlight courant = 723 ; plafond de certificats Apple documenté (log CI run 41357572394) — action propriétaire.', 'tile-parcours-pwa-stores', '[]', 2, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_versions WHERE product_slug = 'tile' AND version = '1.0.6+724');
 INSERT INTO product_versions (product_slug, version, released_on, date_precision, kind, summary, features, improvements, fixes, tech_notes, article_slug, media_json, sort_order, status) SELECT 'ferefad', '2.2.0', '2026-10-20', 'exacte', 'module', 'Telimani au cœur de Ferefad + espace chauffeur professionnel. La super-app malienne gagne la commande de courses (taxi, taxi-moto, livraison) et une console chauffeur complète.', '["Telimani : taxi, taxi-moto et livraison en quelques secondes","Tarif estimé avant la course + suivi en temps réel","Règlement en espèces à la fin de la course — aucun paiement dans l''application","Annulation avec motifs, notation client ↔ chauffeur, signalement de problème","Espace chauffeur : solde, courses et revenus du jour, note moyenne","Marketplace : filtres par catégories (Électronique, Mode, Maison, Véhicules, Emplois, Services)","Messagerie vocale plus fiable (envoi, lecture)"]', 'Nouveau design Telimani : boutons clairs, prix toujours lisibles, chargements élégants, messages d''erreur compréhensibles.', '["Protection anti double-commande","Gestion hors ligne annoncée","Notifications push enrichies"]', 'Notes de version publiques de la fiche App Store — 53,5 Mo, catégorie Shopping.', NULL, '[]', 1, 'publie' WHERE NOT EXISTS (SELECT 1 FROM product_versions WHERE product_slug = 'ferefad' AND version = '2.2.0');
 
@@ -2542,7 +2856,7 @@ INSERT INTO product_sources (product_slug, source_type, title, detail, url, evid
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'tile', 'git', 'Dépôt Green-fad/Tile (branche master)', 'Historique de commits, branches et releases consultable ; branche master unique, aucun rewrite des commits protégés.', 'https://github.com/Green-fad/Tile', '2026-11-02', 'haute', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'tile' AND title = 'Dépôt Green-fad/Tile (branche master)');
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'ferefad', 'store', 'Fiche App Store Ferefad (id6780280349)', 'Version 2.2.0, mise à jour du 20 octobre 2026, notes de version Telimani + espace chauffeur ; vendeur GREEN-FAD-SARL.', 'https://apps.apple.com/us/app/ferefad/id6780280349', '2026-10-20', 'haute', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'ferefad' AND title = 'Fiche App Store Ferefad (id6780280349)');
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'ferefad', 'store', 'Fiche Google Play — com.ferefad.connect', 'Canal Android officiel de FEREFAD Connect, vérifié publiquement.', 'https://play.google.com/store/apps/details?id=com.ferefad.connect', '2026-11-09', 'haute', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'ferefad' AND title = 'Fiche Google Play — com.ferefad.connect');
-INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'ferefad', 'web', 'Site officiel ferefad.com', 'Application web Flutter — canal public direct du produit.', 'https://ferefad.com', '2026-11-10', 'haute', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'ferefad' AND title = 'Site officiel ferefad.com');
+INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'ferefad', 'web', 'Site officiel ferefad.com', 'Application web — canal public direct du produit.', 'https://ferefad.com', '2026-11-10', 'haute', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'ferefad' AND title = 'Site officiel ferefad.com');
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'ferefad', 'fondateur', 'Fondateur — historique FEREFAD à retrouver', 'Un historique important existe déjà et doit être retrouvé et documenté (mission CTO N°2). Reconstitution en cours.', NULL, '2026-11-10', 'moyenne', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'ferefad' AND title = 'Fondateur — historique FEREFAD à retrouver');
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'fad-card', 'fondateur', 'Fondateur — mission CTO N°2 (9-10/11/2026)', 'Conception ≈ 7 ans, développement ≈ 3 ans, mise en production jusqu''au premier utilisateur, mises à jour tous les 3 à 6 mois, dernière mise à jour la veille du 9 novembre 2026.', NULL, '2026-11-09', 'moyenne', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'fad-card' AND title = 'Fondateur — mission CTO N°2 (9-10/11/2026)');
 INSERT INTO product_sources (product_slug, source_type, title, detail, url, evidenced_on, confidence, validated_by) SELECT 'qrfad', 'fondateur', 'Fondateur — mission CTO N°2 (9-10/11/2026)', 'Conception ≈ 7 ans, développement ≈ 3 ans, mise en production jusqu''au premier utilisateur, évolutions régulières. Historique indépendant de FAD CARD.', NULL, '2026-11-09', 'moyenne', NULL WHERE NOT EXISTS (SELECT 1 FROM product_sources WHERE product_slug = 'qrfad' AND title = 'Fondateur — mission CTO N°2 (9-10/11/2026)');
@@ -2557,14 +2871,14 @@ INSERT INTO product_sources (product_slug, source_type, title, detail, url, evid
 INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, product_slug) VALUES (
   'tile-parcours-pwa-stores',
   'Tile : un an et huit mois d''ingénierie, de la première PWA aux stores',
-  'Reconstruction éditoriale publiée le 10 novembre 2026 à partir des archives internes datées : comment Tile est passé d''un chantier Flutter/Firebase démarré début 2025 à une publication finale 1.0.6+724 sur les stores. Ce texte n''est pas une publication historique originale.',
+  'Reconstruction éditoriale publiée le 10 novembre 2026 à partir des archives internes datées : comment Tile est passé d''un chantier d''ingénierie démarré début 2025 à une publication finale 1.0.6+724 sur les stores. Ce texte n''est pas une publication historique originale.',
   '# Tile : un an et huit mois d''ingénierie, de la première PWA aux stores
 
 > **Note de transparence éditoriale.** Cet article est une **reconstruction éditoriale rédigée le 10 novembre 2026** à partir des archives internes de GREEN FAD (plus d''une centaine de rapports de missions datés, worklogs CI, dépôt Git). Il ne s''agit **pas** d''une publication historique originale : aucune annonce comparable n''a été retrouvée dans le blog. Les dates issues des archives sont exactes ; celles issues du fondateur sont signalées « environ ».
 
 ## Un chantier d''environ un an et huit mois
 
-Selon le fondateur, le développement de Tile a duré **environ un an et huit mois** : le chantier démarre donc **début 2025**. L''architecture posée dès l''origine — **Flutter** pour Android, iOS et le Web/PWA, **Firebase** pour les fonctions et les données, **React** pour l''administration — n''a jamais été remplacée : elle a été conservée et enrichie, mission après mission.
+Selon le fondateur, le développement de Tile a duré **environ un an et huit mois** : le chantier démarre donc **début 2025**. L''architecture posée dès l''origine — une application multiplateforme pour Android, iOS et le Web/PWA, des services cloud pour les fonctions et les données, une console d''administration dédiée — n''a jamais été remplacée : elle a été conservée et enrichie, mission après mission.
 
 ## Deux jalons de mise à disposition, volontairement distincts
 
@@ -2579,7 +2893,7 @@ Ne pas confondre ces deux jalons n''est pas un détail : chacun raconte une éta
 
 Les rapports internes datés racontent la maturation du produit :
 
-- **17 juillet 2026** — *V1.0 LOCK* : analyse Flutter sans erreur, build d''administration compilé, composants UI dédoublonnés, trois fils validés (Certifié, Global, Vidéo), backend gelé.
+- **17 juillet 2026** — *V1.0 LOCK* : analyse statique sans erreur, build d''administration compilé, composants UI dédoublonnés, trois fils validés (Certifié, Global, Vidéo), backend gelé.
 - **Septembre 2026** — campagne d''audits et de mise à l''échelle : fils du réseau, Explorer, performance P1/P2/P3, stabilisation « zéro erreur », domaine officiel.
 - **Octobre 2026** — consolidation : espace entreprise, Explorer knowledge, studio de création, activation de l''authentification, parité PWA/Android/iOS, préparation des dossiers de soumission.
 - **27 octobre 2026** — play readiness + pré-soumission + drill complet de sauvegarde/restauration Firestore.
@@ -2601,7 +2915,7 @@ Tile continue d''évoluer : sa chronologie, administrable depuis le Dashboard GR
   '2026-11-10 09:00:00',
   'publie',
   'Tile : un an et huit mois d''ingénierie, de la PWA aux stores | Green FAD',
-  'Reconstruction éditoriale documentée : le parcours de Tile, de la conception Flutter/Firebase début 2025 à la publication finale 1.0.6+724 sur les stores, raconté à partir des archives internes datées de GREEN FAD.',
+  'Reconstruction éditoriale documentée : le parcours de Tile, de la conception d''ingénierie début 2025 à la publication finale 1.0.6+724 sur les stores, raconté à partir des archives internes datées de GREEN FAD.',
   'tile'
 );
 
