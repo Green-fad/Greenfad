@@ -29,6 +29,34 @@
     }
   }, true);
 
+  // Compression navigateur du formulaire natif « Téléverser » (bibliothèque médias)
+  // avant envoi : mêmes règles que uploadMedia() — aucune image plus lourde que l'original.
+  document.addEventListener("submit", function (e) {
+    var form = e.target.closest && e.target.closest("form.adm-upload");
+    if (!form || form.dataset.compressed === "1") return;
+    var input = form.querySelector('input[type="file"]');
+    if (!input || !input.files || !input.files.length) return;
+    e.preventDefault();
+    form.dataset.compressed = "1";
+    var files = Array.prototype.slice.call(input.files);
+    var prepared = new Array(files.length);
+    var pending = 0;
+    for (var i = 0; i < files.length; i++) {
+      pending++;
+      (function (idx) {
+        compressImage(files[idx], function (f) { prepared[idx] = f; pending--; if (!pending) finish(); });
+      })(i);
+    }
+    function finish() {
+      try {
+        var dt = new DataTransfer();
+        for (var i = 0; i < prepared.length; i++) { if (prepared[i]) dt.items.add(prepared[i]); }
+        input.files = dt.files;
+      } catch (err) { /* DataTransfer indisponible : envoi des fichiers d'origine */ }
+      form.submit();
+    }
+  }, true);
+
   // Copier l'URL média (ou une URL complète pour les partages)
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-copy]");
@@ -108,20 +136,61 @@
     }
   }
 
-  // Téléverse des fichiers vers R2 via l'API interne
+  // Compression navigateur avant téléversement (perf — demande fondateur 10/11/2026 :
+  // « les partenaires sont nombreux, il faut alléger l'affichage »). Les images lourdes
+  // (JPEG/PNG/WebP/AVIF > 60 Ko) sont redimensionnées à 1600 px max sur l'arête longue
+  // puis ré-encodées en WebP qualité 82 — JAMAIS plus lourdes que l'original ; SVG, GIF
+  // animés et fichiers déjà légers restent intacts. Le PNG conserve sa transparence.
+  function compressImage(file, done) {
+    var REENCODABLE = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+    if (REENCODABLE.indexOf(file.type) === -1 || file.size < 60 * 1024) { done(file); return; }
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      try {
+        var MAX = 1600;
+        var ratio = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+        var w = Math.max(1, Math.round(img.naturalWidth * ratio));
+        var h = Math.max(1, Math.round(img.naturalHeight * ratio));
+        var cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(img, 0, 0, w, h);
+        cv.toBlob(function (blob) {
+          if (!blob || blob.size >= file.size) { done(file); return; }
+          var name = file.name.replace(/\.[^.]+$/, "") + ".webp";
+          done(new File([blob], name, { type: "image/webp" }));
+        }, "image/webp", 0.82);
+      } catch (e) { done(file); }
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); done(file); };
+    img.src = url;
+  }
+
+  // Téléverse des fichiers vers R2 via l'API interne (compression navigateur au passage)
   function uploadMedia(files, docMode, done) {
-    var fd = new FormData();
-    var n = 0;
-    for (var i = 0; i < files.length; i++) { if (files[i]) { fd.append("file", files[i]); n++; } }
+    var n = 0, pending = 0;
+    var prepared = new Array(files.length);
+    for (var i = 0; i < files.length; i++) {
+      if (!files[i]) continue;
+      n++; pending++;
+      (function (idx) {
+        compressImage(files[idx], function (f) { prepared[idx] = f; pending--; if (!pending) send(); });
+      })(i);
+    }
     if (!n) { done({ ok: false, j: { error: "Aucun fichier reçu" } }); return; }
-    fetch("/api/v1/media?folder=" + (docMode ? "docs" : "media"), {
-      method: "POST",
-      headers: { "x-csrf-token": window.GF_CSRF },
-      body: fd
-    })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(done)
-      .catch(function () { done({ ok: false, j: { error: "Erreur réseau pendant l'envoi" } }); });
+    function send() {
+      var fd = new FormData();
+      for (var i = 0; i < prepared.length; i++) { if (prepared[i]) fd.append("file", prepared[i]); }
+      fetch("/api/v1/media?folder=" + (docMode ? "docs" : "media"), {
+        method: "POST",
+        headers: { "x-csrf-token": window.GF_CSRF },
+        body: fd
+      })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(done)
+        .catch(function () { done({ ok: false, j: { error: "Erreur réseau pendant l'envoi" } }); });
+    }
   }
 
   // Ouvre un sélecteur de fichiers natif (input dynamique)
