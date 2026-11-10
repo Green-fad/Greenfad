@@ -237,7 +237,8 @@ async function dynamicCards(db: D1Database, source: string, limit: number): Prom
       return (await q(db, "SELECT slug, name, tagline, image_key, logo_key, category, state FROM products WHERE status=? ORDER BY sort_order LIMIT ?", pub, limit)).map((r) => ({
         title: String(r.name || ""),
         text: String(r.tagline || ""),
-        image_key: String(r.logo_key || r.image_key || ""),
+        // Bannière officielle d'abord (identique à la page /produits) — le logo reste réservé au bandeau « Écosystème » (logo_marquee)
+        image_key: String(r.image_key || r.logo_key || ""),
         url: `/produits/${r.slug}`,
         icon: "",
         tag: String(r.category || ""),
@@ -453,8 +454,10 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
     case "partners": {
       const rows = await q(ctx.env.DB, "SELECT name, logo_key, url FROM partners WHERE status='publie' ORDER BY sort_order LIMIT ?", p.limit);
       if (!rows.length) return "";
+      // Perf (demande fondateur 10/11/2026) : logos optimisés WebP 320×200 côté migration 0020 —
+      // chargement différé (lazy) + décodage asynchrone + dimensions intrinsèques (0 décalage de mise en page).
       return `<section class="container"><div class="partners reveal" data-stagger>${rows
-        .map((r) => `<div class="partner">${r.logo_key ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy">` : `<span>${esc(r.name)}</span>`}</div>`)
+        .map((r) => `<div class="partner">${r.logo_key ? `<img src="${esc(String(r.logo_key).startsWith("/") ? r.logo_key : "/media/" + r.logo_key)}" alt="${esc(r.name)}" loading="lazy" decoding="async" width="320" height="200">` : `<span>${esc(r.name)}</span>`}</div>`)
         .join("")}</div></section>`;
     }
     case "posts": {
@@ -487,7 +490,7 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
           : await q(ctx.env.DB, "SELECT name, logo_key AS logo FROM partners WHERE status='publie' AND COALESCE(logo_key, '') != '' ORDER BY sort_order");
       if (!rows.length) return "";
       const tile = (name: string, logo: string) =>
-        `<span class="marquee__item" title="${esc(name)}"><img src="${esc(String(logo).startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(name)}" loading="lazy"></span>`;
+        `<span class="marquee__item" title="${esc(name)}"><img src="${esc(String(logo).startsWith("/") ? logo : "/media/" + logo)}" alt="${esc(name)}" loading="lazy" decoding="async"></span>`;
       const sequence = rows.map((r) => tile(String(r.name), String(r.logo))).join("");
       return `<div class="marquee reveal" aria-label="${esc(p.label || "Produits Green FAD")}">
         <p class="marquee__label">${esc(p.label || "Nos produits")}</p>
