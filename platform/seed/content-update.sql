@@ -2290,6 +2290,112 @@ UPDATE media_albums SET cover_key = '/assets/images/products/tile-banniere.jpg' 
 --    section Démonstrations (vidéos réelles) et Ressources (documents publics).
 UPDATE pages SET blocks = '[{"type": "hero", "visible": true, "eyebrow": "GREEN FAD SARL — Entreprise technologique africaine", "title": "Nous concevons les produits numériques qui transforment l''Afrique", "subtitle": "Innovation, ingénierie logicielle et transformation digitale : Green FAD développe ses propres technologies et accompagne les organisations, du Mali vers l''international.", "cta_label": "Découvrir nos produits", "cta_url": "/produits", "cta2_label": "Nous contacter", "cta2_url": "/contact", "variant": "gradient"}, {"type": "logo_marquee", "visible": true, "source": "products", "label": "L''écosystème Green FAD — 10 produits propriétaires"}, {"type": "section_header", "visible": true, "eyebrow": "Nos solutions", "title": "Des produits nés sur le terrain", "text": "Chaque produit Green FAD répond à un besoin réel observé sur le terrain africain.", "align": "center"}, {"type": "cards", "visible": true, "source": "products", "limit": 6, "columns": 3, "items": [], "view_all_label": "Voir tous les produits", "view_all_url": "/produits"}, {"type": "stats", "visible": true, "variant": "dark", "items": [{"value": "10", "label": "Produits technologiques propriétaires"}, {"value": "5", "label": "Pays d''intervention en Afrique"}, {"value": "4", "label": "Expertises d''ingénierie"}, {"value": "14", "label": "Références clients & partenaires"}]}, {"type": "section_header", "visible": true, "eyebrow": "Blog & publications", "title": "Les dernières actualités", "text": "Lancements produits, analyses technologiques et retours d''expérience écrits par nos équipes.", "align": "center"}, {"type": "posts", "visible": true, "limit": 3}, {"type": "section_header", "visible": true, "eyebrow": "Expertises", "title": "Ce que nous faisons", "align": "center"}, {"type": "cards", "visible": true, "source": "services", "limit": 4, "columns": 4, "items": [], "view_all_label": "Toutes nos expertises", "view_all_url": "/expertises"}, {"type": "split", "visible": true, "title": "L''alliance de la technologie et de l''écologie", "text_md": "Fondée par des professionnels passionnés par l''innovation et sensibles aux enjeux environnementaux, **GREEN FAD SARL** accompagne la transition numérique et écologique des organisations en Afrique.\n\n**Notre vision :** un avenir où technologie et durabilité vont de pair, réduisant la fracture numérique en Afrique.\n\n**Notre ambition :** porter nos propres innovations technologiques à l''échelle internationale.", "image_key": "/assets/images/gallery/tech-ecologie.jpg", "image_side": "right", "cta_label": "Découvrir l''entreprise", "cta_url": "/p/entreprise"}, {"type": "section_header", "visible": true, "eyebrow": "Galerie", "title": "Green FAD en images", "text": "Nos équipes, nos produits et le terrain : la vie réelle de l''entreprise.", "align": "center"}, {"type": "gallery_album", "visible": true, "album_slug": "greenfad-en-images", "limit": 7, "layout": "featured"}, {"type": "section_header", "visible": true, "eyebrow": "Démonstrations", "title": "Green FAD en vidéo", "text": "Présentations produits et passages médias — la chaîne YouTube officielle Green FAD.", "align": "center"}, {"type": "video_playlist", "visible": true, "limit": 3}, {"type": "section_header", "visible": true, "eyebrow": "Ressources", "title": "Documents publics", "text": "Plaquettes, fiches produits et guides — téléchargeables librement.", "align": "center"}, {"type": "document_list", "visible": true, "limit": 3}, {"type": "section_header", "visible": true, "eyebrow": "Références", "title": "Ils nous font confiance", "align": "center"}, {"type": "partners", "visible": true, "limit": 14}, {"type": "countries_map", "visible": true, "eyebrow": "Implantation internationale", "title": "Enracinés en Afrique, tournés vers le monde", "text": "Cinq pays d''intervention, une même exigence : concevoir localement, déployer et supporter durablement.", "cta_label": "Découvrir l''implantation", "cta_url": "/implantation"}, {"type": "cta", "visible": true, "title": "Construisons ensemble un avenir durable et digital", "text": "Parlons de votre projet — nos équipes vous répondent rapidement.", "button_label": "Démarrer la conversation", "button_url": "/contact", "variant": "solid"}]' WHERE slug = 'accueil';
 
+-- 9bis) WARIPAY — articles fondateurs du blog (demande du fondateur,
+--        10/11/2026) : identiques à la migration 0016, re-seed safe
+--        (le DELETE FROM posts en tête de ce fichier efface tout ;
+--        ces INSERT garantissent la survie en cas de bump futur)
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'waripay-origine-une-etude', 'WARIPAY : l''étude qui a donné naissance à une ambition',
+  'Février 2026 : Green FAD annonce la création de WARIPAY. Tout est parti d''une étude de terrain à Bamako — et d''un constat simple : encaisser en Afrique de l''Ouest ne devrait pas être un parcours du combattant.',
+  '# WARIPAY : l''étude qui a donné naissance à une ambition
+
+Février 2026 : Green FAD annonce officiellement la création de **WARIPAY**, son infrastructure de paiement pour l''Afrique de l''Ouest. Mais avant l''annonce, il y a eu une étude — et un constat que nous ne pouvions plus ignorer.
+
+## Le constat de départ
+
+Chez Green FAD, nous exploitons nous-mêmes des produits qui encaissent : billetterie, boutiques, collectes. À chaque fois, la même difficulté revient : **recevoir de l''argent est simple, le faire proprement est compliqué.** Une intégration par opérateur, des réconciliations sur tableur, des frais opaques, des retraits à relancer.
+
+## L''étude de terrain
+
+Pendant trois mois, nous sommes allés écouter le terrain à Bamako : commerçants de quartier, boutiques en ligne naissantes, entreprises qui facturent des clients dans plusieurs pays. Nous avons cartographié ce qu''ils utilisent vraiment au quotidien : **Orange Money**, **Moov Money**, **Wave**, **MTN MoMo**, les cartes **Visa** et **Mastercard**, les virements bancaires UEMOA.
+
+Le résultat est sans appel :
+
+- chacun jongle avec plusieurs canaux d''encaissement, aucun n''est centralisé
+- la réconciliation est manuelle, sujette aux erreurs, chronophage
+- les frais réels ne sont souvent connus qu''après coup
+- les retraits vers la banque ou le wallet restent un processus à part
+
+## La décision
+
+L''étude s''est transformée en conviction : ce n''est pas un outil de plus qu''il faut, c''est **une infrastructure**. Une seule intégration, plusieurs providers, un dashboard, une réconciliation, un settlement. Nous l''avons appelée **WARIPAY** — une API, tous les paiements d''Afrique de l''Ouest.
+
+## Ce que nous nous sommes imposé
+
+Dès le premier jour, trois principes non négociables : **des frais affichés avant chaque confirmation** (aucun coût caché), **un registre en double partie** (chaque mouvement rapprochable à tout instant) et **une couverture pays annoncée clairement** — le Mali d''abord, puis le Sénégal, la Côte d''Ivoire, le Burkina Faso, le Bénin, le Togo, la Guinée-Bissau et le Niger.
+
+La suite ? La construction. Nous vous raconterons bientôt les premières étapes.',
+  '/assets/images/blog/waripay-origine-etude.jpg', 'Produits', '["WARIPAY", "Origine", "Étude de terrain"]', 'Green FAD — Équipe produit', 'article', 0, '2026-02-10 09:00:00', 'publie',
+  'WARIPAY : l''étude qui a donné naissance à une ambition | Blog Green FAD',
+  'Février 2026 : création de WARIPAY annoncée par Green FAD — une seule intégration pour encaisser Orange Money, Moov Money, Wave, MTN MoMo, Visa, Mastercard et banques UEMOA.',
+  '/assets/images/blog/waripay-origine-etude.jpg', 'waripay', (SELECT id FROM products WHERE slug = 'waripay'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'waripay-premiers-retours-experience', 'WARIPAY : les premiers retours d''expérience',
+  'Août 2026 : le cercle de pilotes de WARIPAY a testé liens de paiement, checkout hébergé et retraits. Voici ce que le terrain nous a appris — et ce que nous avons changé.',
+  '# WARIPAY : les premiers retours d''expérience
+
+Six mois après l''annonce de sa création, WARIPAY a franchi une étape discrète mais décisive : un **cercle fermé de pilotes** — commerçants de quartier, jeunes plateformes en ligne, une entreprise de services — a pris en main la console, les liens de paiement et l''API en mode **sandbox**. Voici ce que nous avons appris.
+
+## Ce que les pilotes nous ont dit
+
+**Le lien de paiement avec QR est devenu l''outil préféré.** Créer un lien en un clic, l''afficher en boutique ou l''envoyer par WhatsApp : c''est l''usage le plus immédiat, celui qui convertit le mieux.
+
+**Les frais affichés avant confirmation rassurent.** Transaction après transaction, le même réflexe : regarder le montant des frais avant de valider. Cette transparence est devenue notre meilleur argument de confiance.
+
+**Le choix du canal de retrait compte.** Virement bancaire UEMOA (T+1 ouvré) ou mobile money instantané : les pilotes veulent les deux, selon la journée. Les frais et délais affichés avant chaque retrait évitent les mauvaises surprises.
+
+**La réconciliation sans tableur change la vie.** Le registre en double partie, rapproché de chaque provider, a supprimé le travail manuel de fin de mois. C''est le retour le plus fréquent chez les entreprises.
+
+## Ce que nous avons changé
+
+- **La console réorganisée en quatre espaces** : Pilotage, Opérations, Encaisser, Développeurs — pour que chaque profil trouve son chemin
+- **L''application Android** : demandée dès les premières semaines, elle est arrivée avec notifications natives, QR et deep links
+- **Le connecteur WooCommerce** : plusieurs pilotes vendent avec WordPress — la v1.0.0 est née de ce besoin
+- **Le routage automatique** : quand un provider ralentit ou échoue, il est écarté — les pilotes ne voyaient que le taux de succès monter
+
+## La suite
+
+Ces retours nourrissent la préparation de l''ouverture élargie. Le prochain jalon : l''annonce de la phase de test publique — et les raisons pour lesquelles nous prenons notre temps avant le lancement commercial.',
+  '/assets/images/blog/waripay-retours-experience.jpg', 'Produits', '["WARIPAY", "Terrain", "Pilotes", "Retours d''expérience"]', 'Green FAD — Équipe produit', 'article', 0, '2026-08-20 09:00:00', 'publie',
+  'WARIPAY : les premiers retours d''expérience | Blog Green FAD',
+  'Août 2026 : retours d''expérience du cercle de pilotes WARIPAY — liens de paiement avec QR, frais affichés avant confirmation, retraits banque UEMOA ou mobile money, réconciliation sans tableur.',
+  '/assets/images/blog/waripay-retours-experience.jpg', 'waripay', (SELECT id FROM products WHERE slug = 'waripay'));
+INSERT OR IGNORE INTO posts (slug, title, excerpt, content_md, cover_key, category, tags, author, kind, is_featured, published_at, status, meta_title, meta_description, og_image, product_slug, related_product_id) VALUES (
+  'waripay-phase-de-test-annonce', 'WARIPAY entre en phase de test : pourquoi nous attendons avant le lancement',
+  '9 novembre 2026 : WARIPAY ouvre sa phase de test. Console complète, checkout hébergé, application Android, connecteur WooCommerce — et deux raisons assumées d''attendre avant le lancement commercial : les conformités et les partenariats financiers.',
+  '# WARIPAY entre en phase de test : pourquoi nous attendons avant le lancement
+
+Le **9 novembre 2026**, WARIPAY entre officiellement en **phase de test**. Pas encore un lancement commercial — une ouverture maîtrisée, assumée. Voici ce qui est disponible, et surtout, pourquoi nous attendons.
+
+## Ce qui est ouvert aujourd''hui
+
+La console marchande est complète : **pilotage en temps réel** (volume, taux de succès, soldes, frais), **opérations** (retraits, remboursements, clients, rapports), **encaissement** (liens de paiement avec QR, checkout hébergé mobile-first) et **espace développeurs** (API & docs, clés, webhooks signés).
+
+- **Une seule intégration** : Orange Money, Moov Money, Wave, MTN MoMo, Visa, Mastercard et banques UEMOA
+- **Clés sandbox immédiates** : testez l''API sans engagement, webhooks et idempotence inclus
+- **Application Android v1.0.3** et **connecteur WooCommerce v1.0.0** disponibles
+- **Rail Mali ouvert** : le Sénégal, la Côte d''Ivoire, le Burkina Faso, le Bénin, le Togo, la Guinée-Bissau et le Niger suivront
+
+## Pourquoi nous attendons
+
+Deux chantiers déterminent notre date de lancement commercial, et nous refusons de les brader.
+
+**Les conformités.** Nous manipulons l''argent des marchands : la vérification KYB des entreprises, les exigences réglementaires de l''espace UEMOA et les contrôles internes doivent être irréprochables **avant** l''ouverture à grande échelle, pas après.
+
+**Les partenariats financiers.** Un settlement fiable repose sur des accords solides avec des institutions financières. Nous préférons une porte ouverte une fois pour toutes plutôt qu''un lancement prématuré suivi de promesses non tenues.
+
+C''est la même discipline qui porte nos produits depuis 2021 : publier quand c''est solide.
+
+## Nous cherchons des partenaires
+
+Vous êtes une **banque de l''espace UEMOA**, une **institution de paiement**, un **opérateur mobile money** ou une **entreprise** qui veut encaisser proprement dès le premier jour ? Parlons-en. Les portes de la phase de test sont ouvertes — et les places de partenaire stratégique le sont aussi.
+
+Contactez l''équipe Green FAD depuis la **page contact** du site ou via la fiche produit WARIPAY.',
+  '/assets/images/blog/waripay-phase-de-test.jpg', 'Produits', '["WARIPAY", "Phase de test", "Partenariats", "Conformité"]', 'Green FAD — Équipe produit', 'article', 1, '2026-11-09 09:00:00', 'publie',
+  'WARIPAY entre en phase de test : pourquoi nous attendons | Blog Green FAD',
+  '9 novembre 2026 : WARIPAY ouvre sa phase de test — console complète, sandbox, Android v1.0.3, WooCommerce v1.0.0. Lancement commercial attendu après conformités et partenariats financiers. Appel à partenaires.',
+  '/assets/images/blog/waripay-phase-de-test.jpg', 'waripay', (SELECT id FROM products WHERE slug = 'waripay'));
+
 -- 10) Version du contenu
 UPDATE settings SET value = '14' WHERE key = 'content_version';
 
