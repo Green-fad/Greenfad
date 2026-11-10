@@ -1,0 +1,57 @@
+# GREEN FAD — Récupération des images de la galerie (après incident du 10/11/2026)
+# Recrée les éléments de galerie (media_items) manquants pour les fichiers
+# téléversés par l administration et toujours présents dans D1/R2.
+# Additif pur : ne supprime ni ne modifie aucune donnée existante. Idempotent.
+name: Récupérer les images de la galerie
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: greenfad-production
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    name: Recréer les media_items des images téléversées orphelines
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: État avant récupération
+        run: |
+          npx wrangler d1 execute greenfad-production --remote \
+            --command "SELECT (SELECT COUNT(*) FROM media WHERE uploaded_by != 'seed' AND mime LIKE 'image/%') AS images_admin, (SELECT COUNT(*) FROM media m WHERE m.uploaded_by != 'seed' AND m.mime LIKE 'image/%' AND NOT EXISTS (SELECT 1 FROM media_items mi WHERE mi.media_id = m.id)) AS images_orphelines, (SELECT COUNT(*) FROM media_albums WHERE slug = 'images-restaurees') AS album_existant" --json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Récupération (seed/restore_media_items.sql — additif, idempotent)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote --file=seed/restore_media_items.sql
+          for KEY in cache:settings cache:menus cache:footer_sections cache:redirects; do
+            npx wrangler kv key delete "$KEY" --namespace-id=4d8efa4efac74c7faae30dd533f86353 2>/dev/null || true
+          done
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: État après récupération
+        run: |
+          npx wrangler d1 execute greenfad-production --remote \
+            --command "SELECT a.name AS album, COUNT(mi.id) AS items_restaurés FROM media_albums a LEFT JOIN media_items mi ON mi.album_id = a.id AND mi.status = 'publie' WHERE a.slug = 'images-restaurees' GROUP BY a.id; SELECT (SELECT COUNT(*) FROM media m WHERE m.uploaded_by != 'seed' AND m.mime LIKE 'image/%' AND NOT EXISTS (SELECT 1 FROM media_items mi WHERE mi.media_id = m.id)) AS images_encore_orphelines" --json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

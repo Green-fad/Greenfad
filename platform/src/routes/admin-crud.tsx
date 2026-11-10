@@ -314,7 +314,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
     key: "partners", table: "partners", title: "Références & partenaires", single: "référence", perm: "partners", statusable: true,
     slugFrom: "name", order: "sort_order ASC", searchable: ["name", "sector"],
     intro: "Les références publiées alimentent la section « Ils nous font confiance » de l'accueil, la page publique /references et la fiche détaillée de chaque organisation (les logos peuvent être cliqués depuis l'accueil).",
-    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "sector", label: "Secteur", type: "text", list: true }, { name: "slug", label: "Fiche", type: "readonly", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
+    columns: [{ name: "name", label: "Nom", type: "text", list: true }, { name: "sector", label: "Secteur", type: "text", list: true }, { name: "slug", label: "Fiche", type: "readonly", list: true }, { name: "sort_order", label: "Ordre", type: "number", list: true }, { name: "status", label: "Statut", type: "readonly", list: true }],
     fields: [
       { name: "name", label: "Nom de la référence", type: "text", required: true },
       { name: "slug", label: "Slug de la fiche (URL /references/…)", type: "text", help: "Laisser vide : généré automatiquement depuis le nom (lettres minuscules, tirets)." },
@@ -322,7 +322,7 @@ export const RESOURCES: Record<string, ResourceDef> = {
       { name: "logo_key", label: "Logo", type: "image" },
       { name: "url", label: "Site web", type: "url" },
       { name: "description", label: "Présentation de la collaboration", type: "textarea", form_span: true, help: "Texte affiché sur la fiche détaillée — markdown léger accepté. Vide : la fiche affiche une phrase de repli." },
-      { name: "sort_order", label: "Ordre", type: "number" },
+      { name: "sort_order", label: "Ordre d'affichage", type: "number", help: "Position sur la page /references et dans le bloc « Ils nous font confiance » de l'accueil : plus le numéro est petit, plus la référence apparaît tôt. Ordre actuel : alphabétique (0, 1, 2…)." },
       { name: "status", label: "Statut", type: "select", options: STATUS_OPTIONS },
     ],
   },

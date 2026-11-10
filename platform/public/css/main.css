@@ -309,6 +309,7 @@ section.flush{padding:0}
 .ref-card__body{display:flex;flex-direction:column;gap:8px;padding:18px;flex:1}
 .ref-card__body strong{font-size:1.02rem;color:var(--ink)}
 .ref-card__body p{margin:0;font-size:.9rem;color:var(--muted);line-height:1.55}
+.ref-card__body .card__more{margin-top:auto}
 .ref-card:hover{transform:translateY(-4px);border-color:rgba(70,146,155,.45);box-shadow:var(--sh);color:inherit}
 .ref-hero__row{display:flex;align-items:center;gap:18px;margin-top:10px;flex-wrap:wrap}
 .ref-hero__logo{background:var(--paper);border-radius:var(--r-sm);padding:12px;display:inline-flex;align-items:center;justify-content:center;min-width:124px;min-height:86px}

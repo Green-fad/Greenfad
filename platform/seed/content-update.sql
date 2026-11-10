@@ -1,5 +1,10 @@
--- GREEN FAD — Mise à jour du contenu éditorial (exécutée par la CI quand content_version change)
--- Ne touche JAMAIS à la table users ni aux fichiers média réellement téléversés (media).
+-- GREEN FAD — Seed éditorial complet ⚠️ FICHIER DESTRUCTIF ⚠️
+-- Ce fichier SUPPRIME tout le contenu éditorial existant (16 DELETE ci-dessous)
+-- puis le remplace par le contenu semé du dépôt. Il ne touche ni users, ni
+-- media (registre des fichiers R2), ni hero_slides.
+-- RÈGLE (incident du 10/11/2026) : ne JAMAIS l exécuter automatiquement depuis
+-- la CI. Utiliser uniquement le workflow manuel « Synchronisation manuelle du
+-- contenu (destructif) » avec confirmation tapée SYNCHRONISER.
 DELETE FROM settings;
 DELETE FROM menus;
 DELETE FROM footer_sections;
@@ -925,15 +930,15 @@ INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'ArtifyFad', m.
 INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Casa des Délices', m.r2_key, 2, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-casa-des-delices-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
 INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Cours Africa', m.r2_key, 3, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-cours-africa-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
 INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'EFB Entreprise', m.r2_key, 4, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-efb-entreprise-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Massaley Hôtel', m.r2_key, 5, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-massaley-hotel-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Pharmacie hôpital du Mali', m.r2_key, 6, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-pharmacie-hopital-du-mali-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Eurodecor', m.r2_key, 7, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-eurodecor-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Massaley Hôtel', m.r2_key, 10, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-massaley-hotel-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Pharmacie hôpital du Mali', m.r2_key, 12, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-pharmacie-hopital-du-mali-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Eurodecor', m.r2_key, 5, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-eurodecor-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
 INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Justice Mali', m.r2_key, 8, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-justice-mali-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
 INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Le Baobab Hôtel', m.r2_key, 9, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-le-baobab-hotel-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Nature Attitude', m.r2_key, 10, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-nature-attitude-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Sky Buffet', m.r2_key, 11, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-sky-buffet-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Greenfad', m.r2_key, 12, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-greenfad-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
-INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Greenfad 2', m.r2_key, 13, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-greenfad-2-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Nature Attitude', m.r2_key, 11, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-nature-attitude-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Sky Buffet', m.r2_key, 13, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-sky-buffet-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Greenfad', m.r2_key, 6, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-greenfad-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
+INSERT INTO partners (name, logo_key, sort_order, status) SELECT 'Greenfad 2', m.r2_key, 7, 'publie' FROM media m WHERE m.r2_key = '/assets/images/clients/partenaire-greenfad-2-w320.webp' AND NOT EXISTS (SELECT 1 FROM partners p WHERE p.logo_key = m.r2_key);
 INSERT INTO faqs (question, answer, category, sort_order, status) VALUES ('Qui est GREEN FAD ?', 'GREEN FAD SARL est une entreprise technologique africaine d''innovation, de conception et de développement. Elle conçoit des produits numériques propriétaires (FAD CARD, QRFAD, FEREFAD, NIAFAD…), assure l''ingénierie logicielle et accompagne la transformation digitale des organisations, depuis Bamako (Mali) et à l''international.', 'Général', 0, 'publie');
 INSERT INTO faqs (question, answer, category, sort_order, status) VALUES ('Quels sont les trois univers de Green FAD ?', 'Green FAD déploie son expertise selon trois univers complémentaires : le corporate (l''entreprise, sa vision et son identité), le business & technology (produits, expertises et réalisations) et le media & knowledge (galerie, innovation et ressources).', 'Général', 1, 'publie');
 INSERT INTO faqs (question, answer, category, sort_order, status) VALUES ('Dans quels pays intervient GREEN FAD ?', 'GREEN FAD est immatriculée au Mali (siège à Bamako), au Burkina Faso, en République démocratique du Congo et au Niger, et sert des clients en Côte d''Ivoire. Consultez la page Implantation pour le détail.', 'Général', 2, 'publie');
