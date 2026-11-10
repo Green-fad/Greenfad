@@ -5,7 +5,7 @@ import { Hono, Context } from "hono";
 import { Env } from "../types";
 import { q, q1, count, getSetting } from "../db";
 import { layout, loadSiteData, PageSEO, crumbsHTML, Crumb } from "../render/layout";
-import { renderBlocks, renderBlock, Block, parseVideo, countriesCardsHTML } from "../blocks";
+import { renderBlocks, renderBlock, Block, parseVideo, videoProviderLabel, countriesCardsHTML } from "../blocks";
 import { md, esc, fmtDate, fmtBytes, excerptFromMd, stripFirstH1, parseJSON, mediaSrc } from "../utils";
 import { icon } from "../icons";
 import { audit } from "../audit";
@@ -924,8 +924,9 @@ publicRoutes.get("/galerie", async (c) => {
       <span class="album__overlay"><h3>${esc(String(a.name))}</h3><p>${icon("image")} ${Number(a.n)} visuel${Number(a.n) > 1 ? "s" : ""}${a.description ? ` · ${esc(String(a.description).slice(0, 60))}` : ""}</p></span></a>`).join("")}</div></section>` : ""}
   ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Vidéos</p><h2>Nos démonstrations & interventions</h2></header>
     <div class="video-grid reveal">${videos.map((v) => { const pv = parseVideo(String(v.source_url || "")); return `<a class="video-card" href="/galerie/video/${v.id}">
-      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : ""}<span class="video-card__play"><span>${icon("play")}</span></span></span>
-      <span class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}</p>` : ""}</span></a>`; }).join("")}</div></section>` : ""}
+      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
+      <span class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}</p>` : ""}</span></a>`; }).join("")}</div>
+    <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></section>` : ""}
   ${!albums.length && !videos.length ? `<section class="container center"><div class="form-card" style="max-width:560px">${icon("image-off")}<h2 style="margin-top:1rem">Galerie en préparation</h2><p class="muted">Aucun média publié pour le moment. Les premiers albums arrivent bientôt.</p></div></section>` : ""}`;
   const seo = await seoOf(c, site, "/galerie", "Galerie multimédia");
   return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/galerie" }), body));
@@ -950,12 +951,46 @@ publicRoutes.get("/galerie/video/:id", async (c) => {
   const pv = parseVideo(String(v.source_url || ""));
   const others = await q(c.env.DB, "SELECT id, title, source_url FROM media_items WHERE type='video' AND status='publie' AND id != ? ORDER BY sort_order LIMIT 4", v.id);
   const site = await loadSiteData(c);
-  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Galerie", url: "/galerie" }, { label: String(v.title) }])}<p class="eyebrow">Vidéo</p><h1>${esc(String(v.title))}</h1></div></section>
+  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Vidéos", url: "/videos" }, { label: String(v.title) }])}<p class="eyebrow">Vidéo</p><h1>${esc(String(v.title))}</h1></div></section>
   <section class="container"><div class="video-wrap"><div class="video-embed"><iframe src="${esc(pv.embed)}" allowfullscreen title="${esc(String(v.title))}"></iframe></div>
   ${v.description ? `<div class="prose" style="margin-top:1.4rem">${esc(String(v.description))}</div>` : ""}
   ${v.credit ? `<p class="muted" style="margin-top:.6rem;font-size:.85rem">Source : ${esc(String(v.credit))}</p>` : ""}</div></section>
-  ${others.length ? `<section class="container"><header class="sec-head"><h2>Autres vidéos</h2></header><div class="video-grid reveal">${others.map((o) => { const pvo = parseVideo(String(o.source_url || "")); return `<a class="video-card" href="/galerie/video/${o.id}"><span class="video-card__thumb">${pvo.thumb ? `<img src="${esc(pvo.thumb)}" alt="" loading="lazy">` : ""}<span class="video-card__play"><span>${icon("play")}</span></span></span><span class="video-card__body"><h3>${esc(String(o.title))}</h3></span></a>`; }).join("")}</div></section>` : ""}`;
-  return c.html(await layout(c, site, await getPageSEO(c, { title: String(v.title), description: String(v.description || "Vidéo Green FAD"), canonicalPath: `/galerie/video/${v.id}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Galerie", url: "/galerie" }, { label: String(v.title) }] }), body));
+  ${others.length ? `<section class="container"><header class="sec-head"><h2>Autres vidéos</h2></header><div class="video-grid reveal">${others.map((o) => { const pvo = parseVideo(String(o.source_url || "")); return `<a class="video-card" href="/galerie/video/${o.id}"><span class="video-card__thumb">${pvo.thumb ? `<img src="${esc(pvo.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pvo.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span><span class="video-card__body"><h3>${esc(String(o.title))}</h3></span></a>`; }).join("")}</div>
+  <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></section>` : ""}`;
+  return c.html(await layout(c, site, await getPageSEO(c, { title: String(v.title), description: String(v.description || "Vidéo Green FAD"), canonicalPath: `/galerie/video/${v.id}`, crumbs: [{ label: "Accueil", url: "/" }, { label: "Vidéos", url: "/videos" }, { label: String(v.title) }] }), body));
+});
+
+// ---------- Vidéos : TOUTES les vidéos publiques (page « voir tout », 11/11/2026) ----------
+// Demande du fondateur : « fais pareil pour les vidéos — menu + voir plus,
+// ajoute plus de vidéos Greenfad depuis YouTube, Facebook et TikTok ».
+// Toutes plateformes confondues (YouTube, Facebook, TikTok, Vimeo), filtre par
+// catégorie côté client, tuile « source » sur les cartes sans miniature officielle.
+publicRoutes.get("/videos", async (c) => {
+  const vids = await q<Record<string, unknown>>(c.env.DB, "SELECT id, title, description, category, source_url, provider, credit, published_at FROM media_items WHERE type='video' AND status = ? ORDER BY sort_order, id", PUBLIE);
+  const site = await loadSiteData(c);
+  const hero = heroOf(site, "/videos", "Vidéos");
+  // Catégories réellement présentes en base — aucune catégorie fictive
+  const cats = new Map<string, number>();
+  for (const v of vids) { const k = String(v.category || "").trim() || "Autres"; cats.set(k, (cats.get(k) || 0) + 1); }
+  const card = (v: Record<string, unknown>) => {
+    const pv = parseVideo(String(v.source_url || ""));
+    const cat = String(v.category || "").trim() || "Autres";
+    return `<a class="video-card" data-cat="${esc(cat)}" href="/galerie/video/${v.id}">
+      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
+      <span class="video-card__body"><h3>${esc(String(v.title || ""))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}${String(v.description).length > 120 ? "…" : ""}</p>` : ""}${cat ? `<span class="tag">${esc(cat)}</span>` : ""}</span></a>`;
+  };
+  const chips = [...cats.entries()].map(([k, n]) => `<button type="button" class="chip" data-cat="${esc(k)}">${esc(k)} (${n})</button>`).join("");
+  const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Vidéos" }])}<p class="eyebrow">Media Center</p>
+    <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
+  ${vids.length ? `<section class="container">
+    <p class="docs-count" data-vids-count>${vids.length} vidéo${vids.length > 1 ? "s" : ""} — YouTube, Facebook, TikTok et plus</p>
+    ${cats.size > 1 ? `<div class="chips docs-filters" role="group" aria-label="Filtrer par catégorie"><button type="button" class="chip is-on" data-cat="">Toutes (${vids.length})</button>${chips}</div>` : ""}
+    <div class="video-grid reveal">${vids.map(card).join("")}</div>
+  </section>
+  <script>(function(){var b=document.querySelectorAll(".docs-filters .chip");var d=document.querySelectorAll(".video-card[data-cat]");if(!b.length)return;b.forEach(function(x){x.addEventListener("click",function(){b.forEach(function(y){y.classList.toggle("is-on",y===x);});var f=x.getAttribute("data-cat"),n=0;d.forEach(function(e){var s=!f||e.getAttribute("data-cat")===f;e.style.display=s?"":"none";if(s)n++;});var cc=document.querySelector("[data-vids-count]");if(cc)cc.textContent=n+(n>1?" vidéos publiées":" vidéo publiée");});});})();</script>`
+  : `<section class="container center"><p class="muted">Les premières vidéos seront publiées prochainement.</p></section>`}`;
+  const seo = await seoOf(c, site, "/videos", "Vidéos GREEN FAD");
+  return c.html(await layout(c, site, await getPageSEO(c, { title: seo.title, description: seo.description, canonicalPath: "/videos" }), body));
 });
 
 // ---------- BLOG — média éditorial de l'entreprise ----------
@@ -1434,6 +1469,7 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     { loc: "/realisations", date: today, priority: "0.8" },
     ...projects.map((p) => ({ loc: `/realisations/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.6" })),
     { loc: "/galerie", date: today, priority: "0.7" },
+    { loc: "/videos", date: today, priority: "0.7" },
     ...albums.map((a) => ({ loc: `/galerie/album/${a.slug}`, date: String(a.updated_at).slice(0, 10), priority: "0.5" })),
     { loc: "/blog", date: today, priority: "0.9" },
     { loc: "/blog/archives", date: today, priority: "0.4" },

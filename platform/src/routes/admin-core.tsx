@@ -9,6 +9,7 @@ import { audit } from "../audit";
 import { saveToR2, deleteMedia, isAllowedMime } from "../media";
 import { esc, fmtDate, fmtBytes, parseJSON, slugify, mediaSrc } from "../utils";
 import { icon } from "../icons";
+import { parseVideo } from "../blocks";
 
 export function adminCore(): Hono<{ Bindings: Env }> {
   const r = new Hono<{ Bindings: Env }>();
@@ -494,12 +495,18 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     return c.redirect("/admin/media/albums");
   });
 
-  // ---------- MEDIA CENTER : vidéos par URL (YouTube / Vimeo) ----------
+  // ---------- MEDIA CENTER : vidéos par URL (YouTube / Vimeo / Facebook / TikTok) ----------
   function parseVideoMeta(raw: string): { provider: string; providerId: string } {
     const yt = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/.exec(raw);
     if (yt) return { provider: "youtube", providerId: yt[1] };
     const vm = /vimeo\.com\/(?:video\/)?(\d{6,})/.exec(raw);
     if (vm) return { provider: "vimeo", providerId: vm[1] };
+    const fb = /facebook\.com\/(?:[^\/?]+\/)?videos\/(?:[^\/?]+\/)?(\d{9,20})/.exec(raw) || /facebook\.com\/(?:video\.php|watch)\/?\?(?:[^#]*&)*v=(\d{9,20})/.exec(raw);
+    if (fb) return { provider: "facebook", providerId: fb[1] };
+    if (/fb\.watch\//.test(raw)) return { provider: "facebook", providerId: "" };
+    const tt = /(?:tiktok\.com\/@[^\/?]+\/|vm\.tiktok\.com\/.+\/)video\/(\d{15,25})/.exec(raw);
+    if (tt) return { provider: "tiktok", providerId: tt[1] };
+    if (/vm\.tiktok\.com\//.test(raw)) return { provider: "tiktok", providerId: "" };
     return { provider: "url", providerId: "" };
   }
 
@@ -509,7 +516,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     if (d) return d;
     const rows = await q(c.env.DB, "SELECT * FROM media_items WHERE type = 'video' ORDER BY id DESC LIMIT 100");
     const canEdit = can(user.role, "media", "create");
-    const body = `<div class="adm-toolbar"><span class="muted">Les vidéos sont référencées par URL (YouTube, Vimeo, plateformes officielles) — aucun fichier lourd, aucune duplication.</span>
+    const body = `<div class="adm-toolbar"><span class="muted">Les vidéos sont référencées par URL (YouTube, Facebook, TikTok, Vimeo — plateformes officielles) — aucun fichier lourd, aucune duplication.</span>
       ${canEdit ? `<a class="btn btn--primary adm-new" href="/admin/media/videos/new">${icon("plus")} Ajouter une vidéo</a>` : ""}</div>
     ${rows.length ? `<table class="adm-table"><thead><tr><th>#</th><th>Titre</th><th>Plateforme</th><th>Statut</th><th>Actions</th></tr></thead><tbody>${rows
       .map((v) => `<tr><td>${v.id}</td><td><strong>${esc(String(v.title))}</strong>${v.description ? `<br><span class="muted">${esc(String(v.description).slice(0, 80))}</span>` : ""}</td>
@@ -525,7 +532,7 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const val = (k: string) => esc(String(v?.[k] ?? ""));
     return `<form method="post" action="${action}" class="adm-form" data-confirm-leave>
       <input type="hidden" name="_csrf" value="${csrf}">
-      <label class="adm-field full"><span>URL de la vidéo (YouTube, Vimeo…) *</span><input type="url" name="source_url" value="${val("source_url")}" required placeholder="https://www.youtube.com/watch?v=…" maxlength="500"></label>
+      <label class="adm-field full"><span>URL de la vidéo (YouTube, Facebook, TikTok, Vimeo…) *</span><input type="url" name="source_url" value="${val("source_url")}" required placeholder="https://www.youtube.com/watch?v=…" maxlength="500"></label>
       <label class="adm-field"><span>Titre *</span><input name="title" value="${val("title")}" required maxlength="160"></label>
       <label class="adm-field"><span>Catégorie</span><input name="category" value="${val("category")}" maxlength="80" placeholder="démonstration, événement…"></label>
       <label class="adm-field full"><span>Description</span><textarea name="description" rows="2" maxlength="600">${val("description")}</textarea></label>
@@ -567,8 +574,8 @@ export function adminCore(): Hono<{ Bindings: Env }> {
     const v = await q1<Record<string, unknown>>(c.env.DB, "SELECT * FROM media_items WHERE id = ? AND type='video'", c.req.param("id"));
     if (!v) return c.notFound();
     const albums = await q(c.env.DB, "SELECT id, name FROM media_albums ORDER BY name").then((rows) => rows.map((r) => ({ value: String(r.id), label: String(r.name) })));
-    const meta = parseVideoMeta(String(v.source_url || ""));
-    const preview = meta.provider === "youtube" ? `<div class="video-embed" style="max-width:560px"><iframe src="https://www.youtube-nocookie.com/embed/${esc(meta.providerId)}" allowfullscreen title="Aperçu"></iframe></div>` : meta.provider === "vimeo" ? `<div class="video-embed" style="max-width:560px"><iframe src="https://player.vimeo.com/video/${esc(meta.providerId)}" allowfullscreen title="Aperçu"></iframe></div>` : "";
+    const pv = parseVideo(String(v.source_url || ""));
+    const preview = pv.provider !== "url" ? `<div class="video-embed" style="max-width:560px"><iframe src="${esc(pv.embed)}" allowfullscreen title="Aperçu"></iframe></div>` : "";
     const body = `${preview}${videoForm(v, user.csrf, `/admin/media/videos/${v.id}`, albums)}`;
     return c.html(adminLayout(c, user, `Vidéo : ${String(v.title)}`, body, "/admin/media/videos"));
   });

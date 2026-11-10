@@ -290,13 +290,28 @@ function cardMediaHTML(src: string, alt: string, url: string): string {
   return `<a class="card__media" href="${esc(href)}"><img src="${esc(src.startsWith("/") ? src : "/media/" + src)}" alt="${esc(alt)}" loading="lazy"></a>`;
 }
 
-/** Analyse une URL YouTube/Vimeo → URL d'intégration officielle + miniature */
+/** Analyse une URL YouTube/Vimeo/Facebook/TikTok → URL d'intégration officielle + miniature.
+ *  Embeds officiels uniquement : youtube-nocookie (YT), player.vimeo (Vimeo),
+ *  plugins/video.php (Facebook), embed/v2 (TikTok). Les miniatures existantes
+ *  (i.ytimg.com) ne sont disponibles que pour YouTube — les autres plateformes
+ *  reçoivent une tuile « source » côté CSS (aucune image inventée). */
 export function parseVideo(raw: string): { embed: string; thumb: string; provider: string } {
   const yt = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/.exec(raw);
   if (yt) return { embed: `https://www.youtube-nocookie.com/embed/${yt[1]}`, thumb: `https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`, provider: "youtube" };
   const vm = /vimeo\.com\/(?:video\/)?(\d{6,})/.exec(raw);
   if (vm) return { embed: `https://player.vimeo.com/video/${vm[1]}`, thumb: "", provider: "vimeo" };
+  const fb = /facebook\.com\/(?:[^\/?]+\/)?videos\/(?:[^\/?]+\/)?(\d{9,20})/.exec(raw) || /facebook\.com\/(?:video\.php|watch)\/?\?(?:[^#]*&)*v=(\d{9,20})/.exec(raw);
+  if (fb) return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(`https://www.facebook.com/video.php?v=${fb[1]}`)}&show_text=false`, thumb: "", provider: "facebook" };
+  if (/fb\.watch\//.test(raw)) return { embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(raw)}&show_text=false`, thumb: "", provider: "facebook" };
+  const tt = /(?:tiktok\.com\/@[^\/?]+\/|vm\.tiktok\.com\/.+\/)video\/(\d{15,25})/.exec(raw);
+  if (tt) return { embed: `https://www.tiktok.com/embed/v2/${tt[1]}`, thumb: "", provider: "tiktok" };
+  if (/vm\.tiktok\.com\//.test(raw)) return { embed: raw, thumb: "", provider: "tiktok" };
   return { embed: raw, thumb: "", provider: "url" };
+}
+
+/** Libellé lisible d'une plateforme vidéo — pour les cartes sans miniature officielle */
+export function videoProviderLabel(provider: string): string {
+  return ({ youtube: "YouTube", facebook: "Facebook", tiktok: "TikTok", vimeo: "Vimeo", url: "Vidéo" } as Record<string, string>)[provider] || "Vidéo";
 }
 
 export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
@@ -367,12 +382,12 @@ export async function renderBlock(b: Block, ctx: BlockCtx): Promise<string> {
       return `<div class="container"><div class="video-grid reveal">${rows
         .map((r) => {
           const v = parseVideo(String(r.source_url || ""));
-          const thumb = v.provider === "youtube" ? v.thumb : "";
+          const thumb = v.thumb;
           return `<a class="video-card" href="/galerie/video/${r.id}">
-            <span class="video-card__thumb">${thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : ""}<span class="video-card__play"><span>${icon("play")}</span></span></span>
+            <span class="video-card__thumb">${thumb ? `<img src="${esc(thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(v.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
             <span class="video-card__body"><h3>${esc(String(r.title || ""))}</h3>${r.description ? `<p>${esc(String(r.description).slice(0, 120))}${String(r.description).length > 120 ? "…" : ""}</p>` : ""}</span></a>`;
         })
-        .join("")}</div></div>`;
+        .join("")}</div><p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></div>`;
     }
     case "split":
       return `<section class="container"><div class="split split--img-${esc(p.image_side)} reveal">
