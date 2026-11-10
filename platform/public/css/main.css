@@ -353,6 +353,7 @@ section.flush{padding:0}
 .state-pill .i{width:13px;height:13px}
 .state--disponible{background:var(--teal-soft);color:var(--teal-700)}
 .state--beta{background:var(--gold-soft);color:var(--gold-600)}
+.state--bientot{background:#E3F3EC;color:#1E6B4E}
 .state--developpement{background:#E9EFF7;color:var(--navy-850)}
 .state--evolution{background:#EDE9F8;color:#5B4BA8}
 .state--archive{background:var(--paper-soft);color:var(--muted);border:1px solid var(--line)}

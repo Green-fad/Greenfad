@@ -52,6 +52,7 @@ const ICON_OPTIONS = ["cpu", "code", "cloud", "database", "server", "shield", "z
 const PRODUCT_STATES = [
   { value: "developpement", label: "En développement" },
   { value: "beta", label: "Bêta" },
+  { value: "bientot", label: "Bientôt disponible" },
   { value: "disponible", label: "Disponible" },
   { value: "evolution", label: "En évolution" },
   { value: "archive", label: "Archivé" },

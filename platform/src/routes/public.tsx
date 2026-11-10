@@ -113,11 +113,12 @@ function statePill(state: string): string {
   const labels: Record<string, string> = {
     developpement: "En développement",
     beta: "Bêta",
+    bientot: "Bientôt disponible",
     disponible: "Disponible",
     evolution: "En évolution",
     archive: "Archivé",
   };
-  const icons: Record<string, string> = { developpement: "code", beta: "flask", disponible: "check-circle", evolution: "refresh", archive: "archive" };
+  const icons: Record<string, string> = { developpement: "code", beta: "flask", bientot: "clock", disponible: "check-circle", evolution: "refresh", archive: "archive" };
   const s = labels[state] ? state : "developpement";
   return `<span class="state-pill state--${esc(s)}">${icon(icons[s] || "code")} ${esc(labels[s] || state)}</span>`;
 }
@@ -445,7 +446,7 @@ publicRoutes.get("/expertises/:slug", async (c) => {
 publicRoutes.get("/produits", async (c) => {
   const rows = await q<Record<string, unknown>>(c.env.DB, "SELECT slug, name, tagline, image_key, category, state FROM products WHERE status = ? ORDER BY sort_order", PUBLIE);
   const site = await loadSiteData(c);
-  const stateLabels: Record<string, string> = { developpement: "En développement", beta: "Bêta", disponible: "Disponible", evolution: "En évolution", archive: "Archivé" };
+  const stateLabels: Record<string, string> = { developpement: "En développement", beta: "Bêta", bientot: "Bientôt disponible", disponible: "Disponible", evolution: "En évolution", archive: "Archivé" };
   const hero = heroOf(site, "/produits", "Produits");
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Produits" }])}<p class="eyebrow">Produits technologiques</p>
     <h1>${heroTitleHTML(hero)}</h1>
