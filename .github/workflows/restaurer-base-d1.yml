@@ -1,0 +1,92 @@
+# GREEN FAD — Restauration COMPLÈTE de la base D1 (Cloudflare Time Travel)
+#
+# ⚠️⚠️ OPÉRATION MAJEURE — À UTILISER UNIQUEMENT EN DERNIER RECOURS ⚠️⚠️
+#
+# Restaure TOUTE la base greenfad-production à un instant choisi (30 derniers jours).
+# Tout ce qui a été ajouté ou modifié APRÈS cet instant est PERMANENTMENT PERDU.
+#
+# Cas d usage prévu : récupérer les articles / services / produits / albums de
+# galerie personnalises par le fondateur, effacés le 10/11/2026 à 23:14 UTC par
+# le rejeu automatique du seed éditorial. Recommandation : timestamp
+# « 2026-11-10T23:13:00Z » (juste avant le déploiement fautif — run CI
+# 42921578621). Vérifier avant de lancer qu aucun contenu important n a été
+# ajouté depuis : le retour à cet instant l effacerait.
+#
+# Après restauration : les migrations (0024, 0025…) sont automatiquement
+# réappliquées au prochain déploiement — elles sont gardées et idempotentes.
+# La restauration remplace aussi l album « Images restaurées » (créé après
+# l incident) par vos albums et titres d origine.
+#
+# Sécurité : taper RESTAURER dans le champ de confirmation. Toute autre valeur
+# entraîne un refus. La base est sauvegardée par Cloudflare avant restauration.
+name: Restaurer la base D1 (Time Travel — destructif)
+
+on:
+  workflow_dispatch:
+    inputs:
+      timestamp:
+        description: "Instant cible RFC3339 (recommandé : 2026-11-10T23:13:00Z)"
+        required: true
+        type: string
+      confirmation:
+        description: "Taper RESTAURER pour confirmer (tout contenu ajouté après l instant cible sera perdu)"
+        required: true
+        type: string
+
+concurrency:
+  group: greenfad-production
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    name: Time Travel restore greenfad-production
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    steps:
+      - name: Vérification de la confirmation
+        run: |
+          if [ "${{ inputs.confirmation }}" != "RESTAURER" ]; then
+            echo "❌ Confirmation absente ou incorrecte — exécution refusée."
+            exit 1
+          fi
+          echo "Confirmation reçue — restauration autorisée."
+
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: État AVANT restauration (inventaire des contenus)
+        run: |
+          npx wrangler d1 execute greenfad-production --remote \
+            --command "SELECT (SELECT COUNT(*) FROM posts) AS articles, (SELECT COUNT(*) FROM services) AS services, (SELECT COUNT(*) FROM products) AS produits, (SELECT COUNT(*) FROM media_items) AS items_galerie, (SELECT COUNT(*) FROM media_albums) AS albums, (SELECT COUNT(*) FROM media) AS fichiers" --json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Restauration Time Travel (prompt auto-confirmé via stdin)
+        run: |
+          yes | npx wrangler d1 time-travel restore greenfad-production --timestamp="${{ inputs.timestamp }}" --json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: État APRÈS restauration + purge des caches
+        run: |
+          npx wrangler d1 execute greenfad-production --remote \
+            --command "SELECT (SELECT COUNT(*) FROM posts) AS articles, (SELECT COUNT(*) FROM services) AS services, (SELECT COUNT(*) FROM products) AS produits, (SELECT COUNT(*) FROM media_items) AS items_galerie, (SELECT COUNT(*) FROM media_albums) AS albums" --json
+          for KEY in cache:settings cache:menus cache:footer_sections cache:redirects; do
+            npx wrangler kv key delete "$KEY" --namespace-id=4d8efa4efac74c7faae30dd533f86353 2>/dev/null || true
+          done
+          echo "Restauration terminée et caches purgés. Redéployer si besoin : les migrations réappliqueront 0024/0025 automatiquement."
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
