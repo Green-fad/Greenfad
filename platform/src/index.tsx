@@ -12,6 +12,26 @@ import { esc } from "./utils";
 
 const app = new Hono<{ Bindings: Env }>();
 
+// ---------- Redirections canoniques (SEO) : www → apex, slash final → sans slash ----------
+// Un seul hôte et une seule forme d'URL pour Google : https://greenfad.tech/…
+// - www.greenfad.tech → greenfad.tech (301) : s'active dès que « www » est relié au projet
+//   Pages (Paramètres → Domaines personnalisés) ; sans cela www renvoie une erreur 522 Cloudflare.
+// - /produits/tile/ → /produits/tile (301) : évite la duplication et les 404 de crawl.
+// GET/HEAD uniquement (une 301 sur un POST altérerait la méthode) ; ne touche pas les assets ni /media.
+app.on(["GET", "HEAD"], "*", async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.hostname.startsWith("www.")) {
+    url.hostname = url.hostname.slice(4);
+    return c.redirect(url.toString(), 301);
+  }
+  const p = url.pathname;
+  if (p.length > 1 && p.endsWith("/") && !p.startsWith("/admin") && !p.startsWith("/media/") && !p.startsWith("/assets/")) {
+    url.pathname = p.replace(/\/+$/, "");
+    return c.redirect(url.toString(), 301);
+  }
+  await next();
+});
+
 // ---------- Fichiers statiques (css/js/images/favicon) ----------
 // En mode Pages avancé (_worker.js), TOUTES les requêtes passent par le Worker.
 // Les fichiers statiques doivent être servis via le binding ASSETS — AVANT tout middleware.

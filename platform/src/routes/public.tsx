@@ -947,7 +947,7 @@ publicRoutes.get("/galerie", async (c) => {
       <span class="album__overlay"><h3>${esc(String(a.name))}</h3><p>${icon("image")} ${Number(a.n)} visuel${Number(a.n) > 1 ? "s" : ""}${a.description ? ` · ${esc(String(a.description).slice(0, 60))}` : ""}</p></span></a>`).join("")}</div></section>` : ""}
   ${videos.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">Vidéos</p><h2>Nos démonstrations & interventions</h2></header>
     <div class="video-grid reveal">${videos.map((v) => { const pv = parseVideo(String(v.source_url || "")); return `<a class="video-card" href="/galerie/video/${v.id}">
-      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
+      <span class="video-card__thumb">${pv.thumb ? `<img src="${esc(pv.thumb)}" alt="Miniature : ${esc(String(v.title))}" loading="lazy">` : `<span class="video-card__src">${esc(videoProviderLabel(pv.provider))}</span>`}<span class="video-card__play"><span>${icon("play")}</span></span></span>
       <span class="video-card__body"><h3>${esc(String(v.title))}</h3>${v.description ? `<p>${esc(String(v.description).slice(0, 120))}</p>` : ""}</span></a>`; }).join("")}</div>
     <p class="center" style="margin-top:1.8rem"><a class="btn btn--outline btn--sm" href="/videos">${icon("video", "i--inline")} Toutes les vidéos</a></p></section>` : ""}
   ${!albums.length && !videos.length ? `<section class="container center"><div class="form-card" style="max-width:560px">${icon("image-off")}<h2 style="margin-top:1rem">Galerie en préparation</h2><p class="muted">Aucun média publié pour le moment. Les premiers albums arrivent bientôt.</p></div></section>` : ""}`;
@@ -1247,7 +1247,7 @@ publicRoutes.get("/blog/:slug", async (c) => {
     </aside>
   </div></section>
   ${relatedFallback.length ? `<section class="container"><header class="sec-head sec-head--left reveal"><p class="eyebrow">À lire ensuite</p><h2>Articles liés</h2></header>
-    <div class="cards cards--3 reveal">${relatedFallback.map((o) => `<article class="card">${o.cover_key ? `<a class="card__media" href="/blog/${esc(String(o.slug))}"><img src="${esc(mediaSrc(String(o.cover_key)))}" alt="" loading="lazy"></a>` : ""}<div class="card__body">${kindBadge(String(o.kind))}<h3><a href="/blog/${esc(String(o.slug))}">${esc(String(o.title))}</a></h3><p>${esc(String(o.excerpt || ""))}</p><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
+    <div class="cards cards--3 reveal">${relatedFallback.map((o) => `<article class="card">${o.cover_key ? `<a class="card__media" href="/blog/${esc(String(o.slug))}"><img src="${esc(mediaSrc(String(o.cover_key)))}" alt="${esc(String(o.title))}" loading="lazy"></a>` : ""}<div class="card__body">${kindBadge(String(o.kind))}<h3><a href="/blog/${esc(String(o.slug))}">${esc(String(o.title))}</a></h3><p>${esc(String(o.excerpt || ""))}</p><span class="card__more">Lire ${icon("arrow-right")}</span></div></article>`).join("")}</div></section>` : ""}
   ${ctArticle ? ctaBandHTML(ctArticle) : ""}`;
   const jsonLd = [{
     "@context": "https://schema.org",
@@ -1559,7 +1559,8 @@ publicRoutes.post("/carrieres/:slug/apply", async (c) => {
 publicRoutes.get("/sitemap.xml", async (c) => {
   const base = String((await getSetting(c.env.DB, "site_url", c.env.SITE_URL)) as string);
   const [pages, posts, products, services, projects, countries, albums, press, jobs] = await Promise.all([
-    q(c.env.DB, "SELECT slug, updated_at FROM pages WHERE status = ?", PUBLIE),
+    // is_home = 0 : la page « accueil » sert la homepage sur « / » — /p/accueil n'existe pas (404), on ne la soumet jamais
+    q(c.env.DB, "SELECT slug, updated_at FROM pages WHERE status = ? AND is_home = 0", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM posts WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM products WHERE status = ?", PUBLIE),
     q(c.env.DB, "SELECT slug, updated_at FROM services WHERE status = ?", PUBLIE),
@@ -1582,8 +1583,9 @@ publicRoutes.get("/sitemap.xml", async (c) => {
     { loc: "/galerie", date: today, priority: "0.7" },
     { loc: "/videos", date: today, priority: "0.7" },
     ...albums.map((a) => ({ loc: `/galerie/album/${a.slug}`, date: String(a.updated_at).slice(0, 10), priority: "0.5" })),
+    // /blog/archives volontairement absente : page utilitaire noindex,nofollow — soumettre une URL noindex génère
+    // des erreurs « Submitted URL marked 'noindex' » dans Search Console
     { loc: "/blog", date: today, priority: "0.9" },
-    { loc: "/blog/archives", date: today, priority: "0.4" },
     ...posts.map((p) => ({ loc: `/blog/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.7" })),
     { loc: "/implantation", date: today, priority: "0.7" },
     ...countries.map((p) => ({ loc: `/implantation/${p.slug}`, date: String(p.updated_at).slice(0, 10), priority: "0.6" })),
