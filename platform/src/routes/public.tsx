@@ -1594,7 +1594,7 @@ publicRoutes.get("/contact", async (c) => {
   const body = `<section class="page-hero"><div class="page-hero__inner">${crumbsHTML([{ label: "Accueil", url: "/" }, { label: "Contact" }])}<p class="eyebrow">Contact</p>
     <h1>${heroTitleHTML(hero)}</h1>${hero.text ? `<p class="page-hero__text">${esc(hero.text)}</p>` : ""}</div></section>
   ${sent ? `<section class="container"><div class="form-card" id="merci"><div class="form-ok">${icon("check-circle")}<span><strong>Message bien reçu.</strong> Notre équipe revient vers vous très vite.</span></div><a class="btn btn--outline" href="/">Retour à l'accueil</a></div></section>` : ""}
-  <section class="container"><div class="split">
+  <section class="container"><div class="split split--contact">
     <div class="form-card"><h2>Nous écrire</h2>
       <form method="post" action="/contact" class="form-grid">
         <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
