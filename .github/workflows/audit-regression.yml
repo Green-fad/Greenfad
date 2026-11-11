@@ -1,0 +1,65 @@
+# GREEN FAD — Diagnostic de régression contenu (lecture seule)
+# Ne déploie rien : photographie l'état D1 des données écrasées par le
+# rejeu destructif du 10/11/2026 23:14 (content-update.sql, 536 requêtes).
+name: Diagnostic régression contenu (lecture seule)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diag:
+    name: État réel produits / projets / médias / audit_log
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Récupération du code source
+        uses: actions/checkout@v4
+
+      - name: Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: 1) Produits — captures et téléchargements réels présents ?
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, status, COALESCE(image_key,'∅') image, length(COALESCE(screenshots_json,'')) slen, substr(COALESCE(screenshots_json,'∅'),1,48) s40, length(COALESCE(downloads_json,'')) dlen, substr(COALESCE(downloads_json,'∅'),1,48) d40 FROM products ORDER BY sort_order"
+
+      - name: 2) Projets — images des fiches /realisations
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT slug, status, COALESCE(image_key,'∅') image, COALESCE(og_image,'∅') og, length(COALESCE(blocks,'')) blocks_len FROM projects ORDER BY sort_order"
+
+      - name: 3) Médiathèque — captures statiques enregistrées
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT COUNT(*) n FROM media WHERE r2_key LIKE '/assets/images/products/%'"
+
+      - name: 4) Médiathèque — répartition par dossier
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT folder, COUNT(*) n FROM media GROUP BY folder ORDER BY n DESC"
+
+      - name: 5) Albums de la galerie
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT id, slug, name, category, COALESCE(cover_key,'∅') cover, status FROM media_albums ORDER BY sort_order"
+
+      - name: 6) Éléments par album
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT a.slug, COUNT(mi.id) n FROM media_albums a LEFT JOIN media_items mi ON mi.album_id = a.id GROUP BY a.slug ORDER BY a.slug"
+
+      - name: 7) Réglages (bannière références, site…)
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT key, substr(value,1,110) v FROM settings ORDER BY key"
+
+      - name: 8) Relations contenus ↔ médias (galeries fiches)
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT content_type, COUNT(*) n FROM content_relations GROUP BY content_type"
+
+      - name: 9) Documents publics
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT COUNT(*) n FROM documents"
+
+      - name: 10) Patrimoine — jalons et versions produits
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT 'milestones' t, product_slug, COUNT(*) n FROM product_milestones GROUP BY product_slug UNION ALL SELECT 'versions' t, product_slug, COUNT(*) n FROM product_versions GROUP BY product_slug ORDER BY product_slug, t"
+
+      - name: 11) Articles par type
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT kind, status, COUNT(*) n FROM posts GROUP BY kind, status ORDER BY kind"
+
+      - name: 12) Journal d'audit admin — 60 dernières actions
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT id, action, entity, entity_id, substr(COALESCE(details,''),1,70) det, created_at FROM audit_log ORDER BY id DESC LIMIT 60"
