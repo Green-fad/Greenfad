@@ -76,6 +76,9 @@ export async function layout(c: Context<{ Bindings: Env }>, site: SiteData, seo:
   const url = new URL(c.req.url);
   const siteUrl = String(s.site_url || c.env.SITE_URL || "https://greenfad.tech");
   const canonical = `${siteUrl}${seo.canonicalPath || url.pathname}`;
+  // Version d'asset = SHA du déploiement : chaque commit invalide le cache navigateur
+  // des CSS/JS (fini le ?v=6 codé en dur qui gardait l'ancien style 4 h après un déploiement).
+  const assetV = String((c.env as unknown as { CF_PAGES_COMMIT_SHA?: string }).CF_PAGES_COMMIT_SHA || "dev").slice(0, 8);
   const ogImg = seo.ogImage || String(s.og_default_image || "");
 
   const jsonLd: (Record<string, unknown> | null)[] = [null];
@@ -146,7 +149,7 @@ ${jsonLdHTML}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=6">
+<link rel="stylesheet" href="/css/main.css?v=${assetV}">
 </head>
 <body>
 <a class="skip" href="#main">Aller au contenu</a>
@@ -195,6 +198,6 @@ ${body}
     <p><a href="/p/mentions-legales">Mentions légales</a> · <a href="/p/confidentialite">Confidentialité</a></p>
   </div>
 </footer>
-<script src="/js/site.js" defer></script>
+<script src="/js/site.js?v=${assetV}" defer></script>
 </body></html>`;
 }
