@@ -63,3 +63,6 @@ jobs:
 
       - name: 12) Journal d'audit admin — 60 dernières actions
         run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT id, action, entity, entity_id, substr(COALESCE(details,''),1,70) det, created_at FROM audit_log ORDER BY id DESC LIMIT 60"
+
+      - name: 13) Journal d'audit — toutes les actions sur projects
+        run: npx wrangler d1 execute greenfad-production --remote --json --command "SELECT id, action, entity_id, substr(COALESCE(details,''),1,100) det, created_at FROM audit_log WHERE entity = 'projects' ORDER BY id DESC LIMIT 40"
