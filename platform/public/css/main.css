@@ -497,6 +497,11 @@ html:not(.js) .reveal{opacity:1;transform:none} /* sans JS (robots, chargement l
 .blog-search input:focus{outline:none;border-color:var(--teal-400);background:rgba(255,255,255,.13);box-shadow:0 0 0 4px rgba(124,196,204,.14)}
 .filters--scroll{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;scrollbar-width:thin;margin-bottom:2.2rem}
 .filters__spacer{flex:none;width:auto;margin-left:auto}
+/* Desktop : la barre de filtres passe à la ligne au lieu de débordement horizontal (visible à 1366px) */
+@media (min-width:761px){
+  .filters--scroll{flex-wrap:wrap;overflow-x:visible;justify-content:center}
+  .filters--scroll .filters__spacer{display:none}
+}
 .filters__aux{border-style:dashed!important;color:var(--teal-700)!important;background:var(--teal-fog)!important;white-space:nowrap}
 .blog-featured{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:34px;box-shadow:var(--sh);transition:.25s;color:inherit}
 .blog-featured:hover{transform:translateY(-3px);box-shadow:var(--sh-lg);color:inherit;border-color:rgba(70,146,155,.35)}
